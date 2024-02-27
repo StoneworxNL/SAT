@@ -14,7 +14,7 @@ commander
     .requiredOption('-d, --documentName <document>', 'Qualified name of document to analyse.')
     .requiredOption('-a, --appid <appid>', 'AppID of the mendix project')
     .requiredOption('-b, --branch <branch name>', 'Branch of the mendix project')
-    .requiredOption('-m, --module <module name', 'Analysis module to use: SD=sequence Diagram,')
+    .requiredOption('-m, --module <module name', 'Analysis module to use: SD=sequence Diagram, MQ=MicroflowQuality')
     .option('-e, --excludes [exclude....]', 'Modules to exclude from analysis', commaSeparatedList)
     .option('-p, --prefixes [prefix...]', 'Prefixes to aggregate as one', commaSeparatedList)
     .parse();
