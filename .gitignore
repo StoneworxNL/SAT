@@ -1,0 +1,8 @@
+node_modules/
+.vscode/
+DIJK*
+*.workingcopy
+*.txt
+*.png
+*.cmd
+*.svg
