@@ -22,7 +22,7 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
         this.microflows = this.findAllMicroflows();
         var promises = [];
         this.microflows.forEach((microflowIF) => {
-            
+
             promises.push(new Promise((resolve, reject) => {
                 let moduleName = this.getModuleName(microflowIF);
                 let excludeThis = false;
@@ -92,7 +92,10 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
                 this.entities.push(...domainModel.entities);
             })
             Object.keys(this.hierarchy).forEach((microflow) => {
-                this.namingConvention(microflow);
+                if (microflow && microflow != 'undefined') {
+                    this.namingConvention(microflow);
+                    this.illegalShowPage(microflow);        
+                }
             })
         })
     }
@@ -117,18 +120,51 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
             let entityForMF = this.entities.find((entity) => {
                 let entityModule = this.getModuleName(entity);
                 let entityName = this.getDocumentName(entity);
-                return (entityName == mfEntityName || entityName+'s' == mfEntityName);
+                return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName);
             })
             if (entityForMF) {
                 let entityModule = this.getModuleName(entityForMF);
                 let entityName = this.getDocumentName(entityForMF);
                 if (entityModule != moduleName) {
-                    errors.push("NC4: MF not in correct module");    
+                    errors.push("NC4: MF not in correct module");
                 }
 
             } else {
                 errors.push("NC3: MF without existing entity name");
             }
+        }
+        if (errors.length > 0) {
+            console.log(microflow + ": " + errors);
+        }
+    }
+
+    illegalShowPage = function (microflow) {
+        // IP1: Show Page action outside of ACT
+        // IP2: Close Page action outside of ACT
+        let allowedPrefixes = ['ACT'];
+        let [moduleName, microflowName] = microflow.split('.');
+        let mfNameParts = microflowName.split('_');
+        let errors = [];
+
+        if (mfNameParts.length < 2) { //No Prefix, should be reported in naming conventions
+        } else {
+            let mfPrefix = mfNameParts[0];
+            if (mfPrefix != 'ACT') {
+                let mfActions = this.hierarchy[microflow];
+                let showPage = mfActions.find((action) => {
+                    return action == 'Microflows$ShowPageAction'
+                })
+                if (showPage) {
+                    errors.push("IP1: Show Page action outside of ACT");
+                }
+                let closePage = mfActions.find((action) => {
+                    return (action == 'Microflows$CloseFormAction')
+                })
+                if (closePage) {
+                    errors.push("IP2: Close Page action outside of ACT");
+                }
+            }
+
         }
         if (errors.length > 0) {
             console.log(microflow + ": " + errors);
