@@ -4,6 +4,7 @@ const fs = require("fs");
 
 const { program: commander } = require('commander');
 var wc = require('./mxworkingcopy');
+const { OnlineWorkingCopy } = require("mendixplatformsdk");
 
 // Usage: node app.js --help for help
 
@@ -55,14 +56,18 @@ function main() {
     const AnalysisModule = require(module);
     
     outFileName = nickname + '_analysis.txt';
-    let analysis = new AnalysisModule(excludes, prefixes, outFileName);
+    let analysis = new AnalysisModule(appID,excludes, prefixes, outFileName);
+
     wc.loadWorkingCopy(appID, nickname, branch).then((model) => {
-        analysis.analyse(model, documentName).then(() => {
+        analysis.collect(model, documentName).then(() => {
             fs.writeFile(outFileName, '', function (err) {
                 if (err) throw err;
                 console.log('File is created successfully.');
             });
-            analysis.report();
+            analysis.analyse().then(()=>{
+                analysis.report();  
+                console.log("READY");
+            }).catch((e)=>{console.log(e)});
         });
     });
 }

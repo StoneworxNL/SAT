@@ -7,7 +7,8 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         this.microflows_by_name;
     }
     
-    analyse = function(model, microflowname) {
+    collect = function(model, microflowname) {
+        console.log("COLLECT");
         this.model = model;
         if (!this.model || !microflowname) {
             return
@@ -45,7 +46,16 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         })
     }
 
+    analyse = function(){
+        console.log("ANALYSE");
+        return new Promise((resolve, reject) => {
+            resolve();
+        })
+    }
+
     report = function () {
+        console.log("REPORT");
+        console.log(JSON.stringify(this.hierarchy, null ,2));
         let participants = {};
         let calls = [];
         let excludeModule;

@@ -1,9 +1,11 @@
 
 module.exports = class AnalysisModule {
-    constructor(excludes, prefixes, outFileName) {
+    constructor(appID,excludes, prefixes, outFileName) {
         this.model;
         this.hierarchy = {};
+        this.reports = [];
         this.complexity = {};
+        this.appID = appID;
         this.excludes = excludes;
         this.prefixes = prefixes;
         this.outFileName = outFileName;
@@ -40,6 +42,14 @@ module.exports = class AnalysisModule {
 
     }
 
+    nameParts (qualifiedMicroflowName){
+        if (qualifiedMicroflowName){
+            let [moduleName, microflowName] = qualifiedMicroflowName.split('.');
+            let mfNameParts = microflowName.split('_');
+            let mfPrefix = mfNameParts[0];
+            return [moduleName, microflowName, mfPrefix];
+        }  else return [];
+    }
 
     filterMarketplace(){
         this.model.allModules()

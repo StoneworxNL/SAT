@@ -2,7 +2,7 @@ const mendixplatformsdk_1 = require("mendixplatformsdk");
 const fs = require("fs");
 
 exports.loadWorkingCopy = function (appID, nickname, branch) {
-    workingCopyFile = nickname + '.workingcopy';
+    workingCopyFile = nickname + '.workingcopy'; //beetje ugly: global variabele keertje fixen
     return new Promise((resolve, reject) => {
         const client = new mendixplatformsdk_1.MendixPlatformClient();
         readWorkingCopyFile(appID,workingCopyFile, branch);
@@ -12,6 +12,19 @@ exports.loadWorkingCopy = function (appID, nickname, branch) {
         });
 
     })
+};
+
+exports.commitWorkingCopy = async function(appID, model){
+    let token = process.env.MENDIX_TOKEN;
+    mendixplatformsdk_1.setPlatformConfig({mendixToken: token});
+    mendixplatformsdk_1.enableLogger();
+    const client = new mendixplatformsdk_1.MendixPlatformClient();
+    
+    await model.flushChanges(async function(){
+        let app = client.getApp(appID);
+        let wc  = app.getOnlineWorkingCopy(model.workingCopy.id);
+        await wc.commitToRepository("NoSessionStatus", { commitMessage: "SAT check run" });
+    });
 };
 
 function readWorkingCopyFile(appID, workingCopyFile, branch) {

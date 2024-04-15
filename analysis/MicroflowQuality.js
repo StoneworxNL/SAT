@@ -1,7 +1,8 @@
 const fs = require("fs");
 const AnalysisModule = require("./AnalysisModule");
 const { resolve } = require("path");
-const { domainmodels } = require("mendixmodelsdk");
+const { microflows, Annotation, JavaScriptSerializer } = require("mendixmodelsdk");
+var wc = require('../mxworkingcopy');
 
 module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
@@ -10,7 +11,7 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
         this.entities = [];
     }
 
-    analyse = function (model, microflowname) {
+    collect = function (model, microflowname) {
         this.model = model;
         this.filterMarketplace();
         if (!this.model || !microflowname) {
@@ -30,10 +31,9 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
                     excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
                 }
                 if (!excludeThis) {
-                    //console.log("GO Parse: " + microflowIF.qualifiedName);
                     microflowIF.load().then((microflow) => {
-                        var nestedMicroflows = this.parseMicroflow(microflow);
-                        resolve(nestedMicroflows);
+                        this.parseMicroflow(microflow);
+                        resolve();
                     });
                 } else { resolve() };
             }))
@@ -44,40 +44,67 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
     }
 
     parseMicroflow = function (mf, parentMF) {
-        var nestedMicroflows = [];
+        // if (mf.name == 'SUB_Test_illegal_close'){
+        //     console.log("PARSING IT");
+        //     console.log(JavaScriptSerializer.serializeToJs(mf));
+        // }
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
         mfObjects.forEach((obj) => {
             let json = obj.toJSON();
             if (json['$Type'] === 'Microflows$LoopedActivity') {
-                let nestedFromThis = this.parseMicroflow(obj, mf);
-                nestedMicroflows.push(...nestedFromThis);
+                this.parseMicroflow(obj, mf);
             }
             else if (json['$Type'] === 'Microflows$ActionActivity') {
                 let action_type = json['action']['$Type'];
-                this.updateHierarchy(mf.qualifiedName, action_type, parentMF);
+                let subMF = null;
+                if (json['action']['$Type'] === 'Microflows$MicroflowCallAction') {
+                    subMF = json['action']['microflowCall']['microflow'];
+                }
+                this.updateHierarchy(mf, action_type, parentMF, subMF);
             } else if (json['$Type'] === 'Microflows$StartEvent') {
                 let action_type = 'StartEvent';
-                this.updateHierarchy(mf.qualifiedName, action_type, parentMF);
+                this.updateHierarchy(mf, action_type, parentMF);
             } else if (json['$Type'] === 'Microflows$EndEvent') {
                 let action_type = 'EndEvent';
-                this.updateHierarchy(mf.qualifiedName, action_type, parentMF);
+                this.updateHierarchy(mf, action_type, parentMF);
             }
         });
-        return nestedMicroflows;
     }
 
-    updateHierarchy = function (caller, action, parent) {
-        if (!caller && parent && parent.name) { caller = parent.qualifiedName };
-        let actions = this.hierarchy[caller];
-        let hit;
+    updateHierarchy = function (microflow, action, parentMicroflow, subMF) {
+        let microflowName = '';
+        let actions; let subMFs;
+        if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) {
+            microflowName = parentMicroflow.qualifiedName
+        } else { microflowName = microflow.qualifiedName };
+        let microflowData = this.hierarchy[microflowName];
+        if (microflowData) {
+            actions = microflowData.actions;
+            subMFs = microflowData.subMFs;
+        } else {
+            if (!this.hierarchy[microflowName]){
+                let mfToAdd = microflow;
+                if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) {
+                    mfToAdd = parentMicroflow;
+                }
+                this.hierarchy[microflowName] = { mf: mfToAdd };
+            }
+        }
         if (actions) {
             actions.push(action);
         } else {
-            this.hierarchy[caller] = [action];
+            this.hierarchy[microflowName].actions = [action];
+        }
+        if (subMF && subMFs) {
+            subMFs.push(subMF);
+        } else {
+            if (subMF) {
+                this.hierarchy[microflowName].subMFs = [subMF];
+            }
         }
     }
 
-    report = function () {
+    analyse = function () {
         console.log("REPORT==============================");
         //console.log(JSON.stringify(this.hierarchy, null, 2));
         let dms = this.model.allDomainModels();
@@ -87,17 +114,50 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
             let dmPromise = dm.load();
             dmPromises.push(dmPromise);
         })
-        Promise.all(dmPromises).then((domainModels) => {
+        return Promise.all(dmPromises).then((domainModels) => {
             domainModels.forEach(domainModel => {
                 this.entities.push(...domainModel.entities);
             })
             Object.keys(this.hierarchy).forEach((microflow) => {
                 if (microflow && microflow != 'undefined') {
-                    this.namingConvention(microflow);
-                    this.illegalShowPage(microflow);        
+                    let reports = this.reports;
+                    let errors = this.namingConvention(microflow);
+                    if (errors && errors.length > 0) {
+                        let mf = this.hierarchy[microflow];
+                        reports.push({ microflow: mf.mf, errors: errors });
+                    }
+                    errors = this.illegalShowPage(microflow);
+                    if (errors && errors.length > 0) {
+                        let mf = this.hierarchy[microflow];
+                        reports.push({ microflow: mf.mf, errors: errors });
+                    }
+                    errors = this.illegalCommit(microflow);
+                    if (errors && errors.length > 0) {
+                        let mf = this.hierarchy[microflow];
+                        reports.push({ microflow: mf.mf, errors: errors });
+                    }
+
                 }
             })
+            resolve();
         })
+    }
+
+    report = function () {
+        let reports = this.reports;
+        reports.forEach(item => {
+            let theMicroflow = item.microflow;
+            console.log(theMicroflow.qualifiedName + ' ' + item.errors);
+            let annotation = microflows.Annotation.create(this.model);
+            annotation.relativeMiddlePoint = { "x": 227, "y": 72 };
+            annotation.size = { "width": 230, "height": 50 };
+            annotation.caption = item.errors;
+            let collection = microflows.MicroflowObjectCollection.create(this.model);
+            collection.objects.push(annotation);
+        })
+        //console.log(JSON.stringify(this.hierarchy, null , 2));
+        //        this.model.flushChanges();
+        //       wc.commitWorkingCopy(this.appID, this.model);
     }
 
     namingConvention = function (microflow) {
@@ -105,7 +165,7 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
         // NC2: Prefix must be allowed
         // NC3: entity must exist 
         // NC4: entity must exist in same module
-        let allowedPrefixes = ['ACT', 'SUB', 'CRS', 'SCH', 'RET', 'CTL', 'TRN', 'OPR', 'VAL', 'FNC'];
+        let allowedPrefixes = ['ACT', 'SUB', 'CRS', 'SCH', 'OCH', 'DS', 'VAL', 'RET', 'CTL', 'TRN', 'OPR', 'FNC'];
         let [moduleName, microflowName] = microflow.split('.');
         let mfNameParts = microflowName.split('_');
         let errors = [];
@@ -133,24 +193,20 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
                 errors.push("NC3: MF without existing entity name");
             }
         }
-        if (errors.length > 0) {
-            console.log(microflow + ": " + errors);
-        }
+        return errors;
     }
 
     illegalShowPage = function (microflow) {
         // IP1: Show Page action outside of ACT
         // IP2: Close Page action outside of ACT
         let allowedPrefixes = ['ACT'];
-        let [moduleName, microflowName] = microflow.split('.');
-        let mfNameParts = microflowName.split('_');
         let errors = [];
+        let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
 
-        if (mfNameParts.length < 2) { //No Prefix, should be reported in naming conventions
-        } else {
-            let mfPrefix = mfNameParts[0];
-            if (mfPrefix != 'ACT') {
-                let mfActions = this.hierarchy[microflow];
+        if (!mfPrefix) { //No Prefix, should be reported in naming conventions
+        } else {            
+            if (!allowedPrefixes.includes(mfPrefix)) {
+                let mfActions = this.hierarchy[microflow].actions;
                 let showPage = mfActions.find((action) => {
                     return action == 'Microflows$ShowPageAction'
                 })
@@ -166,8 +222,45 @@ module.exports = class AnalysisSequenceDiagram extends AnalysisModule {
             }
 
         }
-        if (errors.length > 0) {
-            console.log(microflow + ": " + errors);
-        }
+        return errors;
+        // if (errors.length > 0) {
+        //     console.log(microflow + ": " + errors.join(':'));
+        // }
     }
+
+    illegalCommit = function (microflow) {
+        let mfActions = this.hierarchy[microflow].actions;
+        let allowedPrefixes = ['ACT'];
+        let errors = [];
+        let commit = mfActions.find((action) => {
+            return action == 'Microflows$CommitAction'
+        })
+        if (commit) {
+            let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
+
+            if (!allowedPrefixes.includes(mfPrefix)) {  //if commit not in ACT: is must be in SUB that is called from ACT only
+                let allMFs = Object.keys(this.hierarchy);
+                let subMFName = allMFs.find((mfName)=> {
+                    let mfData = this.hierarchy[mfName];
+                    let subMFs = mfData.subMFs;
+                    if (subMFs){
+                        let callingMF = subMFs.find((subMF) => {
+                            return subMF === microflow}
+                        );
+                        return callingMF != null;
+                    } else return false;
+                })
+                if (subMFName){
+                    let [subModule, subMF, subMFPrefix] = this.nameParts(subMFName);
+                    if (subMFPrefix !== 'ACT'){
+                        //console.log(`${microflow} called from ${subMFName}`);
+                        errors.push("CM1: Commit not on correct hierarchy level (ACT or one level down)");
+                    }                   
+                }
+            }
+        }
+        return errors;
+    }
+
+    
 }
