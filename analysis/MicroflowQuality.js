@@ -120,6 +120,7 @@
                         this.executeCheck(this.illegalShowPage.bind(this), microflow);
                         this.executeCheck(this.illegalCommit.bind(this), microflow);
                         this.executeCheck(this.missingPermissions.bind(this), microflow);
+                        this.executeCheck(this.errorHandling.bind(this), microflow);                        
                     }
                 })
                 resolve();
@@ -216,9 +217,9 @@
         }
 
         illegalCommit = function (microflow) {
-            let mfActions = this.hierarchy[microflow].actions;
             let allowedPrefixes = ['ACT'];
             let errors = [];
+            let mfActions = this.hierarchy[microflow].actions;
             let commit = mfActions.find((action) => {
                 return action == 'Microflows$CommitAction'
             })
@@ -267,5 +268,31 @@
 
             }
             return errors;
+        }
+
+        errorHandling = function (microflow) {
+            // EH1: Java Action without custom error handling
+            let errors = [];
+            let mfActions = this.hierarchy[microflow].actions;
+            let java = mfActions.find((action) => {
+                return action == 'Microflows$JavaActionCallAction'
+            })
+            if (java) {
+                let mf = this.hierarchy[microflow].mf;
+                let mfObjects = mf.objectCollection.objects;
+                mfObjects.forEach((mfObject)=>{
+                    if (mfObject.structureTypeName ==='Microflows$ActionActivity'){
+                        let json = mfObject.toJSON();
+                        if (json.action.$Type==='Microflows$JavaActionCallAction'){
+                            let errorHandling = json.action.errorHandlingType;
+                            if (!(errorHandling.startsWith('Custom'))){
+                                errors.push("EH1: Java Action without Custom error handling");
+                            }
+
+                        }
+                    }
+                })
+            }
+            return errors;        
         }
     }
