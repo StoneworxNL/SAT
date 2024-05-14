@@ -65,7 +65,7 @@ function main() {
                 console.log('File is created successfully.');
             });
             analysis.analyse().then(()=>{
-                analysis.report();  
+                analysis.report(nickname);  
                 console.log("READY");
             }).catch((e)=>{console.log(e)});
         });

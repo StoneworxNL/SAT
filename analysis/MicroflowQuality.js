@@ -13,9 +13,9 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.cxMaxActions = 25;
         this.cxMaxComplexity = 30;
         this.cxLoopCount = 4;
-        this.cxExclusiveSplit = 5 ;
+        this.cxExclusiveSplit = 5;
         this.cxObjectAction = 2;
-        this.cxVariableAction = 1;        
+        this.cxVariableAction = 1;
         this.cxMaxObjectExpression = 3;
         this.cxMaxVariableExpression = 5;
 
@@ -74,27 +74,31 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
         mfObjects.forEach((obj) => {
             let json = obj.toJSON();
+            if (json['$Type']==='Microflows$Annotation'){
+                //console.log(json['caption']);
+                //Could store annotations on the microflow hierarchy, to check whether error codes have been handled.
+            }
             if (json['$Type'] === 'Microflows$LoopedActivity') {
                 let action_type = 'LoopAction';
                 this.updateHierarchy(parentMF || mf, action_type, parentMF);
                 this.parseMicroflow(obj, parentMF || mf);
-            }
+            }            
             else if (json['$Type'] === 'Microflows$ActionActivity') {
                 let action_type = json['action']['$Type'];
                 let subMF = null;
                 if (action_type === 'Microflows$MicroflowCallAction') {
                     subMF = json['action']['microflowCall']['microflow'];
                 } else if (action_type === 'Microflows$CreateVariableAction') {
-                    action_type += '_'+this.checkExpressionComplexity(json['action']['initialValue']);
+                    action_type += '_' + this.checkExpressionComplexity(json['action']['initialValue']);
                 } else if (action_type === 'Microflows$ChangeVariableAction') {
-                    action_type += '_'+this.checkExpressionComplexity(json['action'][['value']]);
+                    action_type += '_' + this.checkExpressionComplexity(json['action'][['value']]);
                 } else if (action_type === 'Microflows$CreateObjectAction' || action_type === 'Microflows$ChangeObjectAction') {
                     let maxCount = 0;
-                    json['action']['items'].forEach((item)=>{
+                    json['action']['items'].forEach((item) => {
                         let count = this.checkExpressionComplexity(item['value']);
-                        if (count>maxCount){maxCount=count};
+                        if (count > maxCount) { maxCount = count };
                     })
-                    action_type += '_'+ maxCount;
+                    action_type += '_' + maxCount;
                 }
                 this.updateHierarchy(mf, action_type, parentMF, subMF);
             } else if (json['$Type'] === 'Microflows$StartEvent') {
@@ -106,7 +110,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
                 let action_type = 'ExclusiveSplit';
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
-                action_type += '_'+this.checkExpressionComplexity(condition);
+                action_type += '_' + this.checkExpressionComplexity(condition);
                 this.updateHierarchy(mf, action_type, parentMF);
             }
         });
@@ -190,12 +194,28 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         }
 
     }
-    report = function () {
+
+    report = function (fName) {
         let reports = this.reports;
+        if (fName) {
+            try {
+                fs.writeFileSync(fName + '_analysis.csv', '');
+            } catch (err) {
+                console.error(err);
+            }
+        }
         reports.forEach(item => {
             let theMicroflow = item.microflow;
             item.errors.forEach((err) => {
-                console.log(theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]);
+                if (fName) {
+                    try {
+                        fs.appendFileSync(fName + '_analysis.csv', theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]+'\n');
+                    } catch (err) {
+                        console.error(err);
+                    }
+                } else {
+                    console.log(theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]);
+                }
             })
         })
 
@@ -367,23 +387,24 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 complexity += this.cxExclusiveSplit;
             } else if (mfAction.startsWith('Microflows$CreateObjectAction') || mfAction.startsWith('Microflows$ChangeObjectAction')) {
                 complexity += this.cxObjectAction;
-                let parts=mfAction.split('_');
+                let parts = mfAction.split('_');
                 let expressionCX = parts[1];
-                if (expressionCX > this.cxMaxObjectExpression){
-                    errors.push("CX3");        
+                if (expressionCX > this.cxMaxObjectExpression) {
+                    errors.push("CX3");
                 }
             } else if (mfAction.startsWith('Microflows$CreateVariableAction') || mfAction.startsWith('Microflows$ChangeVariableAction')) {
                 complexity += this.cxVariableAction;
-                let parts=mfAction.split('_');
+                let parts = mfAction.split('_');
                 let expressionCX = parts[1];
-                if (expressionCX > this.cxMaxVariableExpression){
-                    errors.push("CX4");        
+                if (expressionCX > this.cxMaxVariableExpression) {
+                    errors.push("CX4");
                 }
             } else {
-                complexity++ }
-           }
+                complexity++
+            }
+        }
         )
-        if (complexity > this.cxMaxComplexity ) {
+        if (complexity > this.cxMaxComplexity) {
             errors.push("CX2");
         }
 
