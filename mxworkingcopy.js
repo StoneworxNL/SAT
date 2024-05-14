@@ -6,24 +6,28 @@ exports.loadWorkingCopy = function (appID, nickname, branch) {
     return new Promise((resolve, reject) => {
         const client = new mendixplatformsdk_1.MendixPlatformClient();
         readWorkingCopyFile(appID,workingCopyFile, branch);
+        console.log(`GET APP: ${appID}-${branch}`);
         app = client.getApp(appID);
-        loadModel(app, appID, branch).then((model) => {
-            resolve(model);
+        console.log(`LOADING: ${appID}-${branch}`);
+        loadModel(app, appID, branch).then(([model, workingCopy]) => {
+            resolve([model, workingCopy]);
         });
 
     })
 };
 
-exports.commitWorkingCopy = async function(appID, model){
+exports.commitWorkingCopy = async function(branch, workingCopy, model){
     let token = process.env.MENDIX_TOKEN;
     mendixplatformsdk_1.setPlatformConfig({mendixToken: token});
     mendixplatformsdk_1.enableLogger();
     const client = new mendixplatformsdk_1.MendixPlatformClient();
-    
     await model.flushChanges(async function(){
-        let app = client.getApp(appID);
-        let wc  = app.getOnlineWorkingCopy(model.workingCopy.id);
-        await wc.commitToRepository("NoSessionStatus", { commitMessage: "SAT check run" });
+        console.log('Commit: '+branch);
+        try {
+            await workingCopy.commitToRepository(branch, { commitMessage: "SAT check run" });
+        } catch (e) {
+            console.error(e);
+        }
     });
 };
 
@@ -45,6 +49,7 @@ function readWorkingCopyFile(appID, workingCopyFile, branch) {
 }
 
 function loadModel(app, appID, branch) {
+    let workingCopy;
     return new Promise((resolve, reject) => {
         if (wcID != "") {
             try {
@@ -52,7 +57,7 @@ function loadModel(app, appID, branch) {
                 workingCopy = app.getOnlineWorkingCopy(wcID);
                 workingCopy.openModel().then((model) => {
                     console.log("Resolve existing model");
-                    resolve(model);
+                    resolve([model, workingCopy]);
                 });
             }
             catch (e) {
@@ -61,34 +66,18 @@ function loadModel(app, appID, branch) {
             }
         }
         if (wcID === "") {
-            const repository = app.getRepository();
+            let repository = app.getRepository();
             console.log("Download workingcopy");
-            if ((branch === "") || (branch === "trunk") || (branch === "main")) {
-                repository.getInfo((repositoryInfo) => {
-                    if (repositoryInfo.type === "svn")
-                        resolve("trunk");
-                    else
-                        resolve("main");
-                }).then((branch) => {
-                    app.createTemporaryWorkingCopy(branch).then((workingCopy) => {
-                        wcID = workingCopy.workingCopyId;
-                        fs.writeFileSync(workingCopyFile, `${appID}:${useBranch}:${wcID}`);
-                        workingCopy.openModel().then((model) => {
-                            console.log("Resolve downloaded model for main/trunk");
-                            resolve(model);
-                        });
-                    });
-                })
-            } else {
+            
                 app.createTemporaryWorkingCopy(branch).then((workingCopy) => {
                     wcID = workingCopy.workingCopyId;
                     fs.writeFileSync(workingCopyFile, `${appID}:${branch}:${wcID}`);
                     workingCopy.openModel().then((model) => {
                         console.log("Resolve downloaded model for " + branch);
-                        resolve(model);
+                        resolve([model, workingCopy]);
                     });
                 });
-            }
+            
         }
     });
 }

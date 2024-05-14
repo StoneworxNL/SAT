@@ -2,6 +2,7 @@
 module.exports = class AnalysisModule {
     constructor(appID,excludes, prefixes, outFileName) {
         this.model;
+        this.branch;
         this.hierarchy = {};
         this.reports = [];
         this.complexity = {};
@@ -52,8 +53,13 @@ module.exports = class AnalysisModule {
     }
 
     filterMarketplace(){
+        if (!this.excludes) {this.excludes = []};
         this.model.allModules()
         .filter(module => module.fromAppStore === true)
-        .forEach(module => this.excludes.push(module.name));
+        .forEach(module => {
+            if (this.excludes){
+                this.excludes.push(module.name);
+            }
+        });
     }
 }

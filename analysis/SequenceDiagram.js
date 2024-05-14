@@ -7,9 +7,10 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         this.microflows_by_name;
     }
     
-    collect = function(model, microflowname) {
+    collect = function(model, branch, microflowname) {
         console.log("COLLECT");
         this.model = model;
+        this.branch = branch;
         if (!this.model || !microflowname) {
             return
         }

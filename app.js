@@ -58,8 +58,8 @@ function main() {
     outFileName = nickname + '_analysis.txt';
     let analysis = new AnalysisModule(appID,excludes, prefixes, outFileName);
 
-    wc.loadWorkingCopy(appID, nickname, branch).then((model) => {
-        analysis.collect(model, documentName).then(() => {
+    wc.loadWorkingCopy(appID, nickname, branch).then(([model, workingCopy]) => {        
+        analysis.collect(model, branch, workingCopy, documentName).then(() => {
             fs.writeFile(outFileName, '', function (err) {
                 if (err) throw err;
                 console.log('File is created successfully.');
