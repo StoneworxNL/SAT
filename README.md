@@ -3,6 +3,7 @@ Tool for analysis and some documentation of Mendix apps.
 **Implemented features**
 * Generate Sequence Diagram from a (top) Microflow
 * Analyse (some) coding quality rules on Microflows:
+  
             NC1: format: [PRE]_[Entity(s)]_description
             NC2: Prefix must be allowed
             NC3: entity must exist
