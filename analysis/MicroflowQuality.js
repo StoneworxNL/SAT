@@ -229,7 +229,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         // NC2: Prefix must be allowed
         // NC3: entity must exist 
         // NC4: entity must exist in same module
-        let allowedPrefixes = ['ACT', 'SUB', 'CRS', 'SCH', 'OCH', 'DS', 'VAL', 'RET', 'CTL', 'TRN', 'OPR', 'FNC'];
+        let allowedPrefixes = ['ACT', 'SUB', 'CRS', 'SCH', 'OCH', 'DS', 'VAL', 'RET', 'CTL', 'TRN', 'OPR', 'FNC', 'ASU', 'SE', 'CWS', 'PWS', 'PRS', 'CWS', 'QUE', 'QUEUE'];
         let [moduleName, microflowName] = microflow.split('.');
         let mfNameParts = microflowName.split('_');
         let errors = [];
