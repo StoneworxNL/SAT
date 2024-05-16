@@ -55,15 +55,10 @@ function main() {
     }
     const AnalysisModule = require(module);
     
-    outFileName = nickname + '_analysis.txt';
-    let analysis = new AnalysisModule(appID,excludes, prefixes, outFileName);
+    let analysis = new AnalysisModule(appID,excludes, prefixes);
 
     wc.loadWorkingCopy(appID, nickname, branch).then(([model, workingCopy]) => {        
         analysis.collect(model, branch, workingCopy, documentName).then(() => {
-            fs.writeFile(outFileName, '', function (err) {
-                if (err) throw err;
-                console.log('File is created successfully.');
-            });
             analysis.analyse().then(()=>{
                 analysis.report(nickname);  
                 console.log("READY");

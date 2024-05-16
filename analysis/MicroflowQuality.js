@@ -1,7 +1,7 @@
 const fs = require("fs");
 const AnalysisModule = require("./AnalysisModule");
 const { resolve } = require("path");
-const { microflows, Annotation, JavaScriptSerializer } = require("mendixmodelsdk");
+const { microflows, Annotation, JavaScriptSerializer, xmlschemas } = require("mendixmodelsdk");
 var wc = require('../mxworkingcopy');
 const exp = require("constants");
 
@@ -32,7 +32,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             "CX1": "Too many actions in a single microflow",
             "CX2": "Too complex microflow",
             "CX3": "Too complex expression in Create/ Change Object",
-            "CX4": "Too complex expression in Create / Change Variable"
+            "CX4": "Too complex expression in Create / Change Variable",
+            "MC1": "Missing caption for Exclusive split"
         }
     }
 
@@ -86,21 +87,20 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             else if (json['$Type'] === 'Microflows$ActionActivity') {
                 let action_type = json['action']['$Type'];
                 let subMF = null;
+                let complexity = 0;
                 if (action_type === 'Microflows$MicroflowCallAction') {
                     subMF = json['action']['microflowCall']['microflow'];
                 } else if (action_type === 'Microflows$CreateVariableAction') {
-                    action_type += '_' + this.checkExpressionComplexity(json['action']['initialValue']);
+                    complexity = this.checkExpressionComplexity(json['action']['initialValue']);
                 } else if (action_type === 'Microflows$ChangeVariableAction') {
-                    action_type += '_' + this.checkExpressionComplexity(json['action'][['value']]);
+                    complexity = this.checkExpressionComplexity(json['action']['value']);
                 } else if (action_type === 'Microflows$CreateObjectAction' || action_type === 'Microflows$ChangeObjectAction') {
-                    let maxCount = 0;
                     json['action']['items'].forEach((item) => {
                         let count = this.checkExpressionComplexity(item['value']);
-                        if (count > maxCount) { maxCount = count };
-                    })
-                    action_type += '_' + maxCount;
+                        if (count > complexity) { complexity = count };
+                    })  
                 }
-                this.updateHierarchy(mf, action_type, parentMF, subMF);
+                this.updateHierarchy(mf, action_type, parentMF, subMF, {'complexity': complexity});
             } else if (json['$Type'] === 'Microflows$StartEvent') {
                 let action_type = 'StartEvent';
                 this.updateHierarchy(mf, action_type, parentMF);
@@ -110,8 +110,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
                 let action_type = 'ExclusiveSplit';
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
-                action_type += '_' + this.checkExpressionComplexity(condition);
-                this.updateHierarchy(mf, action_type, parentMF);
+                let complexity = this.checkExpressionComplexity(condition);
+                this.updateHierarchy(mf, action_type, parentMF, null, {'caption': json['caption'], 'complexity': complexity});
             }
         });
     }
@@ -126,17 +126,17 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         return result;
     }
 
-    updateHierarchy = function (microflow, action, parentMicroflow, subMF) {
+    updateHierarchy = function (microflow, action, parentMicroflow, subMF, data) {
         let microflowName = '';
         let actions; let subMFs;
-        if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) {
+        if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) { //working on top level or nested (looped) MF?
             microflowName = parentMicroflow.qualifiedName
         } else { microflowName = microflow.qualifiedName };
-        let microflowData = this.hierarchy[microflowName];
-        if (microflowData) {
+        let microflowData = this.hierarchy[microflowName];              //fetch existing info
+        if (microflowData) {                                            //update
             actions = microflowData.actions;
             subMFs = microflowData.subMFs;
-        } else {
+        } else {                                                        //or add new
             if (!this.hierarchy[microflowName]) {
                 let mfToAdd = microflow;
                 if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) {
@@ -145,12 +145,14 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 this.hierarchy[microflowName] = { mf: mfToAdd };
             }
         }
-        if (actions) {
-            actions.push(action);
+        let actionInfo = {'type': action};
+        Object.assign(actionInfo, data);
+        if (actions) {                                                  //update or create actions
+            actions.push(actionInfo);
         } else {
-            this.hierarchy[microflowName].actions = [action];
+            this.hierarchy[microflowName].actions = [actionInfo];
         }
-        if (subMF && subMFs) {
+        if (subMF && subMFs) {                                          //update or create sub microflows
             subMFs.push(subMF);
         } else {
             if (subMF) {
@@ -160,7 +162,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
     }
 
     analyse = function () {
-        console.log("ANALYSE==============================");
+        console.log("===================================ANALYSE ==============================\n");
         //console.log(JSON.stringify(this.hierarchy, null, 2));
         let dms = this.model.allDomainModels();
         let dmPromises = [];
@@ -181,6 +183,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                     this.executeCheck(this.missingPermissions.bind(this), microflow);
                     this.executeCheck(this.errorHandling.bind(this), microflow);
                     this.executeCheck(this.tooComplexMicroflow.bind(this), microflow);
+                    this.executeCheck(this.missingCaptions.bind(this), microflow);
                 }
             })
             resolve();
@@ -245,7 +248,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             })
             if (entityForMF) {
                 let entityModule = this.getModuleName(entityForMF);
-                let entityName = this.getDocumentName(entityForMF);
+                //let entityName = this.getDocumentName(entityForMF);
                 if (entityModule != moduleName) {
                     errors.push("NC4");
                 }
@@ -269,13 +272,13 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             if (!allowedPrefixes.includes(mfPrefix)) {
                 let mfActions = this.hierarchy[microflow].actions;
                 let showPage = mfActions.find((action) => {
-                    return action == 'Microflows$ShowPageAction'
+                    return action.type == 'Microflows$ShowPageAction'
                 })
                 if (showPage) {
                     errors.push("IP1");
                 }
                 let closePage = mfActions.find((action) => {
-                    return (action == 'Microflows$CloseFormAction')
+                    return (action.type == 'Microflows$CloseFormAction')
                 })
                 if (closePage) {
                     errors.push("IP2");
@@ -292,7 +295,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let errors = [];
         let mfActions = this.hierarchy[microflow].actions;
         let commit = mfActions.find((action) => {
-            return action == 'Microflows$CommitAction'
+            return action.type == 'Microflows$CommitAction'
         })
         if (commit) {
             let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
@@ -360,7 +363,6 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                         if (!(errorHandling.startsWith('Custom'))) {
                             errors.push("EH1");
                         }
-
                     }
                 }
             })
@@ -381,21 +383,19 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         }
         let complexity = 0;
         mfActions.forEach((mfAction) => {
-            if (mfAction === 'LoopAction') {
+            if (mfAction.type === 'LoopAction') {
                 complexity += this.cxLoopCount;
-            } else if (mfAction.startsWith('ExclusiveSplit')) {
+            } else if (mfAction.type.startsWith('ExclusiveSplit')) {
                 complexity += this.cxExclusiveSplit;
-            } else if (mfAction.startsWith('Microflows$CreateObjectAction') || mfAction.startsWith('Microflows$ChangeObjectAction')) {
+            } else if (mfAction.type.startsWith('Microflows$CreateObjectAction') || mfAction.type.startsWith('Microflows$ChangeObjectAction')) {
                 complexity += this.cxObjectAction;
-                let parts = mfAction.split('_');
-                let expressionCX = parts[1];
+                let expressionCX = mfAction.complexity;
                 if (expressionCX > this.cxMaxObjectExpression) {
                     errors.push("CX3");
                 }
-            } else if (mfAction.startsWith('Microflows$CreateVariableAction') || mfAction.startsWith('Microflows$ChangeVariableAction')) {
+            } else if (mfAction.type.startsWith('Microflows$CreateVariableAction') || mfAction.type.startsWith('Microflows$ChangeVariableAction')) {
                 complexity += this.cxVariableAction;
-                let parts = mfAction.split('_');
-                let expressionCX = parts[1];
+                let expressionCX = mfAction.complexity;
                 if (expressionCX > this.cxMaxVariableExpression) {
                     errors.push("CX4");
                 }
@@ -407,7 +407,25 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         if (complexity > this.cxMaxComplexity) {
             errors.push("CX2");
         }
+        return errors;
+    }
 
+    missingCaptions = function (microflow) {
+        // MC1: Missing caption for Exclusive split
+        let errors = [];
+        let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
+        let mfActions = this.hierarchy[microflow].actions;
+        if (mfActions.length > this.cxMaxActions) {
+            errors.push("CX1");
+        }
+        mfActions.forEach((mfAction) => {
+             if (mfAction.type.startsWith('ExclusiveSplit')) {
+                let caption = mfAction.caption.trim();
+                if (!caption || caption.length == 0 ) {
+                    errors.push("MC1");
+                }
+            } 
+        })
         return errors;
     }
 }

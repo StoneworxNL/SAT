@@ -9,7 +9,6 @@ module.exports = class AnalysisModule {
         this.appID = appID;
         this.excludes = excludes;
         this.prefixes = prefixes;
-        this.outFileName = outFileName;
     }
 
     findAllMicroflows(){
