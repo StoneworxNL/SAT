@@ -202,7 +202,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let reports = this.reports;
         if (fName) {
             try {
-                fs.writeFileSync(fName + '_analysis.csv', '');
+                fs.writeFileSync(fName + '_analysis.csv', 'Microflow;Code;Description\n');
             } catch (err) {
                 console.error(err);
             }
@@ -291,7 +291,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
 
     illegalCommit = function (microflow) {
         //CM1: Commit not on correct hierarchy level (ACT or one level down)
-        let allowedPrefixes = ['ACT'];
+        let allowedPrefixes = ['ACT', 'QUE', 'QUEUE'];
         let errors = [];
         let mfActions = this.hierarchy[microflow].actions;
         let commit = mfActions.find((action) => {
