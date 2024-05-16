@@ -2,7 +2,7 @@ Tool for analysis and some documentation of Mendix apps.
 
 **Implemented features**
 * Generate Sequence Diagram from a (top) Microflow
-* Analyse naming conventions of all MF's in an app
+* Analyse (some) coding quality rules on Microflows
 
 **Installation**
 * requirements: Node & npm
