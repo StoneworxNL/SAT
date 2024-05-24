@@ -14,6 +14,9 @@ module.exports = class AnalysisModule {
     findAllMicroflows(){
         return this.model.allMicroflows();
     }
+    findAllRules(){
+        return this.model.allRules();
+    }
 
     findMicroflowByName(microflowname) {
         return this.model.allMicroflows().filter((mf) => {

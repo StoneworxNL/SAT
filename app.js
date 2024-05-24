@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require("fs");
+const config = require("config");
 
 const { program: commander } = require('commander');
 var wc = require('./mxworkingcopy');

@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^12.0.0",
+    "config": "^3.3.11",
     "mendixmodelsdk": "^4.85.0",
     "mendixplatformsdk": "^5.1.2"
   }

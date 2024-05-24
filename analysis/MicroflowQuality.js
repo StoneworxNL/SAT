@@ -1,4 +1,5 @@
 const fs = require("fs");
+const config = require("config");
 const AnalysisModule = require("./AnalysisModule");
 const { resolve } = require("path");
 const { microflows, Annotation, JavaScriptSerializer, xmlschemas } = require("mendixmodelsdk");
@@ -10,6 +11,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         super(excludes, prefixes, outFileName);
         this.microflows_by_name;
         this.entities = [];
+        this.rules = [];
         this.cxMaxActions = 25;
         this.cxMaxComplexity = 30;
         this.cxLoopCount = 4;
@@ -19,22 +21,19 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.cxMaxObjectExpression = 3;
         this.cxMaxVariableExpression = 5;
 
-        this.errorCodes = {
-            "NC1": "format: [PRE]_[Entity(s)]_description",
-            "NC2": "Prefix must be allowed",
-            "NC3": "entity must exist ",
-            "NC4": "entity must exist in same module",
-            "IP1": "Show Page action outside of ACT",
-            "IP2": "Close Page action outside of ACT",
-            "CM1": "Commit not on correct hierarchy level(ACT or one level down)",
-            "PM1": "Microflow of this type should contain permissions",
-            "EH1": "Java Action without custom error handling",
-            "CX1": "Too many actions in a single microflow",
-            "CX2": "Too complex microflow",
-            "CX3": "Too complex expression in Create/ Change Object",
-            "CX4": "Too complex expression in Create / Change Variable",
-            "MC1": "Missing caption for Exclusive split"
-        }
+        this.errorCodes = {}
+
+        const checks = config.get("checks");
+        let checksFolder = config.get("checksFolder");
+        this.checkFunctions = [];
+        checks.forEach((check)=> {
+            console.log("CHECK TO DO: "+check.fnc);
+            let moduleName = checksFolder+check.fnc;
+            let fnc = require(moduleName);
+            Object.assign(this.errorCodes, fnc.registerCodes());
+            this.checkFunctions.push(fnc);
+        });
+
     }
 
     collect = function (model, branch, workingCopy, microflowname) {
@@ -51,7 +50,6 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.microflows = this.findAllMicroflows();
         var promises = [];
         this.microflows.forEach((microflowIF) => {
-
             promises.push(new Promise((resolve, reject) => {
                 let moduleName = this.getModuleName(microflowIF);
                 let excludeThis = false;
@@ -66,6 +64,23 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 } else { resolve() };
             }))
         });
+        // this.rules = this.findAllRules();
+        // this.rules.forEach((ruleIF) => {            
+        //     promises.push(new Promise((resolve, reject) => {
+        //         let moduleName = this.getModuleName(ruleIF);
+        //         let excludeThis = false;
+        //         if (this.excludes) {
+        //             excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
+        //         }
+        //         if (!excludeThis) {
+        //             ruleIF.load().then((rule) => {
+        //                // RULES PARSING MOET IETS ANDERS DAN MF's => json[$Type] is direct Exclusive split
+        //                 this.parseMicroflow(rule);
+        //                 resolve();
+        //             });
+        //         } else { resolve() };
+        //     }))
+        // });
         return Promise.all(promises).then(() => {
             resolve()
         });
@@ -177,18 +192,15 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             })
             Object.keys(this.hierarchy).forEach((microflow) => {
                 if (microflow && microflow != 'undefined') {
-                    this.executeCheck(this.namingConvention.bind(this), microflow);
-                    this.executeCheck(this.illegalShowPage.bind(this), microflow);
-                    this.executeCheck(this.illegalCommit.bind(this), microflow);
-                    this.executeCheck(this.missingPermissions.bind(this), microflow);
-                    this.executeCheck(this.errorHandling.bind(this), microflow);
-                    this.executeCheck(this.tooComplexMicroflow.bind(this), microflow);
-                    this.executeCheck(this.missingCaptions.bind(this), microflow);
+                    this.checkFunctions.forEach((fnc)=>{
+                        this.executeCheck(fnc.check.bind(this), microflow);
+                    })
                 }
             })
             resolve();
         })
     }
+
     executeCheck = function (validation, microflow) {
         let errors = validation(microflow);
         if (errors && errors.length > 0) {
@@ -223,209 +235,5 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         })
 
     }
-
-    namingConvention = function (microflow) {
-        // NC1: format: [PRE]_[Entity(s)]_description
-        // NC2: Prefix must be allowed
-        // NC3: entity must exist 
-        // NC4: entity must exist in same module
-        let allowedPrefixes = ['ACT', 'SUB', 'CRS', 'SCH', 'OCH', 'DS', 'VAL', 'RET', 'CTL', 'TRN', 'OPR', 'FNC', 'ASU', 'SE', 'CWS', 'PWS', 'PRS', 'CWS', 'QUE', 'QUEUE'];
-        let [moduleName, microflowName] = microflow.split('.');
-        let mfNameParts = microflowName.split('_');
-        let errors = [];
-        if (mfNameParts.length < 3) {
-            errors.push("NC1");
-        } else {
-            let mfPrefix = mfNameParts[0];
-            let pfFound = allowedPrefixes.find((prefix) => prefix == mfPrefix);
-            if (!pfFound) { errors.push("NC2"); }
-            let mfEntityName = mfNameParts[1];
-            let mfDescription = mfNameParts[2];
-            let entityForMF = this.entities.find((entity) => {
-                let entityModule = this.getModuleName(entity);
-                let entityName = this.getDocumentName(entity);
-                return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName);
-            })
-            if (entityForMF) {
-                let entityModule = this.getModuleName(entityForMF);
-                //let entityName = this.getDocumentName(entityForMF);
-                if (entityModule != moduleName) {
-                    errors.push("NC4");
-                }
-
-            } else {
-                errors.push("NC3");
-            }
-        }
-        return errors;
-    }
-
-    illegalShowPage = function (microflow) {
-        // IP1: Show Page action outside of ACT
-        // IP2: Close Page action outside of ACT
-        let allowedPrefixes = ['ACT'];
-        let errors = [];
-        let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
-
-        if (!mfPrefix) { //No Prefix, should be reported in naming conventions
-        } else {
-            if (!allowedPrefixes.includes(mfPrefix)) {
-                let mfActions = this.hierarchy[microflow].actions;
-                let showPage = mfActions.find((action) => {
-                    return action.type == 'Microflows$ShowPageAction'
-                })
-                if (showPage) {
-                    errors.push("IP1");
-                }
-                let closePage = mfActions.find((action) => {
-                    return (action.type == 'Microflows$CloseFormAction')
-                })
-                if (closePage) {
-                    errors.push("IP2");
-                }
-            }
-
-        }
-        return errors;
-    }
-
-    illegalCommit = function (microflow) {
-        //CM1: Commit not on correct hierarchy level (ACT or one level down)
-        let allowedPrefixes = ['ACT', 'QUE', 'QUEUE'];
-        let errors = [];
-        let mfActions = this.hierarchy[microflow].actions;
-        let commit = mfActions.find((action) => {
-            return action.type == 'Microflows$CommitAction'
-        })
-        if (commit) {
-            let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
-
-            if (!allowedPrefixes.includes(mfPrefix)) {  //if commit not in ACT: is must be in SUB that is called from ACT only
-                let allMFs = Object.keys(this.hierarchy);
-                let subMFName = allMFs.find((mfName) => {
-                    let mfData = this.hierarchy[mfName];
-                    let subMFs = mfData.subMFs;
-                    if (subMFs) {
-                        let callingMF = subMFs.find((subMF) => {
-                            return subMF === microflow
-                        }
-                        );
-                        return callingMF != null;
-                    } else return false;
-                })
-                if (subMFName) {
-                    let [subModule, subMF, subMFPrefix] = this.nameParts(subMFName);
-                    if (subMFPrefix !== 'ACT') {
-                        //console.log(`${microflow} called from ${subMFName}`);
-                        errors.push("CM1");
-                    }
-                }
-            }
-        }
-        return errors;
-    }
-
-
-    missingPermissions = function (microflow) {
-        // PM1: Microflow of this type should contain permissions
-        let permissionPrefixes = ['ACT', 'OCH', 'OEN', 'OLE', 'DS'];
-        let errors = [];
-        let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
-
-        if (!mfPrefix) { //No Prefix, should be reported in naming conventions
-        } else {
-            if (permissionPrefixes.includes(mfPrefix)) {
-                let mfAllowedRoles = this.hierarchy[microflow].mf.allowedModuleRoles;
-                if (!mfAllowedRoles || mfAllowedRoles.length < 1) {
-                    errors.push("PM1");
-                }
-            }
-
-        }
-        return errors;
-    }
-
-    errorHandling = function (microflow) {
-        // EH1: Java Action without custom error handling
-        let errors = [];
-        let mfActions = this.hierarchy[microflow].actions;
-        let java = mfActions.find((action) => {
-            return action == 'Microflows$JavaActionCallAction'
-        })
-        if (java) {
-            let mf = this.hierarchy[microflow].mf;
-            let mfObjects = mf.objectCollection.objects;
-            mfObjects.forEach((mfObject) => {
-                if (mfObject.structureTypeName === 'Microflows$ActionActivity') {
-                    let json = mfObject.toJSON();
-                    if (json.action.$Type === 'Microflows$JavaActionCallAction') {
-                        let errorHandling = json.action.errorHandlingType;
-                        if (!(errorHandling.startsWith('Custom'))) {
-                            errors.push("EH1");
-                        }
-                    }
-                }
-            })
-        }
-        return errors;
-    }
-
-    tooComplexMicroflow = function (microflow) {
-        // CX1: Too many actions in a single microflow
-        // CX2: Too complex microflow
-        // CX3: Too complex expression in Create/Change Object
-        // CX4: Too complex expression in Create/Change Variable
-        let errors = [];
-        let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
-        let mfActions = this.hierarchy[microflow].actions;
-        if (mfActions.length > this.cxMaxActions) {
-            errors.push("CX1");
-        }
-        let complexity = 0;
-        mfActions.forEach((mfAction) => {
-            if (mfAction.type === 'LoopAction') {
-                complexity += this.cxLoopCount;
-            } else if (mfAction.type.startsWith('ExclusiveSplit')) {
-                complexity += this.cxExclusiveSplit;
-            } else if (mfAction.type.startsWith('Microflows$CreateObjectAction') || mfAction.type.startsWith('Microflows$ChangeObjectAction')) {
-                complexity += this.cxObjectAction;
-                let expressionCX = mfAction.complexity;
-                if (expressionCX > this.cxMaxObjectExpression) {
-                    errors.push("CX3");
-                }
-            } else if (mfAction.type.startsWith('Microflows$CreateVariableAction') || mfAction.type.startsWith('Microflows$ChangeVariableAction')) {
-                complexity += this.cxVariableAction;
-                let expressionCX = mfAction.complexity;
-                if (expressionCX > this.cxMaxVariableExpression) {
-                    errors.push("CX4");
-                }
-            } else {
-                complexity++
-            }
-        }
-        )
-        if (complexity > this.cxMaxComplexity) {
-            errors.push("CX2");
-        }
-        return errors;
-    }
-
-    missingCaptions = function (microflow) {
-        // MC1: Missing caption for Exclusive split
-        let errors = [];
-        let [moduleName, microflowName, mfPrefix] = this.nameParts(microflow);
-        let mfActions = this.hierarchy[microflow].actions;
-        if (mfActions.length > this.cxMaxActions) {
-            errors.push("CX1");
-        }
-        mfActions.forEach((mfAction) => {
-             if (mfAction.type.startsWith('ExclusiveSplit')) {
-                let caption = mfAction.caption.trim();
-                if (!caption || caption.length == 0 ) {
-                    errors.push("MC1");
-                }
-            } 
-        })
-        return errors;
-    }
+   
 }

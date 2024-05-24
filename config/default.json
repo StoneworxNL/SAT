@@ -1,0 +1,11 @@
+{   "checksFolder": "../qualityChecks/",
+    "checks" : [
+        {"fnc": "NamingConvention"},
+        {"fnc": "IllegalShowPage"},
+        {"fnc": "IllegalCommit"},
+        {"fnc": "MissingPermissions"},
+        {"fnc": "ErrorHandling"},
+        {"fnc": "TooComplexMicroflow"},
+        {"fnc": "MissingCaptions"}
+    ]
+}
