@@ -9,7 +9,6 @@ module.exports = class IllegalShowPage extends CheckModule {
             "IP1": "Show Page action outside of ACT",
             "IP2": "Close Page action outside of ACT"
         };
-        console.log(options);
     }
 
     check = function (mfQuality, microflow) {
@@ -37,11 +36,6 @@ module.exports = class IllegalShowPage extends CheckModule {
 
         }
         return errors;
-    }
-
-
-    getErrorCodes() {
-        return this.errorCodes;
     }
 }
 

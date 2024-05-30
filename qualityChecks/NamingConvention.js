@@ -1,7 +1,7 @@
 const CheckModule = require("./CheckModule");
 
 module.exports = class NamingConvention extends CheckModule {
-    constructor(options) {
+        constructor(options) {
         super(options);
 
         this.errorCodes = {
@@ -10,7 +10,6 @@ module.exports = class NamingConvention extends CheckModule {
             "NC3": "entity must exist ",
             "NC4": "entity must exist in same module"
         };
-        console.log(options);
     }
 
     check = function (mfQuality, microflow) {
@@ -42,7 +41,4 @@ module.exports = class NamingConvention extends CheckModule {
         return errors;
     }
     
-    getErrorCodes() {
-        return this.errorCodes;
-    }
 }

@@ -7,7 +7,6 @@ module.exports = class MissingPermissions extends CheckModule {
         this.errorCodes = {
             "PM1": "Microflow of this type should contain permissions"
         };
-        console.log(options);
     }
 
     check = function (mfQuality, microflow) {
@@ -28,8 +27,4 @@ module.exports = class MissingPermissions extends CheckModule {
         return errors;
     }
 
-
-    getErrorCodes() {
-        return this.errorCodes;
-    }
 }

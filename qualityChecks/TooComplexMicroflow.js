@@ -10,7 +10,6 @@ module.exports = class TooComplexMicroflow extends CheckModule {
             "CX3": "Too complex expression in Create/ Change Object",
             "CX4": "Too complex expression in Create / Change Variable"
         };
-        console.log(options);
     }
 
     check = function (mfQuality, microflow) {
@@ -49,8 +48,5 @@ module.exports = class TooComplexMicroflow extends CheckModule {
         return errors;
     }
     
-    getErrorCodes  () {
-        return this.errorCodes;
-    }
 }
 

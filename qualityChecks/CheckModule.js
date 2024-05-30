@@ -1,12 +1,13 @@
 const MicroflowQuality  = require("../analysis/MicroflowQuality");
 
-module.exports = class CheckModule {
+module.exports = class CheckModule {    
     constructor(options) {
         this.options = options || {};
         this.errorCodes = {};
         this.moduleName = '';
         this.microflowName = '';
         this.mfPrefix = '';
+        this.level = 'microflow';
     }
 
     parseMFName = function (qualifiedMicroflowName) {
@@ -20,4 +21,7 @@ module.exports = class CheckModule {
         }
     }
 
+    getErrorCodes = function() {
+        return this.errorCodes;
+    }
 }

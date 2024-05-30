@@ -32,11 +32,4 @@ module.exports = class ErrorHandling extends CheckModule {
         }
         return errors;
     }
-
-
-    getErrorCodes = function () {
-        return {
-            "EH1": "Java Action without custom error handling"
-        }
-    }
 }

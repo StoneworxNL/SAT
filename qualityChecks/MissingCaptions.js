@@ -1,13 +1,12 @@
 const CheckModule = require("./CheckModule");
 
-module.exports = class MissinCaptions extends CheckModule {
+module.exports = class MissinCaptions extends CheckModule {    
     constructor(options) {
         super(options);
 
         this.errorCodes = {
             "MC1": "Missing caption for Exclusive split"
         };
-        console.log(options);
     }
 
     check = function (mfQuality, microflow) {
@@ -26,9 +25,5 @@ module.exports = class MissinCaptions extends CheckModule {
         return errors;
     }
 
-
-    getErrorCodes() {
-        return this.errorCodes;
-    }
 }
 

@@ -10,6 +10,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
         super(excludes, prefixes, outFileName);
         this.microflows_by_name;
+        this.security = {};
         this.entities = [];
         this.rules = [];
         this.errorCodes = {}
@@ -18,7 +19,6 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let checksFolder = config.get("checksFolder");
         this.checkModules = [];
         checks.forEach((check)=> {
-            console.log("CHECK TO DO: "+check.fnc);
             let moduleName = checksFolder+check.fnc;
             let CheckModule = require(moduleName);
             let checkMod = new CheckModule(check.options);
@@ -41,6 +41,18 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         }
         this.microflows = this.findAllMicroflows();
         var promises = [];
+
+        let securities = this.model.allProjectSecurities();
+        securities.forEach((securityIF) => {
+            promises.push(new Promise((resolve, reject)=>{
+                if (securityIF.structureTypeName==='Security$ProjectSecurity'){
+                    securityIF.load().then((security)=> {
+                        this.security.enableDemoUsers = security.enableDemoUsers;
+                        resolve();
+                    })
+                } else resolve();
+            }))                        
+        });
         this.microflows.forEach((microflowIF) => {
             promises.push(new Promise((resolve, reject) => {
                 let moduleName = this.getModuleName(microflowIF);
@@ -182,10 +194,18 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             domainModels.forEach(domainModel => {
                 this.entities.push(...domainModel.entities);
             })
+            this.checkModules.forEach((checkModule)=>{
+                if (checkModule.level==='security'){
+                    this.executeCheck(checkModule, this.model);
+                }
+            })
+    
             Object.keys(this.hierarchy).forEach((microflow) => {
                 if (microflow && microflow != 'undefined') {
                     this.checkModules.forEach((checkModule)=>{
-                        this.executeCheck(checkModule, microflow);
+                        if (checkModule.level==='microflow'){
+                            this.executeCheck(checkModule, microflow);
+                        }
                     })
                 }
             })
@@ -196,8 +216,12 @@ module.exports = class MicroflowQuality extends AnalysisModule {
     executeCheck = function (checkModule, microflow) {
         let errors = checkModule.check(this, microflow);
         if (errors && errors.length > 0) {
-            let mf = this.hierarchy[microflow];
-            this.reports.push({ microflow: mf.mf, errors: errors });
+            if (checkModule.level==='microflow'){
+                let mf = this.hierarchy[microflow];
+                this.reports.push({ microflow: mf.mf, errors: errors });
+            } else {
+                this.reports.push({ microflow: checkModule.level, errors: errors });
+            }
         }
 
     }
@@ -216,7 +240,11 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             item.errors.forEach((err) => {
                 if (fName) {
                     try {
-                        fs.appendFileSync(fName + '_analysis.csv', theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                        if (typeof theMicroflow==='string'){//not a real microflow ;-)
+                            fs.appendFileSync(fName + '_analysis.csv', theMicroflow + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                        } else {
+                            fs.appendFileSync(fName + '_analysis.csv', theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                        }
                     } catch (err) {
                         console.error(err);
                     }

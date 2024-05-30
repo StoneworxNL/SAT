@@ -7,7 +7,6 @@ module.exports = class IllegalCommit extends CheckModule {
         this.errorCodes = {
             "CM1": "Commit not on correct hierarchy level(ACT or one level down)"
         };
-        console.log(options);
     }
 
     check = function (mfQuality, microflow) {
@@ -42,10 +41,5 @@ module.exports = class IllegalCommit extends CheckModule {
             }
         }
         return errors;
-    }
-
-
-    getErrorCodes() {
-        return this.errorCodes;
     }
 }
