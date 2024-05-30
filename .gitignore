@@ -1,6 +1,7 @@
 node_modules/
 .vscode/
 DIJK*
+Upskill/
 *.workingcopy
 *.txt
 *.png

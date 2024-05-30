@@ -12,26 +12,18 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.microflows_by_name;
         this.entities = [];
         this.rules = [];
-        this.cxMaxActions = 25;
-        this.cxMaxComplexity = 30;
-        this.cxLoopCount = 4;
-        this.cxExclusiveSplit = 5;
-        this.cxObjectAction = 2;
-        this.cxVariableAction = 1;
-        this.cxMaxObjectExpression = 3;
-        this.cxMaxVariableExpression = 5;
-
         this.errorCodes = {}
 
         const checks = config.get("checks");
         let checksFolder = config.get("checksFolder");
-        this.checkFunctions = [];
+        this.checkModules = [];
         checks.forEach((check)=> {
             console.log("CHECK TO DO: "+check.fnc);
             let moduleName = checksFolder+check.fnc;
-            let fnc = require(moduleName);
-            Object.assign(this.errorCodes, fnc.registerCodes());
-            this.checkFunctions.push(fnc);
+            let CheckModule = require(moduleName);
+            let checkMod = new CheckModule(check.options);
+            Object.assign(this.errorCodes, checkMod.getErrorCodes());
+            this.checkModules.push(checkMod);
         });
 
     }
@@ -192,8 +184,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             })
             Object.keys(this.hierarchy).forEach((microflow) => {
                 if (microflow && microflow != 'undefined') {
-                    this.checkFunctions.forEach((fnc)=>{
-                        this.executeCheck(fnc.check.bind(this), microflow);
+                    this.checkModules.forEach((checkModule)=>{
+                        this.executeCheck(checkModule, microflow);
                     })
                 }
             })
@@ -201,8 +193,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         })
     }
 
-    executeCheck = function (validation, microflow) {
-        let errors = validation(microflow);
+    executeCheck = function (checkModule, microflow) {
+        let errors = checkModule.check(this, microflow);
         if (errors && errors.length > 0) {
             let mf = this.hierarchy[microflow];
             this.reports.push({ microflow: mf.mf, errors: errors });
@@ -224,7 +216,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             item.errors.forEach((err) => {
                 if (fName) {
                     try {
-                        fs.appendFileSync(fName + '_analysis.csv', theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]+'\n');
+                        fs.appendFileSync(fName + '_analysis.csv', theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]+'\n');                        
                     } catch (err) {
                         console.error(err);
                     }

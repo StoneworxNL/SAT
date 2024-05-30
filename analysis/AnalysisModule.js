@@ -43,7 +43,7 @@ module.exports = class AnalysisModule {
             return parts[1];
         } else return '';
 
-    }
+    }    
 
     nameParts (qualifiedMicroflowName){
         if (qualifiedMicroflowName){

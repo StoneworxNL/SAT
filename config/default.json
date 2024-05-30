@@ -1,11 +1,78 @@
-{   "checksFolder": "../qualityChecks/",
-    "checks" : [
-        {"fnc": "NamingConvention"},
-        {"fnc": "IllegalShowPage"},
-        {"fnc": "IllegalCommit"},
-        {"fnc": "MissingPermissions"},
-        {"fnc": "ErrorHandling"},
-        {"fnc": "TooComplexMicroflow"},
-        {"fnc": "MissingCaptions"}
+{
+    "checksFolder": "../qualityChecks/",
+    "checks": [
+        {
+            "fnc": "NamingConvention",
+            "options": {
+                "allowedPrefixes": [
+                    "ACT",
+                    "SUB",
+                    "CRS",
+                    "SCH",
+                    "OCH",
+                    "DS",
+                    "VAL",
+                    "RET",
+                    "CTL",
+                    "TRN",
+                    "OPR",
+                    "FNC",
+                    "ASU",
+                    "SE",
+                    "CWS",
+                    "PWS",
+                    "PRS",
+                    "CWS",
+                    "QUE",
+                    "QUEUE",
+                    "BCO",
+                    "CAL",
+                    "ADE"
+                ]
+            }
+        },
+        {
+            "fnc": "ErrorHandling"
+        },
+        {
+            "fnc": "TooComplexMicroflow",
+            "options": {
+                "cxMaxActions": "25",
+                "cxLoopCount": 4,
+                "cxExclusiveSplit": 5,
+                "cxObjectAction": 2,
+                "cxMaxObjectExpression": 3,
+                "cxVariableAction": 1,
+                "cxMaxVariableExpression": 5,
+                "cxMaxComplexity": 30
+            }
+        },
+        {
+            "fnc": "IllegalCommit",
+            "options": {
+                "allowedPrefixes": [
+                    "ACT",
+                    "QUE",
+                    "QUEUE"
+                ]
+            }
+        },
+        {
+            "fnc": "IllegalShowPage",
+            "options": {
+                "allowedPrefixes": [
+                    "ACT"
+                ]
+            }
+        },
+        {
+            "fnc": "MissingCaptions"
+        },
+        {
+            "fnc": "MissingPermissions",
+            "options": {
+                "permissionPrefixes": ["ACT", "OCH", "OEN", "OLE", "DS"]
+            }
+        }
     ]
 }
