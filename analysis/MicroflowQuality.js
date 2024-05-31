@@ -39,9 +39,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         if (this.hierarchy[microflowname]) {
             return;
         }
-        this.microflows = this.findAllMicroflows();
         var promises = [];
-
+        
         let securities = this.model.allProjectSecurities();
         securities.forEach((securityIF) => {
             promises.push(new Promise((resolve, reject)=>{
@@ -53,6 +52,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 } else resolve();
             }))                        
         });
+
+        this.microflows = this.findAllMicroflows();
         this.microflows.forEach((microflowIF) => {
             promises.push(new Promise((resolve, reject) => {
                 let moduleName = this.getModuleName(microflowIF);
@@ -68,23 +69,22 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 } else { resolve() };
             }))
         });
-        // this.rules = this.findAllRules();
-        // this.rules.forEach((ruleIF) => {            
-        //     promises.push(new Promise((resolve, reject) => {
-        //         let moduleName = this.getModuleName(ruleIF);
-        //         let excludeThis = false;
-        //         if (this.excludes) {
-        //             excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
-        //         }
-        //         if (!excludeThis) {
-        //             ruleIF.load().then((rule) => {
-        //                // RULES PARSING MOET IETS ANDERS DAN MF's => json[$Type] is direct Exclusive split
-        //                 this.parseMicroflow(rule);
-        //                 resolve();
-        //             });
-        //         } else { resolve() };
-        //     }))
-        // });
+        this.rules = this.findAllRules();
+        this.rules.forEach((ruleIF) => {            
+            promises.push(new Promise((resolve, reject) => {
+                let moduleName = this.getModuleName(ruleIF);
+                let excludeThis = false;
+                if (this.excludes) {
+                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
+                }
+                if (!excludeThis) {
+                    ruleIF.load().then((rule) => {
+                        this.parseRule(rule);
+                        resolve();
+                    });
+                } else { resolve() };
+            }))
+        });
         return Promise.all(promises).then(() => {
             resolve()
         });
@@ -133,6 +133,10 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 this.updateHierarchy(mf, action_type, parentMF, null, {'caption': json['caption'], 'complexity': complexity});
             }
         });
+    }
+
+    parseRule = function (mf) {
+        this.parseMicroflow(mf, null);
     }
 
     checkExpressionComplexity(expression) {

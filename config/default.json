@@ -27,7 +27,8 @@
                     "QUEUE",
                     "BCO",
                     "CAL",
-                    "ADE"
+                    "ADE",
+                    "RULE"
                 ]
             }
         },
