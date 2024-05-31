@@ -24,4 +24,12 @@ module.exports = class CheckModule {
     getErrorCodes = function() {
         return this.errorCodes;
     }
+
+    addErrors = function(errors, code, ignoreList){
+        let isIgnore = ignoreList.find(ignore => '@'+code === ignore);
+        if (!isIgnore || isIgnore.length == 0 ){
+            errors.push(code);
+        }
+    }
+    
 }

@@ -95,8 +95,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         mfObjects.forEach((obj) => {
             let json = obj.toJSON();
             if (json['$Type']==='Microflows$Annotation'){
-                //console.log(json['caption']);
-                //Could store annotations on the microflow hierarchy, to check whether error codes have been handled.
+                let action_type = 'Annotation';
+                this.updateHierarchy(mf, action_type, parentMF, null, {'caption': json['caption']});
             }
             if (json['$Type'] === 'Microflows$LoopedActivity') {
                 let action_type = 'LoopAction';
@@ -151,7 +151,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
 
     updateHierarchy = function (microflow, action, parentMicroflow, subMF, data) {
         let microflowName = '';
-        let actions; let subMFs;
+        let actions; let subMFs; let annotations;
         if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) { //working on top level or nested (looped) MF?
             microflowName = parentMicroflow.qualifiedName
         } else { microflowName = microflow.qualifiedName };
@@ -159,6 +159,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         if (microflowData) {                                            //update
             actions = microflowData.actions;
             subMFs = microflowData.subMFs;
+            annotations = microflowData.annotations;
         } else {                                                        //or add new
             if (!this.hierarchy[microflowName]) {
                 let mfToAdd = microflow;
@@ -257,7 +258,23 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 }
             })
         })
-
     }
+
+    getIgnoreRuleAnnotations = function(microflow){
+        let mfActions = this.hierarchy[microflow].actions;
+        let ignoreRuleAnnotations = mfActions.flatMap((action) => {
+
+            if (action.type === 'Annotation') {
+                let ignoreRuleAnnotation = action.caption.match(/^(@[A-Z]{2}\d): .*/);
+                if (ignoreRuleAnnotation) {
+                    return ignoreRuleAnnotation[1];
+                }
+                return [];
+            }
+            return  [];
+        })
+        return ignoreRuleAnnotations;
+    }
+
    
 }

@@ -9,7 +9,6 @@ module.exports = class ErrorHandling extends CheckModule {
     }
 
     check = function (mfQuality, microflow) {
-        // EH1: Java Action without custom error handling
         let errors = [];
         let mfActions = mfQuality.hierarchy[microflow].actions;
         let java = mfActions.find((action) => {
@@ -18,13 +17,14 @@ module.exports = class ErrorHandling extends CheckModule {
         if (java) {
             let mf = mfQuality.hierarchy[microflow].mf;
             let mfObjects = mf.objectCollection.objects;
+            let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
             mfObjects.forEach((mfObject) => {
                 if (mfObject.structureTypeName === 'Microflows$ActionActivity') {
                     let json = mfObject.toJSON();
                     if (json.action.$Type === 'Microflows$JavaActionCallAction') {
                         let errorHandling = json.action.errorHandlingType;
                         if (!(errorHandling.startsWith('Custom'))) {
-                            errors.push("EH1");
+                            this.addErrors(errors, "EH1", ignoreRuleAnnotations);
                         }
                     }
                 }

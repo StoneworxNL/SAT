@@ -16,8 +16,9 @@ module.exports = class TooComplexMicroflow extends CheckModule {
         let errors = [];
         this.parseMFName(microflow);
         let mfActions = mfQuality.hierarchy[microflow].actions;
+        let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
         if (mfActions.length > this.options.cxMaxActions) {
-            errors.push("CX1");
+            this.addErrors(errors, "CX1", ignoreRuleAnnotations);
         }
         let complexity = 0;
         mfActions.forEach((mfAction) => {
@@ -29,13 +30,14 @@ module.exports = class TooComplexMicroflow extends CheckModule {
                 complexity += this.options.cxObjectAction;
                 let expressionCX = mfAction.complexity;
                 if (expressionCX > this.options.cxMaxObjectExpression) {
-                    errors.push("CX3");
+                    this.addErrors(errors, "CX3", ignoreRuleAnnotations);
                 }
             } else if (mfAction.type.startsWith('Microflows$CreateVariableAction') || mfAction.type.startsWith('Microflows$ChangeVariableAction')) {
                 complexity += this.options.cxVariableAction;
                 let expressionCX = mfAction.complexity;
                 if (expressionCX > this.options.cxMaxVariableExpression) {
-                    errors.push("CX4");
+                    this.addErrors(errors, "CX4", ignoreRuleAnnotations);
+
                 }
             } else {
                 complexity++
@@ -43,7 +45,7 @@ module.exports = class TooComplexMicroflow extends CheckModule {
         }
         )
         if (complexity > this.options.cxMaxComplexity) {
-            errors.push("CX2");
+            this.addErrors(errors, "CX2", ignoreRuleAnnotations);
         }
         return errors;
     }

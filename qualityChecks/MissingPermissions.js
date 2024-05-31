@@ -17,9 +17,10 @@ module.exports = class MissingPermissions extends CheckModule {
         if (!this.mfPrefix) { //No Prefix, should be reported in naming conventions
         } else {
             if (permissionPrefixes.includes(this.mfPrefix)) {
+                let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
                 let mfAllowedRoles = mfQuality.hierarchy[microflow].mf.allowedModuleRoles;
                 if (!mfAllowedRoles || mfAllowedRoles.length < 1) {
-                    errors.push("PM1");
+                    this.addErrors(errors, "PM1", ignoreRuleAnnotations);
                 }
             }
 

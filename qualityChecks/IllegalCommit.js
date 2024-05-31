@@ -18,6 +18,7 @@ module.exports = class IllegalCommit extends CheckModule {
             return action.type == 'Microflows$CommitAction'
         })
         if (commit) {
+            let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
             if (!allowedPrefixes.includes(this.mfPrefix)) {  //if commit not in ACT: is must be in SUB that is called from ACT only
                 let allMFs = Object.keys(mfQuality.hierarchy);
                 let subMFName = allMFs.find((mfName) => {
@@ -34,8 +35,7 @@ module.exports = class IllegalCommit extends CheckModule {
                 if (subMFName) {
                     let [subModule, subMF, subMFPrefix] = mfQuality.nameParts(subMFName);
                     if (subMFPrefix !== 'ACT') {
-                        //console.log(`${microflow} called from ${subMFName}`);
-                        errors.push("CM1");
+                        this.addErrors(errors, "CM1", ignoreRuleAnnotations);
                     }
                 }
             }

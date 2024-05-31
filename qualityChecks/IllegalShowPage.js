@@ -15,22 +15,22 @@ module.exports = class IllegalShowPage extends CheckModule {
         let allowedPrefixes = this.options.allowedPrefixes;
         let errors = [];
         this.parseMFName(microflow);
-
         if (!this.mfPrefix) { //No Prefix, should be reported in naming conventions
         } else {
             if (!allowedPrefixes.includes(this.mfPrefix)) {
+                let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
                 let mfActions = mfQuality.hierarchy[microflow].actions;
                 let showPage = mfActions.find((action) => {
                     return action.type == 'Microflows$ShowPageAction'
                 })
                 if (showPage) {
-                    errors.push("IP1");
+                    this.addErrors(errors, "IP1", ignoreRuleAnnotations);
                 }
                 let closePage = mfActions.find((action) => {
                     return (action.type == 'Microflows$CloseFormAction')
                 })
                 if (closePage) {
-                    errors.push("IP2");
+                    this.addErrors(errors, "IP2", ignoreRuleAnnotations);
                 }
             }
 
