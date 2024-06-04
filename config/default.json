@@ -5,6 +5,7 @@
             "fnc": "NamingConvention",
             "options": {
                 "allowedPrefixes": [
+                    "ACO",
                     "ACT",
                     "SUB",
                     "CRS",
@@ -77,6 +78,7 @@
         },
         {
             "fnc": "DemoUsers"
-        }
+        },
+        {   "fnc": "NestingTooDeep", "options": {"mxNesting": 5} }
     ]
 }
