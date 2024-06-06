@@ -28,16 +28,13 @@ module.exports = class MicroflowQuality extends AnalysisModule {
 
     }
 
-    collect = function (model, branch, workingCopy, microflowname) {
+    collect = function (model, branch, workingCopy) {
         this.model = model;
         this.branch = branch;
         this.workingCopy = workingCopy;
         this.filterMarketplace();
-        if (!this.model || !microflowname) {
+        if (!this.model ) {
             return
-        }
-        if (this.hierarchy[microflowname]) {
-            return;
         }
         var promises = [];
         

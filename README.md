@@ -36,9 +36,9 @@ Options:
   
   -a, --appid <appid>            AppID of the mendix project
   
-  -b, --branch <branch name>     Branch of the mendix project
+  -b, --branch <branch name>     Branch of the mendix project, use the branch name, or 'trunk' for SVN main line, 'main' for git main line
   
-  -m, --module <module name      Analysis module to use: SD=sequence Diagram, MQ=
+  -m, --module <module name>      Analysis module to use: SD=sequence Diagram, MQ=
   
   -e, --excludes [exclude....]   Modules to exclude from analysis
   
@@ -46,7 +46,12 @@ Options:
   
   -h, --help                     display help for command
 
-  **TODO**
+  **Examples**
+
+  * Sequence Diagram: node app.js -m SD -n [NICKNAME] -d [MODULE].[MICROFLOW] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]
+  * Microflow Quality: node app.js -m MQ -n [NICKNAME] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]
+
+
   
 
   

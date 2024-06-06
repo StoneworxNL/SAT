@@ -13,7 +13,7 @@ commander
     .version('1.0.0', '-v, --version')
     .usage('[OPTIONS]...')
     .requiredOption('-n, --nickname <nickname>', 'Nickname under which data is stored')
-    .requiredOption('-d, --documentName <document>', 'Qualified name of document to analyse.')
+    .option('-d, --documentName <document>', 'Qualified name of document to analyse.')
     .requiredOption('-a, --appid <appid>', 'AppID of the mendix project')
     .requiredOption('-b, --branch <branch name>', 'Branch of the mendix project')
     .requiredOption('-m, --module <module name', 'Analysis module to use: SD=sequence Diagram, MQ=MicroflowQuality')
@@ -36,13 +36,13 @@ function commaSeparatedList(value) {
 
 function main() {
     const nickname = options.nickname;
-    const documentName = options.documentName;
+    const documentName = options.documentName||'';
     appID = options.appid;
     branch = options.branch;
     excludes = options.excludes ? options.excludes : undefined;
     prefixes = options.prefixes ? options.prefixes : undefined;
     moduleCode = options.module ? options.module : 'SD';
-    
+
 
     switch (moduleCode){
         case 'SD': 
@@ -66,6 +66,6 @@ function main() {
                 console.log("READY");
             }).catch((e)=>{console.log(e)});
         });
-    });
+    }).catch((e)=>(console.log(e.message)));
 }
 

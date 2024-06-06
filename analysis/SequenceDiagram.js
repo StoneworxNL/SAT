@@ -1,5 +1,6 @@
 const fs = require("fs");
 const AnalysisModule = require("./AnalysisModule");
+const { error } = require("console");
 
 module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
     constructor(excludes, prefixes, outFileName){
@@ -12,7 +13,8 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         this.branch = branch;
         this.workingCopy = workingCopy;
         if (!this.model || !microflowname) {
-            return
+            throw new Error('Document parameter required');
+        
         }
         if (this.hierarchy[microflowname]) {
             return;
@@ -56,7 +58,6 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
 
     report = function (nickname) {
         console.log("REPORT");
-        console.log(JSON.stringify(this.hierarchy, null ,2));
         let participants = {};
         let calls = [];
         let excludeModule;
@@ -134,7 +135,6 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
                 if (err) throw err;
             });
         })
-        console.log(calls);
         calls.forEach((call) => {
             fs.appendFileSync(outFileName, call, function (err) {
                 if (err) throw err;
