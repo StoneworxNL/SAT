@@ -7,10 +7,10 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         this.microflows_by_name;
     }
     
-    collect = function(model, branch, microflowname) {
-        console.log("COLLECT");
+    collect = function(model, branch, workingCopy, microflowname) {
         this.model = model;
         this.branch = branch;
+        this.workingCopy = workingCopy;
         if (!this.model || !microflowname) {
             return
         }
@@ -40,7 +40,7 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
             if (nestedMicroflows.length > 0) {
                 var promises = [];
                 nestedMicroflows.forEach(nestedMicroflow => {
-                    promises.push(this.analyse(this.model, nestedMicroflow));
+                    promises.push(this.collect(this.model, this.branch, this.workingCopy, nestedMicroflow));
                 });
                 return Promise.all(promises);
             } else return
@@ -54,13 +54,14 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         })
     }
 
-    report = function () {
+    report = function (nickname) {
         console.log("REPORT");
         console.log(JSON.stringify(this.hierarchy, null ,2));
         let participants = {};
         let calls = [];
         let excludeModule;
         let aggregatePrefixCaller;
+        let outFileName = nickname + "_sd.txt";
         Object.keys(this.hierarchy).forEach((caller) => {
             let parts = caller.split('.');
             let moduleName = '';
@@ -77,7 +78,7 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
             }
             if (!excludeModule) {
                 if (!aggregatePrefixCaller) {
-                    participants[callerMicroflow] = this.complexity[caller];
+                    participants[callerMicroflow] = {};
                     participants[callerMicroflow].qualifiedName = caller;
                 }
                 this.hierarchy[caller].forEach((callee) => {
@@ -103,7 +104,7 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
                         if (aggregatePrefixCaller) { callerMicroflow = aggregatePrefixCaller }
                         if (aggregatePrefixCallee) { calleeModuleName = aggregatePrefixCallee }
                         if (!excludeCallee && !aggregatePrefixCallee) {
-                            participants[calleeMicroflow] = this.complexity[callee];
+                            participants[calleeMicroflow] = {};
                             participants[calleeMicroflow].qualifiedName = callee;
                             calls.push(`${callerMicroflow} --> "${calleeMicroflow}"\n`);
                         } else {
@@ -125,23 +126,21 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
             })
         }
         participants['Commit'] = '';
-        fs.appendFileSync(this.outFileName, `@startuml\n`, function (err) {
+        fs.writeFileSync(outFileName, `@startuml\n`, function (err) {
             if (err) throw err;
         });
         Object.keys(participants).forEach((participant) => {
-            let cmplx = this.complexity[participants[participant].qualifiedName];
-            let score = '?';
-            if (cmplx && cmplx.nodeCount) { score = cmplx.nodeCount }
-            fs.appendFileSync(this.outFileName, `participant "${participant} [${score}]" as ${participant}\n`, function (err) {
+            fs.appendFileSync(outFileName, `participant "${participant}" as ${participant}\n`, function (err) {
                 if (err) throw err;
             });
         })
+        console.log(calls);
         calls.forEach((call) => {
-            fs.appendFileSync(this.outFileName, call, function (err) {
+            fs.appendFileSync(outFileName, call, function (err) {
                 if (err) throw err;
             });
         })
-        fs.appendFileSync(this.outFileName, `@enduml\n`, function (err) {
+        fs.appendFileSync(outFileName, `@enduml\n`, function (err) {
             if (err) throw err;
         });
 
@@ -149,7 +148,6 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
 
     parseObjects= function(mf, parentMF) {
         var nestedMicroflows = [];
-        this.analyseComplexity(mf, parentMF);
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
         mfObjects.forEach((obj) => {
             let json = obj.toJSON();
@@ -190,23 +188,4 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         }
     }
 
-    analyseComplexity= function(mf, parentMF) {
-        let count = mf.objectCollection.objects.length;
-        let key = (mf && mf.qualifiedName) ? mf.qualifiedName : parentMF.qualifiedName;
-        mf.objectCollection.objects.forEach((mfObject) => {
-            let json = mfObject.toJSON();
-            if (json['$Type'] === 'Microflows$LoopedActivity') {
-                count += 3 //loops complexity
-            }
-            if (json['$Type'] === 'Microflows$ExclusiveSplit') {
-                count += 5 //decision complexity
-            }
-        });
-        let mfComplexity = this.complexity[key];
-        if (mfComplexity && !(mf && mf.qualifiedName)) { // first hit always via mf, count only once
-            mfComplexity["nodeCount"] += count;
-        } else {
-            this.complexity[key] = { "nodeCount": count }
-        }
-    }
 }

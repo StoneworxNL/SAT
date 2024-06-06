@@ -42,6 +42,7 @@ function main() {
     excludes = options.excludes ? options.excludes : undefined;
     prefixes = options.prefixes ? options.prefixes : undefined;
     moduleCode = options.module ? options.module : 'SD';
+    
 
     switch (moduleCode){
         case 'SD': 

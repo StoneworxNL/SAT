@@ -1,6 +1,6 @@
 
 module.exports = class AnalysisModule {
-    constructor(appID,excludes, prefixes, outFileName) {
+    constructor(appID,excludes, prefixes) {
         this.model;
         this.branch;
         this.hierarchy = {};
