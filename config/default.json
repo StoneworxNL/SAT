@@ -1,10 +1,8 @@
 {
     "checksFolder": "../qualityChecks/",
-    "checks": [
-        {
+    "checks": [{
             "fnc": "NamingConvention",
-            "options": {
-                "allowedPrefixes": [
+            "options": {                  "allowedPrefixes": [
                     "ACO",
                     "ACT",
                     "SUB",

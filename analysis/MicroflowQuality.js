@@ -62,7 +62,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                     microflowIF.load().then((microflow) => {
                         this.parseMicroflow(microflow);
                         resolve();
-                    });
+                    })
+                    .catch((err)=>{console.log(err)})                    
                 } else { resolve() };
             }))
         });
@@ -183,7 +184,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
     }
 
     analyse = function () {
-        console.log("===================================ANALYSE ==============================\n");
+        console.log("===================================ANALYSIS ==============================\n");
         //console.log(JSON.stringify(this.hierarchy, null, 2));
         let dms = this.model.allDomainModels();
         let dmPromises = [];

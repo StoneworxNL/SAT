@@ -2,14 +2,18 @@ const CheckModule = require("./CheckModule");
 
 module.exports = class NestingTooDeep extends CheckModule {
     constructor(options) {
-        super(options);        
+        super(options);     
+        this.mfList = [];   
         this.errorCodes = {
             "ND1": "Nesting of subs too deep"
+            ,"ND2": "Recursion detected"
         };
     }
 
     check = function (mfQuality, microflow) {
         let errors = [];
+        this.mfList = []; 
+        this.isRecursionFound = false;
         this.parseMFName(microflow);
         let maxNesting = this.options.mxNesting;
         let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
@@ -26,33 +30,56 @@ module.exports = class NestingTooDeep extends CheckModule {
         })
         if (!isSubMF){
             this.maxLevel = 0;
-            this.digDeep(mfQuality, microflow, 0, this.maxLevel);
+            console.log("ANALYZING: "+ microflow+ ": "+JSON.stringify(mfQuality.hierarchy[microflow].subMFs, null,2));
+
+            this.digDeep(mfQuality, microflow, 0, maxNesting);
             if (this.maxLevel > maxNesting) {
                 this.addErrors(errors, "ND1", ignoreRuleAnnotations);
+            }
+            if (this.isRecursionFound){
+                this.addErrors(errors, "ND2", ignoreRuleAnnotations);
             }
         } 
         return errors;
     }
 
-    digDeep = function(mfQuality, microflow, level){
+    digDeep = function(mfQuality, microflow, level, maxNesting){
         if (microflow && mfQuality.hierarchy[microflow] && mfQuality.hierarchy[microflow].subMFs){
-            let subs = mfQuality.hierarchy[microflow].subMFs;          
+            let mfFound = this.mfList.find((mf)=>{
+                return mf === microflow
+            });
+            if (mfFound) {
+                
+                console.log(`ND2: ${microflow}`);
+                console.log(mfFound);
+                this.isRecursionFound = true;
+            } else {
+                this.mfList.push(microflow);
+            }
+            let subs = mfQuality.hierarchy[microflow].subMFs;  
+            let uniqueSubs = subs.filter((sub, index) => {
+                return subs.indexOf(sub) === index;                
+            });
             level++;
             if (level > this.maxLevel) {this.maxLevel = level}
-            if (!subs || subs.length == 0){
-                level--;
-            } else {
-                subs.forEach((subMF) => {
-                    this.digDeep(mfQuality, subMF, level);                
-                });
+            if (level <= maxNesting) {
+                if (!uniqueSubs || uniqueSubs.length == 0){
+                    level--;
+                    this.mfList.pop();
+                } else {
+                    uniqueSubs.forEach((subMF) => {
+                        //console.log(`NESTING: ${microflow} ==> ${subMF}:  ${level} < ${maxNesting} `);
+                        this.digDeep(mfQuality, subMF, level, maxNesting);                
+                    });
+                }
             }
 
         } else {
             level--;
+            this.mfList.pop();
         }
-        return level;
-
     }
     
+
 }
 

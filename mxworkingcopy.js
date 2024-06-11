@@ -9,9 +9,10 @@ exports.loadWorkingCopy = function (appID, nickname, branch) {
         console.log(`GET APP: ${appID}-${branch}`);
         app = client.getApp(appID);
         console.log(`LOADING: ${appID}-${branch}`);
-        loadModel(app, appID, branch).then(([model, workingCopy]) => {
+        loadModel(app, appID, branch)
+        .then(([model, workingCopy]) => {
             resolve([model, workingCopy]);
-        });
+        }).catch((err) => {console.log(err.message)});
 
     })
 };
@@ -55,10 +56,12 @@ function loadModel(app, appID, branch) {
             try {
                 console.log("Opening existing working copy: " + wcID);
                 workingCopy = app.getOnlineWorkingCopy(wcID);
-                workingCopy.openModel().then((model) => {
+                workingCopy.openModel()
+                .then((model) => {
                     console.log("Resolve existing model");
                     resolve([model, workingCopy]);
-                });
+                }).catch((err) => {console.log(err.message)})
+            ;
             }
             catch (e) {
                 console.log(`Failed to get existing working copy ${wcID}: ${e}`);
@@ -69,14 +72,15 @@ function loadModel(app, appID, branch) {
             let repository = app.getRepository();
             console.log("Download workingcopy");
             
-                app.createTemporaryWorkingCopy(branch).then((workingCopy) => {
+                app.createTemporaryWorkingCopy(branch)
+                .then((workingCopy) => {
                     wcID = workingCopy.workingCopyId;
                     fs.writeFileSync(workingCopyFile, `${appID}:${branch}:${wcID}`);
                     workingCopy.openModel().then((model) => {
                         console.log("Resolve downloaded model for " + branch);
                         resolve([model, workingCopy]);
-                    });
-                });
+                    }).catch((err) => {console.log(err)});
+                }).catch((err) => {console.log(err)});
             
         }
     });
