@@ -233,7 +233,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let reports = this.reports;
         if (fName) {
             try {
-                fs.writeFileSync(fName + '_analysis.csv', 'Microflow;Code;Description\n');
+                fs.writeFileSync(fName + '_analysis.csv', 'Module;Microflow;Code;Description\n');
             } catch (err) {
                 console.error(err);
             }
@@ -244,15 +244,16 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 if (fName) {
                     try {
                         if (typeof theMicroflow==='string'){//not a real microflow ;-)
-                            fs.appendFileSync(fName + '_analysis.csv', theMicroflow + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                            fs.appendFileSync(fName + '_analysis.csv', 'APP;'+theMicroflow + ';' + err + ';' + this.errorCodes[err]+'\n');                        
                         } else {
-                            fs.appendFileSync(fName + '_analysis.csv', theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                            let moduleName = this.getModuleName(theMicroflow);
+                            fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theMicroflow.name + ';' + err + ';' + this.errorCodes[err]+'\n');                        
                         }
                     } catch (err) {
                         console.error(err);
                     }
                 } else {
-                    console.log(theMicroflow.qualifiedName + ';' + err + ';' + this.errorCodes[err]);
+                    console.log(moduleName + ';' + theMicroflow.name + ';' + err + ';' + this.errorCodes[err]);
                 }
             })
         })
@@ -263,7 +264,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let ignoreRuleAnnotations = mfActions.flatMap((action) => {
 
             if (action.type === 'Annotation') {
-                let ignoreRuleAnnotation = action.caption.match(/^(@[A-Z]{2}\d): .*/);
+                let ignoreRuleAnnotation = action.caption.match(/^@SAT-([A-Z]{2}\d): .*/);
                 if (ignoreRuleAnnotation) {
                     return ignoreRuleAnnotation[1];
                 }

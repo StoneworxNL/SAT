@@ -10,6 +10,7 @@ module.exports = class ErrorHandling extends CheckModule {
 
     check = function (mfQuality, microflow) {
         let errors = [];
+        let allowedJava = this.options.allowedJava;
         let mfActions = mfQuality.hierarchy[microflow].actions;
         let java = mfActions.find((action) => {
             return action.type == 'Microflows$JavaActionCallAction'
@@ -22,9 +23,13 @@ module.exports = class ErrorHandling extends CheckModule {
                 if (mfObject.structureTypeName === 'Microflows$ActionActivity') {
                     let json = mfObject.toJSON();
                     if (json.action.$Type === 'Microflows$JavaActionCallAction') {
-                        let errorHandling = json.action.errorHandlingType;
-                        if (!(errorHandling.startsWith('Custom'))) {
-                            this.addErrors(errors, "EH1", ignoreRuleAnnotations);
+                        let javaAction = json.action.javaAction;
+                        let isAllowed = allowedJava.find((allowedJavaName)=> allowedJavaName === javaAction);
+                        if (!isAllowed){
+                            let errorHandling = json.action.errorHandlingType;
+                            if (!(errorHandling.startsWith('Custom'))) {
+                                this.addErrors(errors, "EH1", ignoreRuleAnnotations);
+                            }
                         }
                     }
                 }

@@ -32,7 +32,11 @@
             }
         },
         {
-            "fnc": "ErrorHandling"
+            "fnc": "ErrorHandling",
+            "options": {
+                "allowedJava": ["CommunityCommons.EndTransaction", "OIDC.DecodeJWTPlainText"]
+            }
+            
         },
         {
             "fnc": "TooComplexMicroflow",

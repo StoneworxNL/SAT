@@ -26,7 +26,7 @@ module.exports = class CheckModule {
     }
 
     addErrors = function(errors, code, ignoreList){
-        let isIgnore = ignoreList.find(ignore => '@'+code === ignore);
+        let isIgnore = ignoreList.find(ignore => code === ignore);
         if (!isIgnore || isIgnore.length == 0 ){
             errors.push(code);
         }
