@@ -247,16 +247,16 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 if (fName) {
                     try {
                         if (typeof theMicroflow==='string'){//not a real microflow ;-)
-                            fs.appendFileSync(fName + '_analysis.csv', 'APP;'+theMicroflow + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                            fs.appendFileSync(fName + '_analysis.csv', 'APP;'+theMicroflow + ';' + err.code + ';' + this.errorCodes[err.code]+'\n');                        
                         } else {
                             let moduleName = this.getModuleName(theMicroflow);
-                            fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theMicroflow.name + ';' + err + ';' + this.errorCodes[err]+'\n');                        
+                            fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theMicroflow.name + ';' + err.code + ';' + this.errorCodes[err.code]+';'+(err.comment||'')+'\n');                        
                         }
                     } catch (err) {
                         console.error(err);
                     }
                 } else {
-                    console.log(moduleName + ';' + theMicroflow.name + ';' + err + ';' + this.errorCodes[err]);
+                    console.log(moduleName + ';' + theMicroflow.name + ';' + err.code + ';' + this.errorCodes[err.code]);
                 }
             })
         })

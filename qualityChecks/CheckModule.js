@@ -25,10 +25,10 @@ module.exports = class CheckModule {
         return this.errorCodes;
     }
 
-    addErrors = function(errors, code, ignoreList){
+    addErrors = function(errors, code, ignoreList, comment){
         let isIgnore = ignoreList.find(ignore => code === ignore);
         if (!isIgnore || isIgnore.length == 0 ){
-            errors.push(code);
+            errors.push({'code': code, 'comment': comment});
         }
     }
     
