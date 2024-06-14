@@ -38,6 +38,8 @@ module.exports = class NestingTooDeep extends CheckModule {
                 this.addErrors(errors, "ND1", ignoreRuleAnnotations);
             }
             if (this.isRecursionFound){
+                let ignoreRuleAnnotationsRecursiveMF = mfQuality.getIgnoreRuleAnnotations(this.recursiveMicroflow);
+                ignoreRuleAnnotations = ignoreRuleAnnotations.concat(ignoreRuleAnnotationsRecursiveMF);
                 this.addErrors(errors, "ND2", ignoreRuleAnnotations, this.recursiveMicroflow);
             }
         } 
@@ -50,7 +52,7 @@ module.exports = class NestingTooDeep extends CheckModule {
                 return mf === microflow
             });
             if (mfFound && !this.isRecursionFound) {
-                console.log(`ND2: ${microflow}`);
+                //console.log(`ND2: ${microflow}`);
                 // console.log(mfFound);
                 this.isRecursionFound = true;
                 this.recursiveMicroflow = microflow;
