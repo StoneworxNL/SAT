@@ -70,7 +70,7 @@
             }
         },
         {
-            "fnc": "MissingCaptions"
+            "fnc": "SplitMergeCheck"
         },
         {
             "fnc": "MissingPermissions",

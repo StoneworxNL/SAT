@@ -1,11 +1,12 @@
 const CheckModule = require("./CheckModule");
 
-module.exports = class MissinCaptions extends CheckModule {    
+module.exports = class SplitMergeCheck extends CheckModule {    
     constructor(options) {
         super(options);
 
         this.errorCodes = {
-            "MC1": "Missing caption for Exclusive split"
+            "SM1": "Missing caption for Exclusive split"
+            ,"SM2": "Useless merge action"
         };
     }
 
@@ -18,7 +19,13 @@ module.exports = class MissinCaptions extends CheckModule {
             if (mfAction.type.startsWith('ExclusiveSplit')) {
                 let caption = mfAction.caption.trim();
                 if (!caption || caption.length == 0) {
-                    this.addErrors(errors, "MC1", ignoreRuleAnnotations);
+                    this.addErrors(errors, "SM1", ignoreRuleAnnotations);
+                }
+            } else if (mfAction.type.startsWith('ExclusiveMerge')) {
+                let flows = mfQuality.hierarchy[microflow].mf.flows;
+                let actionsToMerge = flows.filter((flow) => flow.destination.id === mfAction.id);
+                if (actionsToMerge.length <= 1) {
+                    this.addErrors(errors, "SM2", ignoreRuleAnnotations);
                 }
             }
         })

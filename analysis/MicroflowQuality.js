@@ -129,6 +129,9 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
                 let complexity = this.checkExpressionComplexity(condition);
                 this.updateHierarchy(mf, action_type, parentMF, null, {'caption': json['caption'], 'complexity': complexity});
+            } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
+                let action_type = 'ExclusiveMerge';
+                this.updateHierarchy(mf, action_type, parentMF, null, {'id': json['$ID']});
             }
         });
     }
@@ -154,7 +157,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             microflowName = parentMicroflow.qualifiedName
         } else { microflowName = microflow.qualifiedName };
         let microflowData = this.hierarchy[microflowName];              //fetch existing info
-        if (microflowData) {                                            //update
+        if (microflowData) {                                            //retrieve
             actions = microflowData.actions;
             subMFs = microflowData.subMFs;
             annotations = microflowData.annotations;
@@ -275,5 +278,5 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         return ignoreRuleAnnotations;
     }
 
-   
+
 }
