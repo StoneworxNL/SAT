@@ -31,8 +31,6 @@ module.exports = class NestingTooDeep extends CheckModule {
         })
         if (!isSubMF){
             this.maxLevel = 0;
-            //console.log("ANALYZING: "+ microflow+ ": "+JSON.stringify(mfQuality.hierarchy[microflow].subMFs, null,2));
-
             this.digDeep(mfQuality, microflow, 0, maxNesting);
             if (this.maxLevel > maxNesting) {
                 this.addErrors(errors, "ND1", ignoreRuleAnnotations);
@@ -52,8 +50,6 @@ module.exports = class NestingTooDeep extends CheckModule {
                 return mf === microflow
             });
             if (mfFound && !this.isRecursionFound) {
-                //console.log(`ND2: ${microflow}`);
-                // console.log(mfFound);
                 this.isRecursionFound = true;
                 this.recursiveMicroflow = microflow;
             } else {

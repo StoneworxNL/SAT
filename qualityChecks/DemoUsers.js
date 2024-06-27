@@ -13,7 +13,7 @@ module.exports = class DemoUsers extends CheckModule {
         let errors = [];
         let demoUsers = mfQuality.security.enableDemoUsers;
         if (demoUsers){
-            errors.push("DU1");
+            this.addErrors(errors, "DU1", []);
         }
         return errors;
     }

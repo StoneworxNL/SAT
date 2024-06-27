@@ -5,12 +5,14 @@ module.exports = class IllegalCommit extends CheckModule {
         super(options);
 
         this.errorCodes = {
-            "CM1": "Commit not on correct hierarchy level(ACT or one level down)"
+            "CM1": "Commit not on correct hierarchy level(ACT or one level down)",
+            "CM2": "Commit not allowed in this type of microflow"
         };
     }
 
     check = function (mfQuality, microflow) {
-        let allowedPrefixes = this.options.allowedPrefixes;
+        let allowedPrefixes = this.options.allowedTopLevelPrefixes;
+        let allowedSubs = this.options.allowedSubLevelPrefixes;
         this.parseMFName(microflow);
         let errors = [];
         let mfActions = mfQuality.hierarchy[microflow].actions;
@@ -34,10 +36,13 @@ module.exports = class IllegalCommit extends CheckModule {
                 })
                 if (subMFName) {
                     let [subModule, subMF, subMFPrefix] = mfQuality.nameParts(subMFName);
-                    if (subMFPrefix !== 'ACT') {
+                    if (!allowedPrefixes.includes(subMFPrefix)) {
                         this.addErrors(errors, "CM1", ignoreRuleAnnotations);
                     }
                 }
+            }
+            if (!(allowedPrefixes.includes(this.mfPrefix) || allowedSubs.includes(this.mfPrefix) )) { // Commits may only be found in top levels or allowed sub levels
+                this.addErrors(errors, "CM2", ignoreRuleAnnotations);
             }
         }
         return errors;

@@ -41,23 +41,31 @@
         {
             "fnc": "TooComplexMicroflow",
             "options": {
-                "cxMaxActions": "25",
+                "maxActions": 25,
+                "maxComplexity": 30,
+                "prefixExceptions": ["VAL"],
+                "exceptionsMaxActions": 50,
+                "exceptionsMaxComplexity": 100,
                 "cxLoopCount": 4,
                 "cxExclusiveSplit": 5,
                 "cxObjectAction": 2,
                 "cxMaxObjectExpression": 3,
                 "cxVariableAction": 1,
-                "cxMaxVariableExpression": 5,
-                "cxMaxComplexity": 30
+                "cxMaxVariableExpression": 5
             }
         },
         {
             "fnc": "IllegalCommit",
             "options": {
-                "allowedPrefixes": [
+                "allowedTopLevelPrefixes": [
                     "ACT",
                     "QUE",
-                    "QUEUE"
+                    "QUEUE",
+                    "ACO",
+                    "SCH"
+                ],
+                "allowedSubLevelPrefixes": [
+                    "SUB"
                 ]
             }
         },

@@ -18,8 +18,8 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         const checks = config.get("checks");
         let checksFolder = config.get("checksFolder");
         this.checkModules = [];
-        checks.forEach((check)=> {
-            let moduleName = checksFolder+check.fnc;
+        checks.forEach((check) => {
+            let moduleName = checksFolder + check.fnc;
             let CheckModule = require(moduleName);
             let checkMod = new CheckModule(check.options);
             Object.assign(this.errorCodes, checkMod.getErrorCodes());
@@ -33,56 +33,15 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.branch = branch;
         this.workingCopy = workingCopy;
         this.filterMarketplace();
-        if (!this.model ) {
+        if (!this.model) {
             return
         }
         var promises = [];
-        
-        let securities = this.model.allProjectSecurities();
-        securities.forEach((securityIF) => {
-            promises.push(new Promise((resolve, reject)=>{
-                if (securityIF.structureTypeName==='Security$ProjectSecurity'){
-                    securityIF.load().then((security)=> {
-                        this.security.enableDemoUsers = security.enableDemoUsers;
-                        resolve();
-                    })
-                } else resolve();
-            }))                        
-        });
 
-        this.microflows = this.findAllMicroflows();
-        this.microflows.forEach((microflowIF) => {
-            promises.push(new Promise((resolve, reject) => {
-                let moduleName = this.getModuleName(microflowIF);
-                let excludeThis = false;
-                if (this.excludes) {
-                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
-                }
-                if (!excludeThis) {
-                    microflowIF.load().then((microflow) => {
-                        this.parseMicroflow(microflow);
-                        resolve();
-                    })
-                    .catch((err)=>{console.log(err)})                    
-                } else { resolve() };
-            }))
-        });
-        this.rules = this.findAllRules();
-        this.rules.forEach((ruleIF) => {            
-            promises.push(new Promise((resolve, reject) => {
-                let moduleName = this.getModuleName(ruleIF);
-                let excludeThis = false;
-                if (this.excludes) {
-                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
-                }
-                if (!excludeThis) {
-                    ruleIF.load().then((rule) => {
-                        this.parseRule(rule);
-                        resolve();
-                    });
-                } else { resolve() };
-            }))
-        });
+        this.collectSecurity(promises);
+        this.collectMicroflows(promises);
+        this.collectRules(promises);
+
         return Promise.all(promises).then(() => {
             resolve()
         });
@@ -92,15 +51,15 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
         mfObjects.forEach((obj) => {
             let json = obj.toJSON();
-            if (json['$Type']==='Microflows$Annotation'){
+            if (json['$Type'] === 'Microflows$Annotation') {
                 let action_type = 'Annotation';
-                this.updateHierarchy(mf, action_type, parentMF, null, {'caption': json['caption']});
+                this.updateHierarchy(mf, action_type, parentMF, null, { 'caption': json['caption'] });
             }
             if (json['$Type'] === 'Microflows$LoopedActivity') {
                 let action_type = 'LoopAction';
                 this.updateHierarchy(parentMF || mf, action_type, parentMF);
                 this.parseMicroflow(obj, parentMF || mf);
-            }            
+            }
             else if (json['$Type'] === 'Microflows$ActionActivity') {
                 let action_type = json['action']['$Type'];
                 let subMF = null;
@@ -115,9 +74,9 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                     json['action']['items'].forEach((item) => {
                         let count = this.checkExpressionComplexity(item['value']);
                         if (count > complexity) { complexity = count };
-                    })  
+                    })
                 }
-                this.updateHierarchy(mf, action_type, parentMF, subMF, {'complexity': complexity});
+                this.updateHierarchy(mf, action_type, parentMF, subMF, { 'complexity': complexity });
             } else if (json['$Type'] === 'Microflows$StartEvent') {
                 let action_type = 'StartEvent';
                 this.updateHierarchy(mf, action_type, parentMF);
@@ -128,10 +87,10 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 let action_type = 'ExclusiveSplit';
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
                 let complexity = this.checkExpressionComplexity(condition);
-                this.updateHierarchy(mf, action_type, parentMF, null, {'caption': json['caption'], 'complexity': complexity});
+                this.updateHierarchy(mf, action_type, parentMF, null, { 'caption': json['caption'], 'complexity': complexity });
             } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
                 let action_type = 'ExclusiveMerge';
-                this.updateHierarchy(mf, action_type, parentMF, null, {'id': json['$ID']});
+                this.updateHierarchy(mf, action_type, parentMF, null, { 'id': json['$ID'] });
             }
         });
     }
@@ -170,7 +129,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 this.hierarchy[microflowName] = { mf: mfToAdd };
             }
         }
-        let actionInfo = {'type': action};
+        let actionInfo = { 'type': action };
         Object.assign(actionInfo, data);
         if (actions) {                                                  //update or create actions
             actions.push(actionInfo);
@@ -200,16 +159,16 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             domainModels.forEach(domainModel => {
                 this.entities.push(...domainModel.entities);
             })
-            this.checkModules.forEach((checkModule)=>{
-                if (checkModule.level==='security'){
+            this.checkModules.forEach((checkModule) => {
+                if (checkModule.level === 'security') {
                     this.executeCheck(checkModule, this.model);
                 }
             })
-    
+
             Object.keys(this.hierarchy).forEach((microflow) => {
                 if (microflow && microflow != 'undefined') {
-                    this.checkModules.forEach((checkModule)=>{
-                        if (checkModule.level==='microflow'){
+                    this.checkModules.forEach((checkModule) => {
+                        if (checkModule.level === 'microflow') {
                             this.executeCheck(checkModule, microflow);
                         }
                     })
@@ -222,7 +181,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
     executeCheck = function (checkModule, microflow) {
         let errors = checkModule.check(this, microflow);
         if (errors && errors.length > 0) {
-            if (checkModule.level==='microflow'){
+            if (checkModule.level === 'microflow') {
                 let mf = this.hierarchy[microflow];
                 this.reports.push({ microflow: mf.mf, errors: errors });
             } else {
@@ -246,11 +205,11 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             item.errors.forEach((err) => {
                 if (fName) {
                     try {
-                        if (typeof theMicroflow==='string'){//not a real microflow ;-)
-                            fs.appendFileSync(fName + '_analysis.csv', 'APP;'+theMicroflow + ';' + err.code + ';' + this.errorCodes[err.code]+'\n');                        
+                        if (typeof theMicroflow === 'string') {//not a real microflow ;-)
+                            fs.appendFileSync(fName + '_analysis.csv', 'APP;' + theMicroflow + ';' + err.code + ';' + this.errorCodes[err.code] + '\n');
                         } else {
                             let moduleName = this.getModuleName(theMicroflow);
-                            fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theMicroflow.name + ';' + err.code + ';' + this.errorCodes[err.code]+';'+(err.comment||'')+'\n');                        
+                            fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theMicroflow.name + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                         }
                     } catch (err) {
                         console.error(err);
@@ -262,7 +221,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         })
     }
 
-    getIgnoreRuleAnnotations = function(microflow){
+    getIgnoreRuleAnnotations = function (microflow) {
         let mfActions = this.hierarchy[microflow].actions;
         let ignoreRuleAnnotations = mfActions.flatMap((action) => {
 
@@ -273,10 +232,61 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 }
                 return [];
             }
-            return  [];
+            return [];
         })
         return ignoreRuleAnnotations;
     }
 
+    collectSecurity = function (promises) {
+        let securities = this.model.allProjectSecurities();
+        securities.forEach((securityIF) => {
+            promises.push(new Promise((resolve, reject) => {
+                if (securityIF.structureTypeName === 'Security$ProjectSecurity') {
+                    securityIF.load().then((security) => {
+                        this.security.enableDemoUsers = security.enableDemoUsers;
+                        resolve();
+                    })
+                } else resolve();
+            }))
+        });
+    }
 
+    collectMicroflows(promises){
+        this.microflows = this.findAllMicroflows();
+        this.microflows.forEach((microflowIF) => {
+            promises.push(new Promise((resolve, reject) => {
+                let moduleName = this.getModuleName(microflowIF);
+                let excludeThis = false;
+                if (this.excludes) {
+                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
+                }
+                if (!excludeThis) {
+                    microflowIF.load().then((microflow) => {
+                        this.parseMicroflow(microflow);
+                        resolve();
+                    })
+                        .catch((err) => { console.log(err) })
+                } else { resolve() };
+            }))
+        });
+    }
+
+    collectRules(promises){
+        this.rules = this.findAllRules();
+        this.rules.forEach((ruleIF) => {
+            promises.push(new Promise((resolve, reject) => {
+                let moduleName = this.getModuleName(ruleIF);
+                let excludeThis = false;
+                if (this.excludes) {
+                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
+                }
+                if (!excludeThis) {
+                    ruleIF.load().then((rule) => {
+                        this.parseRule(rule);
+                        resolve();
+                    });
+                } else { resolve() };
+            }))
+        });
+    }
 }
