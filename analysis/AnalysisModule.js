@@ -17,6 +17,9 @@ module.exports = class AnalysisModule {
     findAllRules(){
         return this.model.allRules();
     }
+    findAllDomainModels(){
+        return this.model.allDomainModels();
+    }
 
     findMicroflowByName(microflowname) {
         return this.model.allMicroflows().filter((mf) => {
@@ -29,11 +32,14 @@ module.exports = class AnalysisModule {
 
     getModuleName(document){
         let qualifiedName = document.qualifiedName;
-        let parts = qualifiedName.split('.');
-        if (parts.length = 2){
-            return parts[0];
-        } else return '';
-
+        if (document.structureTypeName ==='DomainModels$DomainModel'){
+            return document.container.name;
+        } else {
+            let parts = qualifiedName.split('.');
+            if (parts.length = 2){
+                return parts[0];
+            } else return '';
+        }
     }
 
     getDocumentName(document){

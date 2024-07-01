@@ -27,12 +27,12 @@ module.exports = class NamingConvention extends CheckModule {
                 this.addErrors(errors, "NC2", ignoreRuleAnnotations); 
             }
             let mfEntityName = mfNameParts[1];
-            let entityForMF = mfQuality.entities.find((entity) => {
-                let entityName = mfQuality.getDocumentName(entity);
+            let entityForMF = mfQuality.domains.find((entity) => {
+                let entityName = entity.name;
                 return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName);
             })
             if (entityForMF) {
-                let entityModule = mfQuality.getModuleName(entityForMF);
+                let entityModule = entityForMF.module;
                 if (entityModule != this.moduleName) {
                     this.addErrors(errors, "NC4", ignoreRuleAnnotations);
                 }

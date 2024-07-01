@@ -89,6 +89,9 @@
         {
             "fnc": "DemoUsers"
         },
-        {   "fnc": "NestingTooDeep", "options": {"mxNesting": 5} }
+        {   "fnc": "NestingTooDeep", "options": {"mxNesting": 5} },
+        {
+            "fnc": "DomainModel"
+        }
     ]
 }

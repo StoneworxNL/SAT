@@ -16,7 +16,6 @@ module.exports = class TooComplexMicroflow extends CheckModule {
     check = function (mfQuality, microflow) {
         let errors = [];
         this.parseMFName(microflow);
-        console.log(this.microflowName);
         let mfActions = mfQuality.hierarchy[microflow].actions;
         let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
         let exceptions = this.options.prefixExceptions;

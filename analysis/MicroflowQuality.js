@@ -5,14 +5,25 @@ const { resolve } = require("path");
 const { microflows, Annotation, JavaScriptSerializer, xmlschemas } = require("mendixmodelsdk");
 var wc = require('../mxworkingcopy');
 const exp = require("constants");
+const { notDeepEqual } = require("assert");
+
+class Entity {
+    constructor(moduleName, entityName, documentation) {
+        this.module = moduleName,
+            this.documentation = documentation;
+        this.name = entityName;
+        this.attrs = [];
+    }
+}
 
 module.exports = class MicroflowQuality extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
         super(excludes, prefixes, outFileName);
         this.microflows_by_name;
         this.security = {};
-        this.entities = [];
+        //this.entities = [];
         this.rules = [];
+        this.domains = [];
         this.errorCodes = {}
 
         const checks = config.get("checks");
@@ -41,6 +52,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.collectSecurity(promises);
         this.collectMicroflows(promises);
         this.collectRules(promises);
+        this.collectDomainModels(promises);
 
         return Promise.all(promises).then(() => {
             resolve()
@@ -99,6 +111,23 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         this.parseMicroflow(mf, null);
     }
 
+    parseDomain = function (domain) {
+        //console.log(JSON.stringify(domain, null, 2));
+        let entities = domain.entities;
+        let domainEntities = [];
+        entities.forEach((entity) => {
+            let moduleName = this.getModuleName(entity);
+            let attributes = entity.attributes;
+            let entityData = new Entity(moduleName, entity.name, entity.documentation || '')
+
+            attributes.forEach((attribute) => {
+                entityData.attrs.push(attribute.name);
+            })
+            domainEntities.push(entityData);
+        })
+        return domainEntities;
+    }
+
     checkExpressionComplexity(expression) {
         let result = 0;
         let regex = /(if(\s|\()|and(\s|\()|or(\s|\()|not(\s|\())/g;
@@ -147,21 +176,16 @@ module.exports = class MicroflowQuality extends AnalysisModule {
 
     analyse = function () {
         console.log("===================================ANALYSIS ==============================\n");
-        //console.log(JSON.stringify(this.hierarchy, null, 2));
         let dms = this.model.allDomainModels();
         let dmPromises = [];
-
-        dms.forEach((dm) => {
-            let dmPromise = dm.load();
-            dmPromises.push(dmPromise);
-        })
-        return Promise.all(dmPromises).then((domainModels) => {
-            domainModels.forEach(domainModel => {
-                this.entities.push(...domainModel.entities);
-            })
+        return new Promise((resolve, reject) => {
             this.checkModules.forEach((checkModule) => {
                 if (checkModule.level === 'security') {
                     this.executeCheck(checkModule, this.model);
+                } else if (checkModule.level === 'domainmodel') {
+                    this.domains.forEach(entity => {
+                        this.executeCheck(checkModule, entity);
+                    })
                 }
             })
 
@@ -178,14 +202,16 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         })
     }
 
-    executeCheck = function (checkModule, microflow) {
-        let errors = checkModule.check(this, microflow);
+    executeCheck = function (checkModule, document) {
+        let errors = checkModule.check(this, document);
         if (errors && errors.length > 0) {
             if (checkModule.level === 'microflow') {
-                let mf = this.hierarchy[microflow];
-                this.reports.push({ microflow: mf.mf, errors: errors });
+                let mf = this.hierarchy[document];
+                this.reports.push({ type: 'microflow', document: mf.mf, errors: errors });
+            } else if (checkModule.level === 'domainmodel') {
+                this.reports.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });
             } else {
-                this.reports.push({ microflow: checkModule.level, errors: errors });
+                this.reports.push({ type: 'app', document: checkModule.level, errors: errors });
             }
         }
 
@@ -201,39 +227,65 @@ module.exports = class MicroflowQuality extends AnalysisModule {
             }
         }
         reports.forEach(item => {
-            let theMicroflow = item.microflow;
+            let theDocument = item.document;
             item.errors.forEach((err) => {
                 if (fName) {
                     try {
-                        if (typeof theMicroflow === 'string') {//not a real microflow ;-)
-                            fs.appendFileSync(fName + '_analysis.csv', 'APP;' + theMicroflow + ';' + err.code + ';' + this.errorCodes[err.code] + '\n');
-                        } else {
-                            let moduleName = this.getModuleName(theMicroflow);
-                            fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theMicroflow.name + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                        switch (item.type) {
+                            case 'app':
+                                fs.appendFileSync(fName + '_analysis.csv', 'APP;' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                break;
+                            case 'domainmodel':
+                                let [domainModel, entityName, mfPrefix] = this.nameParts(theDocument)
+                                fs.appendFileSync(fName + '_analysis.csv', domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code] + '\n');
+                                break;
+                            case 'microflow':
+                                let moduleName = this.getModuleName(theDocument);
+                                fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theDocument.name + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                break;
+                            default:
+                                console.log('Cannot determine: ' + item.type);
                         }
+                        // if (typeof theDocument === 'string') {//not a real microflow ;-)
+                        //     if (theDocument ==='domainmodel'){
+                        //     } else {
+                        //         fs.appendFileSync(fName + '_analysis.csv', 'APP;' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '')  + '\n');
+                        //     }
+                        // } else {
+                        // }
                     } catch (err) {
                         console.error(err);
                     }
                 } else {
-                    console.log(moduleName + ';' + theMicroflow.name + ';' + err.code + ';' + this.errorCodes[err.code]);
+                    console.log(moduleName + ';' + theDocument.name + ';' + err.code + ';' + this.errorCodes[err.code]);
                 }
             })
         })
     }
 
-    getIgnoreRuleAnnotations = function (microflow) {
-        let mfActions = this.hierarchy[microflow].actions;
-        let ignoreRuleAnnotations = mfActions.flatMap((action) => {
-
-            if (action.type === 'Annotation') {
-                let ignoreRuleAnnotation = action.caption.match(/^@SAT-([A-Z]{2}\d): .*/);
-                if (ignoreRuleAnnotation) {
-                    return ignoreRuleAnnotation[1];
-                }
-                return [];
+    getIgnoreRuleAnnotations = function (document) {
+        let ignoreRuleAnnotations = [];
+        if (document instanceof Entity) {
+            //console.log('Entity: '+JSON.stringify(document, null, 2));
+            let documentation = document.documentation;
+            let ignoreRuleAnnotation = documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
+            if (ignoreRuleAnnotation) {
+                return [ignoreRuleAnnotation[1]];
             }
             return [];
-        })
+        } else {
+            let mfActions = this.hierarchy[document].actions;
+            ignoreRuleAnnotations = mfActions.flatMap((action) => {
+                if (action.type === 'Annotation') {
+                    let ignoreRuleAnnotation = action.caption.match(/^@SAT-([A-Z]{2}\d): .*/);
+                    if (ignoreRuleAnnotation) {
+                        return ignoreRuleAnnotation[1];
+                    }
+                    return [];
+                }
+                return [];
+            })
+        }
         return ignoreRuleAnnotations;
     }
 
@@ -251,7 +303,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         });
     }
 
-    collectMicroflows(promises){
+    collectMicroflows(promises) {
         this.microflows = this.findAllMicroflows();
         this.microflows.forEach((microflowIF) => {
             promises.push(new Promise((resolve, reject) => {
@@ -271,7 +323,7 @@ module.exports = class MicroflowQuality extends AnalysisModule {
         });
     }
 
-    collectRules(promises){
+    collectRules(promises) {
         this.rules = this.findAllRules();
         this.rules.forEach((ruleIF) => {
             promises.push(new Promise((resolve, reject) => {
@@ -283,6 +335,27 @@ module.exports = class MicroflowQuality extends AnalysisModule {
                 if (!excludeThis) {
                     ruleIF.load().then((rule) => {
                         this.parseRule(rule);
+                        resolve();
+                    });
+                } else { resolve() };
+            }))
+        });
+    }
+
+    collectDomainModels(promises) {
+        let domains = this.findAllDomainModels();
+        domains.forEach((domainIF) => {
+            promises.push(new Promise((resolve, reject) => {
+                let moduleName = this.getModuleName(domainIF);
+                let excludeThis = false;
+                if (this.excludes) {
+                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
+                }
+                if (!excludeThis) {
+                    domainIF.load().then((domain) => {
+                        //this.entities.push(...domain.entities);
+                        let domainEntities = this.parseDomain(domain);
+                        this.domains.push(...domainEntities);
                         resolve();
                     });
                 } else { resolve() };
