@@ -1,4 +1,4 @@
-const MicroflowQuality  = require("../analysis/MicroflowQuality");
+const MicroflowQuality  = require("../analysis/ModelQuality");
 
 module.exports = class CheckModule {    
     constructor(options) {

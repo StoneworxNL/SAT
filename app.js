@@ -49,7 +49,7 @@ function main() {
             module = "./analysis/SequenceDiagram";
             break
         case 'MQ': 
-            module = "./analysis/MicroflowQuality";
+            module = "./analysis/ModelQuality";
             break
         default:
             console.log("No module specified");

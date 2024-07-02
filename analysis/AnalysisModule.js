@@ -30,6 +30,10 @@ module.exports = class AnalysisModule {
         });
     }
 
+    logObject(object){
+        console.log(JSON.stringify(object, null, 2));
+    }
+
     getModuleName(document){
         let qualifiedName = document.qualifiedName;
         if (document.structureTypeName ==='DomainModels$DomainModel'){

@@ -92,6 +92,9 @@
         {   "fnc": "NestingTooDeep", "options": {"mxNesting": 5} },
         {
             "fnc": "DomainModel"
+        },
+        {
+            "fnc": "MenuStructure"
         }
     ]
 }
