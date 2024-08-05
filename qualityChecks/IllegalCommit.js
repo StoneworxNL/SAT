@@ -6,7 +6,8 @@ module.exports = class IllegalCommit extends CheckModule {
 
         this.errorCodes = {
             "CM1": "Commit not on correct hierarchy level(ACT or one level down)",
-            "CM2": "Commit not allowed in this type of microflow"
+            "CM2": "Commit not allowed in this type of microflow",
+            "CM3": "Create or Change object with commit  not on correct hierarchy level(ACT or one level down)"
         };
     }
 
@@ -19,7 +20,13 @@ module.exports = class IllegalCommit extends CheckModule {
         let commit = mfActions.find((action) => {
             return action.type == 'Microflows$CommitAction'
         })
-        if (commit) {
+        let createOrChangeCommit = mfActions.find((action) => {
+            if (action.type == 'Microflows$CreateObjectAction' || action.type == 'Microflows$ChangeObjectAction'){
+                return action.commit;            
+            } else return false;
+
+        })
+        if (commit || createOrChangeCommit) {
             let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
             if (!allowedPrefixes.includes(this.mfPrefix)) {  //if commit not in ACT: is must be in SUB that is called from ACT only
                 let allMFs = Object.keys(mfQuality.hierarchy);
@@ -37,7 +44,11 @@ module.exports = class IllegalCommit extends CheckModule {
                 if (subMFName) {
                     let [subModule, subMF, subMFPrefix] = mfQuality.nameParts(subMFName);
                     if (!allowedPrefixes.includes(subMFPrefix)) {
-                        this.addErrors(errors, "CM1", ignoreRuleAnnotations);
+                        if (commit) {
+                            this.addErrors(errors, "CM1", ignoreRuleAnnotations);
+                        } else if (createOrChangeCommit) {
+                            this.addErrors(errors, "CM3", ignoreRuleAnnotations);
+                        }
                     }
                 }
             }

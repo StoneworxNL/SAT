@@ -324,6 +324,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                 let action_type = json['action']['$Type'];
                 let subMF = null;
                 let complexity = 0;
+                let commit = false;
                 if (action_type === 'Microflows$MicroflowCallAction') {
                     subMF = json['action']['microflowCall']['microflow'];
                 } else if (action_type === 'Microflows$CreateVariableAction') {
@@ -335,8 +336,11 @@ module.exports = class ModelQuality extends AnalysisModule {
                         let count = this.checkExpressionComplexity(item['value']);
                         if (count > complexity) { complexity = count };
                     })
+                    if (json['action']['commit']==='Yes'){
+                        commit = true;
+                    }
                 }
-                this.updateHierarchy(mf, action_type, parentMF, subMF, { 'complexity': complexity });
+                this.updateHierarchy(mf, action_type, parentMF, subMF, { 'complexity': complexity, 'commit': commit });
             } else if (json['$Type'] === 'Microflows$StartEvent') {
                 let action_type = 'StartEvent';
                 this.updateHierarchy(mf, action_type, parentMF);
@@ -444,7 +448,6 @@ module.exports = class ModelQuality extends AnalysisModule {
             }
             let subItems = menuItem.items;
             if (subItems.length > 0){
-                console.log("GOING SUB FOR: "+caption);
                 this.parseMenuItems(subItems, module, document);
             }
         })
