@@ -2,7 +2,7 @@
     "checksFolder": "../qualityChecks/",
     "checks": [{
             "fnc": "NamingConvention",
-            "options": {                  "allowedPrefixes": [
+            "options": { "allowedPrefixes": [
                     "ACO",
                     "ACT",
                     "SUB",
@@ -95,6 +95,26 @@
         },
         {
             "fnc": "MenuStructure"
+        },
+        {
+            "fnc": "TopLevelFlows",
+            "options" : {
+            "TopLevelPrefixes": [
+                    "ACO",
+                    "BCO",
+                    "BCR",
+                    "ACR",
+                    "BDE",
+                    "ADE",
+                    "BRO",
+                    "ARO",
+                    "ACT",
+                    "DS",
+                    "OEN",
+                    "OLE",
+                    "OCH" 
+                ]
+            }
         }
     ]
 }

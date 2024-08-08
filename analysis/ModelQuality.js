@@ -10,7 +10,7 @@ const { notDeepEqual } = require("assert");
 class Entity {
     constructor(moduleName, entityName, documentation) {
         this.module = moduleName,
-            this.documentation = documentation;
+        this.documentation = documentation;
         this.name = entityName;
         this.attrs = [];
     }
@@ -155,13 +155,6 @@ module.exports = class ModelQuality extends AnalysisModule {
                             default:
                                 console.log('Cannot determine: ' + item.type);
                         }
-                        // if (typeof theDocument === 'string') {//not a real microflow ;-)
-                        //     if (theDocument ==='domainmodel'){
-                        //     } else {
-                        //         fs.appendFileSync(fName + '_analysis.csv', 'APP;' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '')  + '\n');
-                        //     }
-                        // } else {
-                        // }
                     } catch (err) {
                         console.error(err);
                     }
