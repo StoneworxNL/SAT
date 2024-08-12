@@ -20,6 +20,9 @@ module.exports = class AnalysisModule {
     findAllDomainModels(){
         return this.model.allDomainModels();
     }
+    findAllPages(){
+        return this.model.allPages();
+    }
 
     findMicroflowByName(microflowname) {
         return this.model.allMicroflows().filter((mf) => {

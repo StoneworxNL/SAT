@@ -17,7 +17,9 @@
                     "OPR",
                     "FNC",
                     "ASU",
-                    "SE",
+                    "BSD",
+                    "HCH",
+                    "SCE",
                     "CWS",
                     "PWS",
                     "PRS",
@@ -27,7 +29,16 @@
                     "BCO",
                     "CAL",
                     "ADE",
-                    "RULE"
+                    "RULE",
+                    "WFA",
+                    "WFS",
+                    "WFC"
+                ], "exceptionPrefixes": [
+                    "ACT",
+                    "ASU",
+                    "BSD",
+                    "HCH",
+                    "WFA"
                 ]
             }
         },
@@ -115,6 +126,8 @@
                     "OCH" 
                 ]
             }
+        },
+        { "fnc": "PageCommit"
         }
     ]
 }

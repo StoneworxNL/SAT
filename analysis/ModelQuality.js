@@ -1,5 +1,6 @@
 const fs = require("fs");
 const config = require("config");
+var jspath = require('jspath');
 const AnalysisModule = require("./AnalysisModule");
 const { resolve } = require("path");
 const { microflows, Annotation, JavaScriptSerializer, xmlschemas } = require("mendixmodelsdk");
@@ -10,7 +11,7 @@ const { notDeepEqual } = require("assert");
 class Entity {
     constructor(moduleName, entityName, documentation) {
         this.module = moduleName,
-        this.documentation = documentation;
+            this.documentation = documentation;
         this.name = entityName;
         this.attrs = [];
     }
@@ -26,16 +27,26 @@ class Menu {
     }
 }
 
+class Page {
+    constructor(moduleName, pageName, documentation) {
+        this.module = moduleName,
+        this.documentation = documentation;
+        this.name = pageName;
+        this.allowedRoles = [];
+        this.buttons = [];
+    }
+}
+
 module.exports = class ModelQuality extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
         super(excludes, prefixes, outFileName);
         this.microflows_by_name;
         this.security = {};
-        //this.entities = [];
         this.rules = [];
         this.domains = [];
         this.menus = [];
         this.errorCodes = {}
+        this.pages = [];
 
         const checks = config.get("checks");
         let checksFolder = config.get("checksFolder");
@@ -65,6 +76,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.collectRules(promises);
         this.collectDomainModels(promises);
         this.collectMenus(promises);
+        this.collectPages(promises);
 
         return Promise.all(promises).then(() => {
             resolve()
@@ -87,6 +99,10 @@ module.exports = class ModelQuality extends AnalysisModule {
                 } else if (checkModule.level === 'menu') {
                     this.menus.forEach(menu => {
                         this.executeCheck(checkModule, menu);
+                    })
+                } else if (checkModule.level === 'page') {
+                    this.pages.forEach(page => {
+                        this.executeCheck(checkModule, page);
                     })
                 }
             })
@@ -114,6 +130,8 @@ module.exports = class ModelQuality extends AnalysisModule {
                 this.reports.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });
             } else if (checkModule.level === 'menu') {
                 this.reports.push({ type: 'menu', document: document.module + '.' + document.document, errors: errors });
+            } else if (checkModule.level === 'page') {
+                this.reports.push({ type: 'page', document: document.module + '.' + document.name, errors: errors });
             } else {
                 this.reports.push({ type: 'app', document: checkModule.level, errors: errors });
             }
@@ -149,9 +167,13 @@ module.exports = class ModelQuality extends AnalysisModule {
                                 fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theDocument.name + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             case 'menu':
-                                    let menuName = item.document;
-                                    fs.appendFileSync(fName + '_analysis.csv', 'Menu' + ';' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
-                                    break;
+                                let menuName = item.document;
+                                fs.appendFileSync(fName + '_analysis.csv', 'Menu' + ';' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                break;
+                            case 'page':
+                                let [pageModuleName, pageName] = theDocument.split('.');
+                                fs.appendFileSync(fName + '_analysis.csv', pageModuleName  + ';' + pageName + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                break;
                             default:
                                 console.log('Cannot determine: ' + item.type);
                         }
@@ -167,7 +189,7 @@ module.exports = class ModelQuality extends AnalysisModule {
 
     getIgnoreRuleAnnotations = function (document) {
         let ignoreRuleAnnotations = [];
-        if (document instanceof Entity) {
+        if (document instanceof Entity || document instanceof Page) {
             //console.log('Entity: '+JSON.stringify(document, null, 2));
             let documentation = document.documentation;
             let ignoreRuleAnnotation = documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
@@ -299,6 +321,25 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }
 
+    collectPages(promises) {
+        let pages = this.findAllPages();
+        pages.forEach((pageIF) => {
+            promises.push(new Promise((resolve, reject) => {
+                let moduleName = this.getModuleName(pageIF);
+                let excludeThis = false;
+                if (this.excludes) {
+                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
+                }
+                if (!excludeThis) {
+                    pageIF.load().then((page) => {
+                        this.parsePage(page, moduleName, pageIF.name);
+                        resolve();
+                    });
+                } else { resolve() };
+            }))
+        });
+    }
+
 
     parseMicroflow = function (mf, parentMF) {
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
@@ -329,7 +370,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                         let count = this.checkExpressionComplexity(item['value']);
                         if (count > complexity) { complexity = count };
                     })
-                    if (json['action']['commit']==='Yes'){
+                    if (json['action']['commit'] === 'Yes') {
                         commit = true;
                     }
                 }
@@ -440,9 +481,26 @@ module.exports = class ModelQuality extends AnalysisModule {
 
             }
             let subItems = menuItem.items;
-            if (subItems.length > 0){
+            if (subItems.length > 0) {
                 this.parseMenuItems(subItems, module, document);
             }
         })
+    }
+
+    parsePage = function (page, module, pageName) {
+        let thePage = new Page(module, pageName, page.documentation);
+        let json = JSON.parse(JSON.stringify(page));
+        const footerButtons = jspath.apply('..footerWidgets{.$Type==="Pages$ActionButton"}', json);
+        const buttons = jspath.apply("..widgets{.$Type==='Pages$ActionButton'}", json);
+        let allowedRoles = jspath.apply('.allowedRoles', json);
+        thePage.allowedRoles = allowedRoles;
+        footerButtons.forEach((button) => {
+            thePage.buttons.push({ type: button.action.$Type })
+        })
+        buttons.forEach((button) => {
+            thePage.buttons.push({ type: button.action.$Type })
+        })
+        this.pages.push(thePage);
+
     }
 }
