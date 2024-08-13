@@ -19,12 +19,13 @@ module.exports = class NamingConvention extends CheckModule {
         let mfNameParts = this.microflowName.split('_');
         let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
         let errors = [];
-        let isExceptionPrefix = exceptionPrefixes.find((prefix) => prefix == this.mfPrefix);
+        let mfPrefix = this.mfPrefix;
+        let isExceptionPrefix = exceptionPrefixes.find((prefix) => prefix == mfPrefix);
         if (!isExceptionPrefix) {
-            if (mfNameParts.length < 3) {
+            if ((mfPrefix === 'VAL' &&  mfNameParts.length < 2) || mfNameParts.length < 3) {
                 this.addErrors(errors, "NC1", ignoreRuleAnnotations);
             } else {
-                let mfPrefix = this.mfPrefix;
+                
                 let pfFound = allowedPrefixes.find((prefix) => prefix == mfPrefix);
                 if (!pfFound) {
                     this.addErrors(errors, "NC2", ignoreRuleAnnotations);
@@ -44,7 +45,7 @@ module.exports = class NamingConvention extends CheckModule {
                     this.addErrors(errors, "NC3", ignoreRuleAnnotations);
                 }
             }
-        }
+        } 
         return errors;
     }
 

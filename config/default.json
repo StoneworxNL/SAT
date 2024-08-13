@@ -38,7 +38,8 @@
                     "ASU",
                     "BSD",
                     "HCH",
-                    "WFA"
+                    "WFA",
+                    "VAL"
                 ]
             }
         },
@@ -128,6 +129,14 @@
             }
         },
         { "fnc": "PageCommit"
+        },
+        { "fnc": "IllegalObjectActions",
+          "options" : {
+            "PrefixesNotAllowed": [
+                    "DS",
+                    "VAL" 
+                ]
+            }
         }
     ]
 }
