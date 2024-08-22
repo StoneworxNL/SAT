@@ -13,9 +13,10 @@ commander
     .version('1.0.0', '-v, --version')
     .usage('[OPTIONS]...')
     .requiredOption('-n, --nickname <nickname>', 'Nickname under which data is stored')
-    .option('-d, --documentName <document>', 'Qualified name of document to analyse.')
     .requiredOption('-a, --appid <appid>', 'AppID of the mendix project')
     .requiredOption('-b, --branch <branch name>', 'Branch of the mendix project')
+    .option('-c, --clear', 'Clear workingcopy')
+    .option('-d, --documentName <document>', 'Qualified name of document to analyse.')
     .requiredOption('-m, --module <module name', 'Analysis module to use: SD=sequence Diagram, MQ=MicroflowQuality')
     .option('-e, --excludes [exclude....]', 'Modules to exclude from analysis', commaSeparatedList)
     .option('-p, --prefixes [prefix...]', 'Prefixes to aggregate as one', commaSeparatedList)
@@ -28,6 +29,7 @@ var branch = "";
 var excludes;
 var prefixes;
 var moduleCode;
+var clear;
 main();
 
 function commaSeparatedList(value) {
@@ -36,19 +38,20 @@ function commaSeparatedList(value) {
 
 function main() {
     const nickname = options.nickname;
-    const documentName = options.documentName||'';
+    const documentName = options.documentName || '';
     appID = options.appid;
     branch = options.branch;
     excludes = options.excludes ? options.excludes : undefined;
     prefixes = options.prefixes ? options.prefixes : undefined;
     moduleCode = options.module ? options.module : 'SD';
+    clear = options.clear ? options.clear : false;
 
 
-    switch (moduleCode){
-        case 'SD': 
+    switch (moduleCode) {
+        case 'SD':
             module = "./analysis/SequenceDiagram";
             break
-        case 'MQ': 
+        case 'MQ':
             module = "./analysis/ModelQuality";
             break
         default:
@@ -56,16 +59,18 @@ function main() {
             break
     }
     const AnalysisModule = require(module);
-    
-    let analysis = new AnalysisModule(appID,excludes, prefixes);
 
-    wc.loadWorkingCopy(appID, nickname, branch).then(([model, workingCopy]) => {        
+    let analysis = new AnalysisModule(appID, excludes, prefixes);
+
+    wc.loadWorkingCopy(appID, nickname, branch, clear).then(([model, workingCopy]) => {
         analysis.collect(model, branch, workingCopy, documentName).then(() => {
-            analysis.analyse().then(()=>{
-                analysis.report(nickname);  
+            analysis.analyse().then(() => {
+                analysis.report(nickname);
                 console.log("READY");
-            }).catch((e)=>{console.log(e)});
+            }).catch((e) => { console.log(e) });
         });
-    }).catch((e)=>(console.log(e.message)));
+    }).catch((e) => {
+        console.log(e.message)
+    });
 }
 

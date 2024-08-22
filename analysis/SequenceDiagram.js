@@ -167,6 +167,11 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
                 if (action_type === 'Microflows$CommitAction') {
                     this.updateHierarchy(mf.qualifiedName, `Commit ${json['action']['commitVariableName']}`);
                 }
+                if (action_type === 'Microflows$ChangeObjectAction') {
+                    if (json['action']['commit'] && json['action']['commit']==='Yes'){
+                        this.updateHierarchy(mf.qualifiedName, `Commit ${json['action']['changeVariableName']}`);
+                    }
+                }
                 if (action_type === 'Microflows$LoopedActivity') {
                 }
             }

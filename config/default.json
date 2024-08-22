@@ -1,61 +1,70 @@
 {
     "checksFolder": "../qualityChecks/",
-    "checks": [{
+    "checks": [
+        {
             "fnc": "NamingConvention",
-            "options": { "allowedPrefixes": [
+            "options": {
+                "allowedPrefixes": [
                     "ACO",
                     "ACT",
-                    "SUB",
-                    "CRS",
-                    "SCH",
-                    "OCH",
-                    "DS",
-                    "VAL",
-                    "RET",
-                    "CTL",
-                    "TRN",
-                    "OPR",
-                    "FNC",
+                    "ADE",
                     "ASU",
+                    "BCO",
                     "BSD",
+                    "CAL",
+                    "CRS",
+                    "CTL",
+                    "CWS",
+                    "CWS",
+                    "DS",
+                    "FNC",
                     "HCH",
-                    "SCE",
-                    "CWS",
-                    "PWS",
+                    "OCH",
+                    "OLE",
+                    "OPR",
                     "PRS",
-                    "CWS",
+                    "PWS",
                     "QUE",
                     "QUEUE",
-                    "BCO",
-                    "CAL",
-                    "ADE",
+                    "RET",
                     "RULE",
+                    "SCE",
+                    "SCH",
+                    "SUB",
+                    "TRN",
+                    "VAL",
                     "WFA",
-                    "WFS",
-                    "WFC"
-                ], "exceptionPrefixes": [
-                    "ACT",
+                    "WFC",
+                    "WFS"
+                ],
+                "exceptionPrefixes": [
                     "ASU",
                     "BSD",
+                    "CRS",
+                    "CWS",
                     "HCH",
-                    "WFA",
-                    "VAL"
+                    "VAL",
+                    "WFA"
                 ]
             }
         },
         {
             "fnc": "ErrorHandling",
             "options": {
-                "allowedJava": ["CommunityCommons.EndTransaction", "OIDC.DecodeJWTPlainText"]
+                "allowedJava": [
+                    "CommunityCommons.EndTransaction",
+                    "OIDC.DecodeJWTPlainText"
+                ]
             }
-            
         },
         {
             "fnc": "TooComplexMicroflow",
             "options": {
                 "maxActions": 25,
                 "maxComplexity": 30,
-                "prefixExceptions": ["VAL"],
+                "prefixExceptions": [
+                    "VAL"
+                ],
                 "exceptionsMaxActions": 50,
                 "exceptionsMaxComplexity": 100,
                 "cxLoopCount": 4,
@@ -95,13 +104,24 @@
         {
             "fnc": "MissingPermissions",
             "options": {
-                "permissionPrefixes": ["ACT", "OCH", "OEN", "OLE", "DS"]
+                "permissionPrefixes": [
+                    "ACT",
+                    "OCH",
+                    "OEN",
+                    "OLE",
+                    "DS"
+                ]
             }
         },
         {
             "fnc": "DemoUsers"
         },
-        {   "fnc": "NestingTooDeep", "options": {"mxNesting": 5} },
+        {
+            "fnc": "NestingTooDeep",
+            "options": {
+                "mxNesting": 5
+            }
+        },
         {
             "fnc": "DomainModel"
         },
@@ -110,8 +130,8 @@
         },
         {
             "fnc": "TopLevelFlows",
-            "options" : {
-            "TopLevelPrefixes": [
+            "options": {
+                "TopLevelPrefixes": [
                     "ACO",
                     "BCO",
                     "BCR",
@@ -124,17 +144,19 @@
                     "DS",
                     "OEN",
                     "OLE",
-                    "OCH" 
+                    "OCH"
                 ]
             }
         },
-        { "fnc": "PageCommit"
+        {
+            "fnc": "PageCommit"
         },
-        { "fnc": "IllegalObjectActions",
-          "options" : {
-            "PrefixesNotAllowed": [
+        {
+            "fnc": "IllegalObjectActions",
+            "options": {
+                "PrefixesNotAllowed": [
                     "DS",
-                    "VAL" 
+                    "VAL"
                 ]
             }
         }

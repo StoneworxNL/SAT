@@ -4,8 +4,10 @@ DIJK*
 Upskill/
 *.workingcopy
 *.txt
+*.puml
 *.png
 *.cmd
 *.svg
+*.csv
 *_analysis.csv
 RESTO_analysis.old

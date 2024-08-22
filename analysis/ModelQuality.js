@@ -190,7 +190,6 @@ module.exports = class ModelQuality extends AnalysisModule {
     getIgnoreRuleAnnotations = function (document) {
         let ignoreRuleAnnotations = [];
         if (document instanceof Entity || document instanceof Page) {
-            //console.log('Entity: '+JSON.stringify(document, null, 2));
             let documentation = document.documentation;
             let ignoreRuleAnnotation = documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
             if (ignoreRuleAnnotation) {
