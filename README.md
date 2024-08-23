@@ -46,6 +46,8 @@ Options:
   
   -h, --help                     display help for command
 
+  -c, --clear                    Clear working copy, create new
+
   **Examples**
 
   * Sequence Diagram: node app.js -m SD -n [NICKNAME] -d [MODULE].[MICROFLOW] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]

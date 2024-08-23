@@ -7,8 +7,8 @@ module.exports = class NamingConvention extends CheckModule {
         this.errorCodes = {
             "NC1": "format: [PRE]_[Entity(s)]_description",
             "NC2": "Prefix must be allowed",
-            "NC3": "entity must exist ",
-            "NC4": "entity must exist in same module"
+            "NC3": "Entity must exist ",
+            "NC4": "Entity must exist in same module"
         };
     }
 
