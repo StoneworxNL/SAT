@@ -1,21 +1,14 @@
 const fs = require("fs");
 const config = require("config");
 var jspath = require('jspath');
-const AnalysisModule = require("./AnalysisModule");
 const { resolve } = require("path");
-const { microflows, Annotation, JavaScriptSerializer, xmlschemas } = require("mendixmodelsdk");
-var wc = require('../mxworkingcopy');
 const exp = require("constants");
-const { notDeepEqual } = require("assert");
+const { microflows, Annotation, JavaScriptSerializer, xmlschemas } = require("mendixmodelsdk");
 
-class Entity {
-    constructor(moduleName, entityName, documentation) {
-        this.module = moduleName,
-            this.documentation = documentation;
-        this.name = entityName;
-        this.attrs = [];
-    }
-}
+var wc = require('../mxworkingcopy');
+const Entity = require("./Entity");
+const AnalysisModule = require("./AnalysisModule");
+const DomainCollector = require("./DomainCollector");
 
 class Menu {
     constructor(moduleName, document, caption, actionType, action) {
@@ -47,6 +40,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.menus = [];
         this.errorCodes = {}
         this.pages = [];
+        this.domainCollector = new DomainCollector(this);
 
         const checks = config.get("checks");
         let checksFolder = config.get("checksFolder");
@@ -74,7 +68,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.collectSecurity(promises);
         this.collectMicroflows(promises);
         this.collectRules(promises);
-        this.collectDomainModels(promises);
+        this.domainCollector.collect(promises, this.domains);
         this.collectMenus(promises);
         this.collectPages(promises);
 
@@ -265,27 +259,6 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }
 
-    collectDomainModels(promises) {
-        let domains = this.findAllDomainModels();
-        domains.forEach((domainIF) => {
-            promises.push(new Promise((resolve, reject) => {
-                let moduleName = this.getModuleName(domainIF);
-                let excludeThis = false;
-                if (this.excludes) {
-                    excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
-                }
-                if (!excludeThis) {
-                    domainIF.load().then((domain) => {
-                        //this.entities.push(...domain.entities);
-                        let domainEntities = this.parseDomain(domain);
-                        this.domains.push(...domainEntities);
-                        resolve();
-                    });
-                } else { resolve() };
-            }))
-        });
-    }
-
     collectMenus(promises) {
         let menus = this.model.allMenuDocuments();
         let navigations = this.model.allNavigationDocuments();
@@ -441,23 +414,6 @@ module.exports = class ModelQuality extends AnalysisModule {
 
     parseRule = function (mf) {
         this.parseMicroflow(mf, null);
-    }
-
-    parseDomain = function (domain) {
-        //console.log(JSON.stringify(domain, null, 2));
-        let entities = domain.entities;
-        let domainEntities = [];
-        entities.forEach((entity) => {
-            let moduleName = this.getModuleName(entity);
-            let attributes = entity.attributes;
-            let entityData = new Entity(moduleName, entity.name, entity.documentation || '')
-
-            attributes.forEach((attribute) => {
-                entityData.attrs.push(attribute.name);
-            })
-            domainEntities.push(entityData);
-        })
-        return domainEntities;
     }
 
     parseMenuItems = function (menuItems, module, document) {
