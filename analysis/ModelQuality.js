@@ -160,7 +160,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                                 break;
                             case 'domainmodel':
                                 let [domainModel, entityName, mfPrefix] = this.nameParts(theDocument)
-                                fs.appendFileSync(fName + '_analysis.csv', domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code] + '\n');
+                                fs.appendFileSync(fName + '_analysis.csv', domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code]+ ';' + (err.comment || '')  + '\n');
                                 break;
                             case 'microflow':
                                 let moduleName = this.getModuleName(theDocument);

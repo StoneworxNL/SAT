@@ -4,8 +4,8 @@ module.exports = class PageCommit extends CheckModule {
     constructor(options) {
         super(options);
         this.errorCodes = {
-            "PC1": "Commit button on page in stead of micro/nanonflow",
-            "PC2": "Delete button on page in stead of micro/nanonflow"
+            "PC1": "Commit button on page in stead of micro/nanoflow",
+            "PC2": "Delete button on page in stead of micro/nanoflow"
         };
         this.level = 'page';
     }
