@@ -133,12 +133,17 @@ module.exports = class ModelQuality extends AnalysisModule {
 
     }
 
-    report = function (fName) {
+    report = function (nickName) {
         let reports = this.reports;
+        var now = new Date();
+        let dateTimeString = this.getDateTimeString();
 
-        if (fName) {
+        let folder = config.get("outputFolder")||'./';
+        this.reportFile = `${folder}/${nickName}_${this.branch}_${dateTimeString}.csv`;
+        console.log("Writing to "+this.reportFile);
+        if (nickName) {
             try {
-                fs.writeFileSync(fName + '_analysis.csv', 'Module;Microflow;Code;Description\n');
+                fs.writeFileSync(this.reportFile, 'Module;Microflow;Code;Description;Info\n');
             } catch (err) {
                 console.error(err);
             }
@@ -146,27 +151,27 @@ module.exports = class ModelQuality extends AnalysisModule {
         reports.forEach(item => {
             let theDocument = item.document;
             item.errors.forEach((err) => {
-                if (fName) {
+                if (nickName) {
                     try {
                         switch (item.type) {
                             case 'app':
-                                fs.appendFileSync(fName + '_analysis.csv', 'APP;' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                fs.appendFileSync(this.reportFile, 'APP;' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             case 'domainmodel':
                                 let [domainModel, entityName, mfPrefix] = this.nameParts(theDocument)
-                                fs.appendFileSync(fName + '_analysis.csv', domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code]+ ';' + (err.comment || '')  + '\n');
+                                fs.appendFileSync(this.reportFile, domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code]+ ';' + (err.comment || '')  + '\n');
                                 break;
                             case 'microflow':
                                 let moduleName = this.getModuleName(theDocument);
-                                fs.appendFileSync(fName + '_analysis.csv', moduleName + ';' + theDocument.name + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                fs.appendFileSync(this.reportFile, moduleName + ';' + theDocument.name + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             case 'menu':
                                 let menuName = item.document;
-                                fs.appendFileSync(fName + '_analysis.csv', 'Menu' + ';' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                fs.appendFileSync(this.reportFile, 'Menu' + ';' + theDocument + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             case 'page':
                                 let [pageModuleName, pageName] = theDocument.split('.');
-                                fs.appendFileSync(fName + '_analysis.csv', pageModuleName  + ';' + pageName + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                fs.appendFileSync(this.reportFile, pageModuleName  + ';' + pageName + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             default:
                                 console.log('Cannot determine: ' + item.type);

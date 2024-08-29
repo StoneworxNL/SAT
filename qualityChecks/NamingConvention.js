@@ -31,16 +31,17 @@ module.exports = class NamingConvention extends CheckModule {
                     this.addErrors(errors, "NC2", ignoreRuleAnnotations);
                 }
                 let mfEntityName = mfNameParts[1];
-                let entityForMF = mfQuality.domains.find((entity) => {
+                let entitiesForMF = mfQuality.domains.filter((entity) => {
                     let entityName = entity.name;
                     return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName);
                 })
-                if (entityForMF) {
-                    let entityModule = entityForMF.module;
-                    if (entityModule != this.moduleName) {
+                if (entitiesForMF && entitiesForMF.length > 0) { //one or more entities with same name found
+                    let entityForMFInModule = entitiesForMF.find((entity) => {
+                        return this.moduleName === entity.module;
+                    })
+                    if (!entityForMFInModule || entityForMFInModule.length == 0) {
                         this.addErrors(errors, "NC4", ignoreRuleAnnotations);
                     }
-
                 } else {
                     this.addErrors(errors, "NC3", ignoreRuleAnnotations);
                 }

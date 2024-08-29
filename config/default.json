@@ -1,5 +1,6 @@
 {
     "checksFolder": "../qualityChecks/",
+    "outputFolder": "./output",
     "checks": [
         {
             "fnc": "NamingConvention",

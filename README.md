@@ -53,6 +53,10 @@ Options:
   * Sequence Diagram: node app.js -m SD -n [NICKNAME] -d [MODULE].[MICROFLOW] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]
   * Microflow Quality: node app.js -m MQ -n [NICKNAME] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]
 
+  **Accept notifications**
+  To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
+  @SAT-[CODE]: explanation. Where [CODE] is the finding code (like NC1)
+
 
   
 
