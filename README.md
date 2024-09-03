@@ -61,6 +61,8 @@ Options:
   To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
   @SAT-[CODE]: explanation. Where [CODE] is the finding code (like NC1)
 
+  **Diff tool**
+  To compare two results with each other, use node diff.js -1 [FIRST FILE] -2 [SECOND FILE] -o [OUTPUT FILE]
 
   
 
