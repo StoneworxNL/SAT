@@ -1,4 +1,5 @@
-Tool for analysis and some documentation of Mendix apps.
+Tool for analysis and some documentation of Mendix apps. 
+Brought to you by Stoneworx
 
 **Implemented features**
 * Generate Sequence Diagram from a (top) Microflow
@@ -23,6 +24,9 @@ Tool for analysis and some documentation of Mendix apps.
 * requirements: Node & npm
 * clone repo into working directory
 * npm install to install all modules
+* update default.json to liking
+** checksFolder: should point to folder that contains all checks that are specified in the 'checks' array 
+** outputFolder: should point to folder where reports are written. Make sure that it exists
 
 **Usage**
 node app.js [OPTIONS]...
