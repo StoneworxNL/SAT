@@ -160,6 +160,14 @@
                     "VAL"
                 ]
             }
+        },
+        {
+            "fnc": "GetOrCreateCheck",
+            "options": {
+                "allowedPrefixes": [
+                    "SUB"
+                ]
+            }
         }
     ]
 }

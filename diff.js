@@ -11,8 +11,8 @@ commander
     .parse();
 
 const options = commander.opts();
-let fileB = options.first;
-let fileA = options.second;
+let fileA = options.first;
+let fileB = options.second;
 let fileOut = options.output;
 let listA = [];
 let listB = [];
@@ -45,7 +45,7 @@ function sort(){
 
 function diff(listASorted, listBSorted){
     let indexA = 0; let indexB = 0;
-    fs.writeFileSync(fileOut, `diff: ${fileA} <-> ${fileB}`);
+    fs.writeFileSync(fileOut, `diff: ${fileA} <-> ${fileB}\n`);
     while (indexA <= listASorted.length || indexB <= listBSorted.length){
         let valueA = listASorted[indexA];
         let valueB = listBSorted[indexB];

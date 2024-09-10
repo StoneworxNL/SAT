@@ -10,10 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bson": "^6.8.0",
     "commander": "^12.0.0",
     "config": "^3.3.11",
     "jspath": "^0.4.0",
     "mendixmodelsdk": "^4.89.0",
-    "mendixplatformsdk": "^5.1.3"
+    "mendixplatformsdk": "^5.1.3",
+    "sqlite3": "^5.1.7"
   }
 }
