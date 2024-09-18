@@ -1,9 +1,11 @@
 {
     "checksFolder": "../qualityChecks/",
     "outputFolder": "./output",
+    "SquatChecksFolder": "../SquatChecks/",
     "checks": [
         {
             "fnc": "NamingConvention",
+            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "ACO",

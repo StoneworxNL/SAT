@@ -12,10 +12,10 @@ module.exports = class NamingConvention extends CheckModule {
         };
     }
 
-    check = function (mfQuality, microflow) {
+    check = function (model, microflow) {
         let allowedPrefixes = this.options.allowedPrefixes;
         let exceptionPrefixes = this.options.exceptionPrefixes;
-        this.parseMFName(microflow);
+        this.parseMFName(microflow.name);
         let mfNameParts = this.microflowName.split('_');
         let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
         let errors = [];

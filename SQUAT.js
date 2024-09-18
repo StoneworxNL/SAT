@@ -6,6 +6,8 @@ const { program: commander } = require('commander');
 
 const MxModel = require("./MxModel/MxModel.js");
 const MPRCollector = require("./MPRCollector.js")
+const SquatAnalysis = require("./SquatChecks/SquatAnalysis.js");
+
 let model = new MxModel();
 
 
@@ -25,8 +27,10 @@ function main() {
     let outFile = options.out;
     let mprCollector = new MPRCollector(mpr);
     mprCollector.collect().then((model)=>{
-        console.log("DONE: " + JSON.stringify(model, null, 2));
-        console.log("WOOOHOO");
+        let analysis = new SquatAnalysis();
+        analysis.analyse(model);
+        // console.log("DONE: " + JSON.stringify(model, null, 2));
+        // console.log("WOOOHOO");
     });
 
     // switch (moduleCode) {
