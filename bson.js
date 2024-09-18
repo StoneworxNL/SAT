@@ -1,6 +1,7 @@
 const { BSON, EJSON, ObjectId, UUID } = require('bson');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('C:/Mendix/Mx106DemoApp-main_2/Mx106DemoApp.mpr');
+//const db = new sqlite3.Database('C:/Mendix/Mx106DemoApp-main_2/Mx106DemoApp.mpr');
+const db = new sqlite3.Database('/home/mark/Documents/App.mpr');
 
 const MxModel = require("./MxModel/MxModel.js");
 let model = new MxModel();
