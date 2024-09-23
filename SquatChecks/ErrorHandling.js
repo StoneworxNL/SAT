@@ -8,7 +8,7 @@ module.exports = class ErrorHandling extends CheckModule {
         };
     }
 
-    check = function (mfQuality, microflow) {
+    check = function (model, microflow) {
         let errors = [];
         let allowedJava = this.options.allowedJava;
         let mfActions = mfQuality.hierarchy[microflow].actions;

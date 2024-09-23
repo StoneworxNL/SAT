@@ -1,6 +1,7 @@
 const Module = require("./Module");
 const Entity = require("./Entity");
 const Microflow = require("./Microflow");
+const Folder = require("./Folder");
 
 class MxModel{
     constructor() {
@@ -8,6 +9,7 @@ class MxModel{
         this.modules = [];
         this.entities = [];
         this.microflows = [];
+        this.folders = {};
     }
 
     parseSecurity(doc) {
@@ -24,6 +26,25 @@ class MxModel{
     
     parseMicroflow(doc, container){
         this.microflows.push(Microflow.parse(doc, container))
+    }
+
+    parseFolder(doc, container){
+        let folder = Folder.parse(doc, container);
+        this.folders[folder.id] =  folder;
+    }
+
+    getModule(containerID){
+        let module = this.modules.find(module=> module.id === containerID);
+        if (module) {
+            return module
+        } else {
+            let folder = this.folders[containerID];
+            if (folder) {
+                return this.getModule(folder.container)
+            } else {
+                return;
+            }
+        }
     }
 
 

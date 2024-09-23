@@ -7,6 +7,7 @@ const { program: commander } = require('commander');
 const MxModel = require("./MxModel/MxModel.js");
 const MPRCollector = require("./MPRCollector.js")
 const SquatAnalysis = require("./SquatChecks/SquatAnalysis.js");
+const { log } = require("console");
 
 let model = new MxModel();
 
@@ -26,37 +27,15 @@ function main() {
     let mpr = options.mpr;
     let outFile = options.out;
     let mprCollector = new MPRCollector(mpr);
-    mprCollector.collect().then((model)=>{
+    console.log("==================================== COLLECTING DATA: " + mpr);
+
+    mprCollector.collect().then((model) => {
+        console.log(model);
         let analysis = new SquatAnalysis();
+        console.log("====================== ANALYSING =======================");
         analysis.analyse(model);
-        // console.log("DONE: " + JSON.stringify(model, null, 2));
-        // console.log("WOOOHOO");
+        console.log(JSON.stringify(analysis.reportedErrors, null, 2));
+
     });
-
-    // switch (moduleCode) {
-    //     case 'SD':
-    //         module = "./analysis/SequenceDiagram";
-    //         break
-    //     case 'MQ':
-    //         module = "./analysis/ModelQuality";
-    //         break
-    //     default:
-    //         console.log("No module specified");
-    //         break
-    // }
-    // const AnalysisModule = require(module);
-
-    // let analysis = new AnalysisModule(appID, excludes, prefixes);
-
-    // wc.loadWorkingCopy(appID, nickname, branch, clear).then(([model, workingCopy]) => {
-    //     analysis.collect(model, branch, workingCopy, documentName).then(() => {
-    //         analysis.analyse().then(() => {
-    //             analysis.report(nickname);
-    //             console.log("READY");
-    //         }).catch((e) => { console.log(e) });
-    //     });
-    // }).catch((e) => {
-    //     console.log(e.message)
-    // });
 }
 

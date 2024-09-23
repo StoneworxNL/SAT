@@ -26,12 +26,15 @@ class MPRCollector {
                         case 'DomainModels$DomainModel':
                             model.parseDomain(doc, container);
                             break;
-                        case 'Microflows$Microflow':
+                        case 'Microflows$Microflow':                          
                             model.parseMicroflow(doc, container);
                             break;
                         case 'Projects$ModuleSettings':
                         //                console.log(JSON.stringify(doc, null, 4));
-            
+                            break;
+                        case 'Projects$Folder':
+                            model.parseFolder(doc, container);
+                            break;
                         default:
                             //console.log('Not Implemented: '+docType);                
                             break;

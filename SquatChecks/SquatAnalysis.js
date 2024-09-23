@@ -19,7 +19,6 @@ class SquatAnalysis{
     }
 
     analyse(model){
-        console.log(JSON.stringify(this.checkModules, null, 2));
         this.checkModules.forEach((checkModule) => {
             if (checkModule.level === 'security') {
                 this.executeCheck(checkModule, this.model);
@@ -42,19 +41,20 @@ class SquatAnalysis{
             if (microflow && microflow != 'undefined') {
                 this.checkModules.forEach((checkModule) => {
                     if (checkModule.level === 'microflow') {
-                        this.executeCheck(checkModule, microflow);
+                        this.executeCheck(checkModule,  model, microflow);
                     }
                 })
             }
         })
     }
 
-    executeCheck = function (checkModule, document) {
-        let errors = checkModule.check(this, document);
+    executeCheck = function (checkModule, model, document) {
+        let errors = checkModule.check(model, document);
         if (errors && errors.length > 0) {
-            if (checkModule.level === 'microflow') {
-                let mf = this.hierarchy[document];
-                this.reportedErrors.push({ type: 'microflow', document: mf.mf, errors: errors });
+            if (checkModule.level === 'microflow') {                
+                let module = model.getModule(document.moduleID);
+                console.log(document.moduleID+' = '+module);
+                this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
             } else if (checkModule.level === 'domainmodel') {
                 this.reportedErrors.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });
             } else if (checkModule.level === 'menu') {
