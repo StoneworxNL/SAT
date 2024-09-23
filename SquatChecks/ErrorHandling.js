@@ -11,26 +11,18 @@ module.exports = class ErrorHandling extends CheckModule {
     check = function (model, microflow) {
         let errors = [];
         let allowedJava = this.options.allowedJava;
-        let mfActions = mfQuality.hierarchy[microflow].actions;
-        let java = mfActions.find((action) => {
+        let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
+        let mfActions = microflow.actions;
+        let javaActions = mfActions.filter((action) => {
             return action.type == 'Microflows$JavaActionCallAction'
         })
-        if (java) {
-            let mf = mfQuality.hierarchy[microflow].mf;
-            let mfObjects = mf.objectCollection.objects;
-            let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
-            mfObjects.forEach((mfObject) => {
-                if (mfObject.structureTypeName === 'Microflows$ActionActivity') {
-                    let json = mfObject.toJSON();
-                    if (json.action.$Type === 'Microflows$JavaActionCallAction') {
-                        let javaAction = json.action.javaAction;
-                        let isAllowed = allowedJava.find((allowedJavaName)=> allowedJavaName === javaAction);
-                        if (!isAllowed){
-                            let errorHandling = json.action.errorHandlingType;
-                            if (!(errorHandling.startsWith('Custom'))) {
-                                this.addErrors(errors, "EH1", ignoreRuleAnnotations);
-                            }
-                        }
+        if (javaActions.length > 0) {
+            javaActions.forEach((javaAction) => {
+                let isAllowed = allowedJava.find((allowedJavaName) => allowedJavaName === javaAction.javaActionName);
+                if (!isAllowed) {
+                    let errorHandling = javaAction.errorHandlingType||'';
+                    if (!(errorHandling.startsWith('Custom'))) {
+                        this.addErrors(errors, "EH1", ignoreRuleAnnotations);
                     }
                 }
             })

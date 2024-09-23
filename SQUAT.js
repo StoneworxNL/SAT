@@ -30,7 +30,7 @@ function main() {
     console.log("==================================== COLLECTING DATA: " + mpr);
 
     mprCollector.collect().then((model) => {
-        console.log(model);
+        console.log(JSON.stringify(model, null, 2));
         let analysis = new SquatAnalysis();
         console.log("====================== ANALYSING =======================");
         analysis.analyse(model);

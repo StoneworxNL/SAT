@@ -1,5 +1,5 @@
 const Flow = require('./Flow');
-const Action = require('./Action');
+const {Action, JavaAction} = require('./Action');
 
 class Microflow {
     constructor(containerID, microflowName, returnType, returnEntity) {
@@ -53,6 +53,7 @@ class Microflow {
             if (action['$Type']) {
                 let actionID = action['$ID'].toString('base64');
                 let actionType = action['$Type'];
+                let actionData;
                 switch (actionType) {
                     case 'Microflows$Annotation':
                         let annotation = action['Caption'];
@@ -68,8 +69,14 @@ class Microflow {
                             microflow.addSubMicroflow(subMF);
                         } else if (activityType === 'Microflows$CreateVariableAction') {
                             let complexity = 0;
-                            let actionData = new Action(activityType, '', false, complexity);
+                            actionData = new Action(activityType, action['$ID'], false, complexity);
                             microflow.addAction(actionData);
+                        } else if (activityType === 'Microflows$JavaActionCallAction'){
+                            console.log(JSON.stringify(action, null, 2));
+                            let errorHandling = action['Action']['ErrorHandlingType'];
+                            let JavaActionName = action['Action']['JavaAction'];
+                            actionData = new JavaAction(activityType, action['$ID'], errorHandling, JavaActionName);
+                            microflow.addAction(actionData);                            
                         } else {
                             //                            console.log('ACTION: '+actionType+' - '+activityType);
                         }

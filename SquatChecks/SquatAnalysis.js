@@ -52,7 +52,7 @@ class SquatAnalysis{
         let errors = checkModule.check(model, document);
         if (errors && errors.length > 0) {
             if (checkModule.level === 'microflow') {                
-                let module = model.getModule(document.moduleID);
+                let module = model.getModule(document.containerID);
                 console.log(document.moduleID+' = '+module);
                 this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
             } else if (checkModule.level === 'domainmodel') {

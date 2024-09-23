@@ -53,9 +53,11 @@
         },
         {
             "fnc": "ErrorHandling",
+            "squat": true,
             "options": {
                 "allowedJava": [
                     "CommunityCommons.EndTransaction",
+                    "CommunityCommons.getGUID",
                     "OIDC.DecodeJWTPlainText"
                 ]
             }

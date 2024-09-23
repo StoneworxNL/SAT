@@ -16,7 +16,7 @@ module.exports = class NamingConvention extends CheckModule {
         let allowedPrefixes = this.options.allowedPrefixes;
         let exceptionPrefixes = this.options.exceptionPrefixes;
         this.parseMFName(microflow.name);
-        let module = model.getModule(microflow.moduleID);
+        let module = model.getModule(microflow.containerID);
         this.moduleName = module.name;
         let errors = [];
         if (!module.fromAppStore){
