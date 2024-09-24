@@ -1,10 +1,10 @@
 const Flow = require('./Flow');
-const {Action, JavaAction} = require('./Action');
+const { Action, JavaAction, ExpressionAction } = require('./Action');
 
 class Microflow {
     constructor(containerID, microflowName, returnType, returnEntity) {
         this.containerID = containerID,
-        this.name = microflowName;
+            this.name = microflowName;
         this.returnType = returnType;
         this.returnEntity = returnEntity;
         this.flows = [];
@@ -17,7 +17,7 @@ class Microflow {
     static parse(doc, container) {
         let containerID = container.toString('base64');
         let microflowName = doc['Name'];
-        let returnType = ''; let returnEntity = '';        
+        let returnType = ''; let returnEntity = '';
         if (doc['MicroflowReturnType']) {
             returnType = doc['MicroflowReturnType']['$Type']
             if (returnType === 'DataTypes$ObjectType' || returnType === 'DataTypes$ListType') {
@@ -54,6 +54,7 @@ class Microflow {
                 let actionID = action['$ID'].toString('base64');
                 let actionType = action['$Type'];
                 let actionData;
+                let complexity = 0;
                 switch (actionType) {
                     case 'Microflows$Annotation':
                         let annotation = action['Caption'];
@@ -64,24 +65,71 @@ class Microflow {
                         break;
                     case 'Microflows$ActionActivity':
                         let activityType = action['Action']['$Type'];
-                        if (activityType === 'Microflows$MicroflowCallAction') {
-                            let subMF = action['Action']['MicroflowCall']['Microflow'];
-                            microflow.addSubMicroflow(subMF);
-                        } else if (activityType === 'Microflows$CreateVariableAction') {
-                            let complexity = 0;
-                            actionData = new Action(activityType, action['$ID'], false, complexity);
-                            microflow.addAction(actionData);
-                        } else if (activityType === 'Microflows$JavaActionCallAction'){
-                            console.log(JSON.stringify(action, null, 2));
-                            let errorHandling = action['Action']['ErrorHandlingType'];
-                            let JavaActionName = action['Action']['JavaAction'];
-                            actionData = new JavaAction(activityType, action['$ID'], errorHandling, JavaActionName);
-                            microflow.addAction(actionData);                            
-                        } else {
-                            //                            console.log('ACTION: '+actionType+' - '+activityType);
+                        switch (activityType) {
+                            case 'Microflows$StartEvent':
+                                actionData = new Action(activityType, actionID);
+                                microflow.addAction(actionData);
+                                break;
+                            case 'Microflows$EndEvent':
+                                actionData = new Action(activityType, actionID);
+                                microflow.addAction(actionData);
+                                break;
+                            case 'Microflows$MicroflowCallAction':
+                                let subMF = action['Action']['MicroflowCall']['Microflow'];
+                                microflow.addSubMicroflow(subMF);
+                                break;
+                            case 'Microflows$CreateVariableAction':
+                                complexity = microflow.checkExpressionComplexity(action['Action']['InitialValue']);
+                                actionData = new ExpressionAction(activityType, actionID, false, complexity);
+                                microflow.addAction(actionData);
+                                break;
+                            case 'Microflows$ChangeVariableAction':
+                                complexity = microflow.checkExpressionComplexity(action['Action']['Value']);
+                                actionData = new ExpressionAction(activityType, actionID, false, complexity);
+                                microflow.addAction(actionData);
+                                break;
+                            case 'Microflows$CreateChangeAction':
+                            case 'Microflows$ChangeAction':
+                                let commit = false;
+                                action['Action']['Items'].forEach((item) => {
+                                    if (item['$ID']) {
+                                        let count = microflow.checkExpressionComplexity(item['Value']);
+                                        if (count > complexity) { complexity = count };
+                                    }
+                                })
+                                if (action['Action']['Commit'] === 'Yes') {
+                                    commit = true;
+                                }
+                                actionData = new ExpressionAction(activityType, actionID, commit, complexity);
+                                microflow.addAction(actionData);
+                                break
+                            case 'Microflows$JavaActionCallAction':
+                                let errorHandling = action['Action']['ErrorHandlingType'];
+                                let JavaActionName = action['Action']['JavaAction'];
+                                actionData = new JavaAction(activityType, action['$ID'], errorHandling, JavaActionName);
+                                microflow.addAction(actionData);
+                                break;
+                            default:
+                                actionData = new Action(activityType, actionID);
+                                microflow.addAction(actionData);
+                                break;
                         }
                         break;
+                    case 'Microflows$ExclusiveSplit':
+                        let caption = action['Caption'];;
+                        let condition = action.SplitCondition.Expression ? action.SplitCondition.Expression : '';
+                        complexity = microflow.checkExpressionComplexity(condition);
+                        actionData = new ExpressionAction(actionType, actionID, false, complexity, caption);
+                        microflow.addAction(actionData);
+                        break;
+                    case 'Microflows$ExclusiveMerge':
+                        actionData = new Action(actionType, actionID);
+                        microflow.addAction(actionData);
+                        break;
                     default:
+                        actionData = new Action(actionType, actionID);
+                        microflow.addAction(actionData);
+                        break;
                 }
             }
         })

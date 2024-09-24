@@ -13,25 +13,20 @@ module.exports = class NamingConvention extends CheckModule {
     }
 
     check = function (model, microflow) {
-        let allowedPrefixes = this.options.allowedPrefixes;
-        let exceptionPrefixes = this.options.exceptionPrefixes;
-        this.parseMFName(microflow.name);
-        let module = model.getModule(microflow.containerID);
-        this.moduleName = module.name;
-        let errors = [];
-        if (!module.fromAppStore){
+        this.setup(model, microflow);        
+        if (!this.module.fromAppStore){
             let mfNameParts = this.microflowName.split('_');
             let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
             let mfPrefix = this.mfPrefix;
-            let isExceptionPrefix = exceptionPrefixes.find((prefix) => prefix == mfPrefix);
+            let isExceptionPrefix = this.exceptionPrefixes.find((prefix) => prefix == mfPrefix);
             if (!isExceptionPrefix) {
                 if ((mfPrefix === 'VAL' &&  mfNameParts.length < 2) || mfNameParts.length < 3) {
-                    this.addErrors(errors, "NC1", ignoreRuleAnnotations);
+                    this.addErrors("NC1", ignoreRuleAnnotations);
                 } else {
                     
-                    let pfFound = allowedPrefixes.find((prefix) => prefix == mfPrefix);
+                    let pfFound = this.allowedPrefixes.find((prefix) => prefix == mfPrefix);
                     if (!pfFound) {
-                        this.addErrors(errors, "NC2", ignoreRuleAnnotations);
+                        this.addErrors("NC2", ignoreRuleAnnotations);
                     }
                     let mfEntityName = mfNameParts[1];
                     let entitiesForMF = model.entities.filter((entity) => {
@@ -40,18 +35,18 @@ module.exports = class NamingConvention extends CheckModule {
                     })
                     if (entitiesForMF && entitiesForMF.length > 0) { //one or more entities with same name found
                         let entityForMFInModule = entitiesForMF.find((entity) => {
-                            return module.id === entity.moduleID;
+                            return this.module.id === entity.moduleID;
                         })
                         if (!entityForMFInModule || entityForMFInModule.length == 0) {
-                            this.addErrors(errors, "NC4", ignoreRuleAnnotations);
+                            this.addErrors("NC4", ignoreRuleAnnotations);
                         }
                     } else {
-                        this.addErrors(errors, "NC3", ignoreRuleAnnotations);
+                        this.addErrors("NC3", ignoreRuleAnnotations);
                     }
                 }
             } 
         }
-        return errors;
+        return this.errors;
     }
 
 }

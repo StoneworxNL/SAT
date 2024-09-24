@@ -16,12 +16,12 @@ module.exports = class SplitMergeCheck extends CheckModule {
         let mfActions = mfQuality.hierarchy[microflow].actions;
         let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
         mfActions.forEach((mfAction) => {
-            if (mfAction.type.startsWith('ExclusiveSplit')) {
+            if (mfAction.type.startsWith('Microflows$ExclusiveSplit')) {
                 let caption = mfAction.caption.trim();
                 if (!caption || caption.length == 0) {
                     this.addErrors(errors, "SM1", ignoreRuleAnnotations);
                 }
-            } else if (mfAction.type.startsWith('ExclusiveMerge')) {
+            } else if (mfAction.type.startsWith('Microflows$ExclusiveMerge')) {
                 let flows = mfQuality.hierarchy[microflow].mf.flows;
                 let actionsToMerge = flows.filter((flow) => flow.destination.id === mfAction.id);
                 if (actionsToMerge.length <= 1) {

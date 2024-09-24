@@ -64,6 +64,7 @@
         },
         {
             "fnc": "TooComplexMicroflow",
+            "squat": true,
             "options": {
                 "maxActions": 25,
                 "maxComplexity": 30,

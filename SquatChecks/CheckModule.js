@@ -3,9 +3,24 @@ class CheckModule {
         this.options = options || {};
         this.errorCodes = {};
         this.moduleName = '';
+        this.module;
         this.microflowName = '';
         this.mfPrefix = '';
         this.level = 'microflow';
+        this.allowedPrefixes = [];
+        this.exceptionPrefixes = [];
+        this.errors = [];
+    }
+
+    setup = function(model, microflow){
+        if (this.options){
+            this.allowedPrefixes = this.options.allowedPrefixes;
+            this.exceptionPrefixes = this.options.exceptionPrefixes;
+        }
+        this.parseMFName(microflow.name);
+        this.module = model.getModule(microflow.containerID);
+        this.moduleName = module.name;
+        this.errors = [];
     }
 
     parseMFName = function (microflowName) {
@@ -21,10 +36,10 @@ class CheckModule {
         return this.errorCodes;
     }
 
-    addErrors = function(errors, code, ignoreList, comment){
+    addErrors = function(code, ignoreList, comment){
         let isIgnore = ignoreList.find(ignore => code === ignore);
         if (!isIgnore || isIgnore.length == 0 ){
-            errors.push({'code': code, 'comment': comment});
+            this.errors.push({'code': code, 'comment': comment});
         }
     }
     

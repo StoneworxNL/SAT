@@ -9,9 +9,9 @@ module.exports = class ErrorHandling extends CheckModule {
     }
 
     check = function (model, microflow) {
-        let errors = [];
         let allowedJava = this.options.allowedJava;
         let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
+        this.setup(model, microflow);  
         let mfActions = microflow.actions;
         let javaActions = mfActions.filter((action) => {
             return action.type == 'Microflows$JavaActionCallAction'
@@ -22,11 +22,11 @@ module.exports = class ErrorHandling extends CheckModule {
                 if (!isAllowed) {
                     let errorHandling = javaAction.errorHandlingType||'';
                     if (!(errorHandling.startsWith('Custom'))) {
-                        this.addErrors(errors, "EH1", ignoreRuleAnnotations);
+                        this.addErrors("EH1", ignoreRuleAnnotations);
                     }
                 }
             })
         }
-        return errors;
+        return this.errors;
     }
 }
