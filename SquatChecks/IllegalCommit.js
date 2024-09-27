@@ -11,7 +11,7 @@ module.exports = class IllegalCommit extends CheckModule {
         };
     }
 
-    check = function (mfQuality, microflow) {
+    check = function (model, microflow) {
         let allowedPrefixes = this.options.allowedTopLevelPrefixes;
         let allowedSubs = this.options.allowedSubLevelPrefixes;
         this.parseMFName(microflow);
