@@ -14,48 +14,47 @@ module.exports = class IllegalCommit extends CheckModule {
     check = function (model, microflow) {
         let allowedPrefixes = this.options.allowedTopLevelPrefixes;
         let allowedSubs = this.options.allowedSubLevelPrefixes;
-        this.parseMFName(microflow);
-        let errors = [];
-        let mfActions = mfQuality.hierarchy[microflow].actions;
-        let commit = mfActions.find((action) => {
+        let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
+        this.setup(model, microflow);  
+        let mfActions = microflow.actions;
+        let commit = mfActions.find((action) => {               // find all commit actions
             return action.type == 'Microflows$CommitAction'
         })
-        let createOrChangeCommit = mfActions.find((action) => {
-            if (action.type == 'Microflows$CreateObjectAction' || action.type == 'Microflows$ChangeObjectAction'){
-                return action.commit;            
+        let createOrChangeCommit = mfActions.find((action) => { //find all create/change actions with commit
+            if (action.type == 'Microflows$CreateChangeAction' || action.type == 'Microflows$ChangeAction'){
+                return action.isCommit;            
             } else return false;
 
         })
-        if (commit || createOrChangeCommit) {
-            let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
+        if (commit || createOrChangeCommit) {            
             if (!allowedPrefixes.includes(this.mfPrefix)) {  //if commit not in ACT: is must be in SUB that is called from ACT only
-                let allMFs = Object.keys(mfQuality.hierarchy);
-                let subMFName = allMFs.find((mfName) => {
-                    let mfData = mfQuality.hierarchy[mfName];
-                    let subMFs = mfData.subMFs;
+                let subMicroflow = model.microflows.find((microflowToCheck)=>{
+                    let subMFs = microflowToCheck.subMicroflows;
                     if (subMFs) {
                         let callingMF = subMFs.find((subMF) => {
-                            return subMF === microflow
+                            return subMF === `${this.module.name}.${microflow.name}`
                         }
                         );
                         return callingMF != null;
                     } else return false;
-                })
-                if (subMFName) {
-                    let [subModule, subMF, subMFPrefix] = mfQuality.nameParts(subMFName);
+
+                })                
+                if (subMicroflow){
+                    let mfNameParts = subMicroflow.name.split('_');
+                    let subMFPrefix = mfNameParts[0];
                     if (!allowedPrefixes.includes(subMFPrefix)) {
                         if (commit) {
-                            this.addErrors(errors, "CM1", ignoreRuleAnnotations);
+                            this.addErrors("CM1", ignoreRuleAnnotations);
                         } else if (createOrChangeCommit) {
-                            this.addErrors(errors, "CM3", ignoreRuleAnnotations);
+                            this.addErrors("CM3", ignoreRuleAnnotations);
                         }
                     }
                 }
             }
             if (!(allowedPrefixes.includes(this.mfPrefix) || allowedSubs.includes(this.mfPrefix) )) { // Commits may only be found in top levels or allowed sub levels
-                this.addErrors(errors, "CM2", ignoreRuleAnnotations);
+                this.addErrors("CM2", ignoreRuleAnnotations);
             }
         }
-        return errors;
+        return this.errors;
     }
 }

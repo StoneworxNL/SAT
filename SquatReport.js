@@ -1,5 +1,6 @@
 
 const fs = require("fs");
+const config = require("config");
 
 class SquatReport {
     constructor(reportName) {
@@ -10,7 +11,8 @@ class SquatReport {
         let dateTimeString = this.getDateTimeString();
         let reports = analysis.reportedErrors;
         let errorCodes = analysis.errorCodes;
-        this.reportFileName = `${this.reportName}_${dateTimeString}.csv`;
+        let folder = config.get("outputFolder");
+        this.reportFileName = `${folder}/${this.reportName}_${dateTimeString}.csv`;
         console.log("Writing to " + this.reportFileName);
         fs.writeFileSync(this.reportFileName, 'Module;Microflow;Code;Description;Info\n');
         reports.forEach(item => {
