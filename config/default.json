@@ -2,6 +2,7 @@
     "checksFolder": "../qualityChecks/",
     "outputFolder": "./output",
     "SquatChecksFolder": "../SquatChecks/",
+    "includeAppstore": false,
     "checks": [
         {
             "fnc": "NamingConvention",
@@ -99,6 +100,7 @@
         },
         {
             "fnc": "IllegalShowPage",
+            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "ACT"

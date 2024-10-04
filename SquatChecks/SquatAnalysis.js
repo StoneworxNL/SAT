@@ -1,14 +1,15 @@
 const config = require("config");
-class SquatAnalysis{
+class SquatAnalysis {
 
-    constructor(){
+    constructor() {
         const checks = config.get("checks");
         let checksFolder = config.get("SquatChecksFolder");
         this.checkModules = [];
         this.errorCodes = {}
         this.reportedErrors = [];
+        this.includeAppstore = config.get("includeAppstore");
         checks.forEach((check) => {
-            if (check.squat){
+            if (check.squat) {
                 let moduleName = checksFolder + check.fnc;
                 let CheckModule = require(moduleName);
                 let checkMod = new CheckModule(check.options);
@@ -18,7 +19,7 @@ class SquatAnalysis{
         });
     }
 
-    analyse(model){
+    analyse(model) {
         this.checkModules.forEach((checkModule) => {
             if (checkModule.level === 'security') {
                 this.executeCheck(checkModule, this.model);
@@ -41,7 +42,7 @@ class SquatAnalysis{
             if (microflow && microflow != 'undefined') {
                 this.checkModules.forEach((checkModule) => {
                     if (checkModule.level === 'microflow') {
-                        this.executeCheck(checkModule,  model, microflow);
+                        this.executeCheck(checkModule, model, microflow);
                     }
                 })
             }
@@ -51,18 +52,20 @@ class SquatAnalysis{
     executeCheck = function (checkModule, model, document) {
         let errors = checkModule.check(model, document);
         if (errors && errors.length > 0) {
-            if (checkModule.level === 'microflow') {                
-                let module = model.getModule(document.containerID);
-                console.log(document.moduleID+' = '+module);
-                this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
-            } else if (checkModule.level === 'domainmodel') {
-                this.reportedErrors.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });
-            } else if (checkModule.level === 'menu') {
-                this.reportedErrors.push({ type: 'menu', document: document.module + '.' + document.document, errors: errors });
-            } else if (checkModule.level === 'page') {
-                this.reportedErrors.push({ type: 'page', document: document.module + '.' + document.name, errors: errors });
-            } else {
-                this.reportedErrors.push({ type: 'app', document: checkModule.level, errors: errors });
+            let module = model.getModule(document.containerID);
+            if (this.includeAppstore || !module.fromAppStore) {
+                if (checkModule.level === 'microflow') {
+                    console.log(document.moduleID + ' = ' + module);
+                    this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
+                } else if (checkModule.level === 'domainmodel') {
+                    this.reportedErrors.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });
+                } else if (checkModule.level === 'menu') {
+                    this.reportedErrors.push({ type: 'menu', document: document.module + '.' + document.document, errors: errors });
+                } else if (checkModule.level === 'page') {
+                    this.reportedErrors.push({ type: 'page', document: document.module + '.' + document.name, errors: errors });
+                } else {
+                    this.reportedErrors.push({ type: 'app', document: checkModule.level, errors: errors });
+                }
             }
         }
 

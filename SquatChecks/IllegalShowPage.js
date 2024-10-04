@@ -11,31 +11,30 @@ module.exports = class IllegalShowPage extends CheckModule {
         };
     }
 
-    check = function (mfQuality, microflow) {
+    check = function (model, microflow) {
         let allowedPrefixes = this.options.allowedPrefixes;
-        let errors = [];
-        this.parseMFName(microflow);
+        let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
+        this.setup(model, microflow);  
         if (!this.mfPrefix) { //No Prefix, should be reported in naming conventions
         } else {
             if (!allowedPrefixes.includes(this.mfPrefix)) {
-                let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(microflow);
-                let mfActions = mfQuality.hierarchy[microflow].actions;
+                let mfActions = microflow.actions;
                 let showPage = mfActions.find((action) => {
-                    return action.type == 'Microflows$ShowPageAction'
+                    return action.type == 'Microflows$ShowFormAction'
                 })
                 if (showPage) {
-                    this.addErrors(errors, "IP1", ignoreRuleAnnotations);
+                    this.addErrors("IP1", ignoreRuleAnnotations);
                 }
                 let closePage = mfActions.find((action) => {
                     return (action.type == 'Microflows$CloseFormAction')
                 })
                 if (closePage) {
-                    this.addErrors(errors, "IP2", ignoreRuleAnnotations);
+                    this.addErrors("IP2", ignoreRuleAnnotations);
                 }
             }
 
         }
-        return errors;
+        return this.errors;
     }
 }
 
