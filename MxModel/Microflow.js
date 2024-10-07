@@ -11,6 +11,7 @@ class Microflow {
         this.actions = [];
         this.annotations = [];
         this.subMicroflows = [];
+        this.roles = [];
     }
 
 
@@ -43,6 +44,11 @@ class Microflow {
                 microflow.addFlow(flowData);
             }
         })
+
+        let allowedRoles = doc['AllowedModuleRoles'];
+        if (allowedRoles.length > 1) {
+            microflow.roles  = allowedRoles.slice(1);
+        }
         Microflow.parseMFActions(doc, microflow, container, microflowName);
         return microflow;
     }

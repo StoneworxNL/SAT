@@ -113,6 +113,7 @@
         },
         {
             "fnc": "MissingPermissions",
+            "squat": true,
             "options": {
                 "permissionPrefixes": [
                     "ACT",
