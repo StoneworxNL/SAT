@@ -32,8 +32,8 @@ class Microflow {
             if (flow['$Type'] && flow['$Type'] === 'Microflows$SequenceFlow') {
                 // console.log('FLOW');
                 // console.log(JSON.stringify(flow, null, 2));
-                let origin = flow['OriginPointer'];
-                let destination = flow['DestinationPointer'];
+                let origin = flow['OriginPointer'].toString('base64');
+                let destination = flow['DestinationPointer'].toString('base64');
                 let flowValue = '';
                 if (flow['NewCaseValue']['Value']) {
                     flowValue = flow['NewCaseValue']['Value'];

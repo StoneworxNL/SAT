@@ -14,10 +14,11 @@ class JavaAction extends Action{
 }
 
 class ExpressionAction extends Action{
-    constructor(Type, ID, IsCommit, Complexity) {
+    constructor(Type, ID, IsCommit, Complexity, Caption) {
         super(Type, ID);
         this.isCommit = IsCommit;
         this.complexity = Complexity;
+        this.caption = Caption;
     }
 }
 

@@ -47,6 +47,12 @@ class MxModel{
         }
     }
 
+    findMicroflow(microflowName){
+        return this.microflows.find(microflow =>{
+            return microflow.name === microflowName
+        })
+    }
+
 
 }
 

@@ -108,7 +108,8 @@
             }
         },
         {
-            "fnc": "SplitMergeCheck"
+            "fnc": "SplitMergeCheck",
+            "squat": true
         },
         {
             "fnc": "MissingPermissions",
