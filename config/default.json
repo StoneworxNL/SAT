@@ -125,7 +125,8 @@
             }
         },
         {
-            "fnc": "DemoUsers"
+            "fnc": "DemoUsers",
+            "squat": true
         },
         {
             "fnc": "NestingTooDeep",

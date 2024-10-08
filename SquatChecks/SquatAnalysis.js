@@ -22,7 +22,7 @@ class SquatAnalysis {
     analyse(model) {
         this.checkModules.forEach((checkModule) => {
             if (checkModule.level === 'security') {
-                this.executeCheck(checkModule, this.model);
+                this.executeCheck(checkModule, model);
             } else if (checkModule.level === 'domainmodel') {
                 this.domains.forEach(entity => {
                     this.executeCheck(checkModule, entity);
@@ -35,7 +35,7 @@ class SquatAnalysis {
                 this.pages.forEach(page => {
                     this.executeCheck(checkModule, page);
                 })
-            }
+            } 
         })
 
         model.microflows.forEach((microflow) => {
@@ -52,7 +52,10 @@ class SquatAnalysis {
     executeCheck = function (checkModule, model, document) {
         let errors = checkModule.check(model, document);
         if (errors && errors.length > 0) {
-            let module = model.getModule(document.containerID);
+            let module = '';
+            if (document) {
+                module = model.getModule(document.containerID);
+            }
             if (this.includeAppstore || !module.fromAppStore) {
                 if (checkModule.level === 'microflow') {
                     console.log(document.moduleID + ' = ' + module);

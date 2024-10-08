@@ -9,12 +9,11 @@ module.exports = class DemoUsers extends CheckModule {
         this.level = 'security';
     }
 
-    check = function (mfQuality) {
-        let errors = [];
-        let demoUsers = mfQuality.security.enableDemoUsers;
+    check = function (model) {
+        let demoUsers = model.security.enableDemoUsers;
         if (demoUsers){
-            this.addErrors(errors, "DU1", []);
+            this.addErrors("DU1", []);
         }
-        return errors;
+        return this.errors;
     }
 }
