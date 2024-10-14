@@ -14,7 +14,7 @@
 
 ![markdown](https://cdn.iconscout.com/icon/free/png-512/free-markdown-logo-icon-download-in-svg-png-gif-file-formats--social-media-pack-logos-icons-2364930.png?f=webp&w=100)
 
-\<u\>mispeled\</u\>
+<u>mispeled</u>
 
 | Header1 | Header2 |
 |--------------------------------|----------------------------------------------------------------------------|
