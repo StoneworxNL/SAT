@@ -2,13 +2,7 @@
 
 *Italic*
 
-Underlined
-
-Strikethrough
-
-^Super^Script
-
-~Sub~Script
+~Strikethrough~
 
 * List
 * unordered
@@ -17,18 +11,6 @@ Strikethrough
 2. List
 
 > QUOTE or CODE?
-
-adadada
-
-Indent
-
-and outdent
-
-Can you center?
-
-Having Georgia on my mind (18px)
-
-Funny Colors
 
 ![LOGOO](https://dev.azure.com/raboweb/_apis/GraphProfile/MemberAvatars/9ab2f275-ff56-44dc-b0d1-e3d0a56bc8cf?overrideDisplayName=Tribe%20Tech4Engineering&size=2)![](https://dev.azure.com/raboweb/_apis/GraphProfile/MemberAvatars/9ab2f275-ff56-44dc-b0d1-e3d0a56bc8cf?overrideDisplayName=Tribe%20Tech4Engineering&size=2)
 
