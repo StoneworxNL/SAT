@@ -12,7 +12,7 @@
 
 > QUOTE or CODE?
 
-![markdown](https://www.fullstackpython.com/img/logos/markdown.png)](https://cdn.iconscout.com/icon/free/png-512/free-markdown-logo-icon-download-in-svg-png-gif-file-formats--social-media-pack-logos-icons-2364930.png?f=webp&w=100)
+![markdown](https://cdn.iconscout.com/icon/free/png-512/free-markdown-logo-icon-download-in-svg-png-gif-file-formats--social-media-pack-logos-icons-2364930.png?f=webp&w=100)
 
 \<u\>mispeled\</u\>
 
