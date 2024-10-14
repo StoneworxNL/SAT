@@ -16,7 +16,8 @@
 
 \<u\>mispeled\</u\>
 
-|HEADER 1|Header2|
+| Header1 | Header2 |
 |--------------------------------|----------------------------------------------------------------------------|
 | Related baseline Identifier(s) | S.SYSREQ.Security_Design |
 | Explanation | Additional care must be taken to protect Critical and / or sensitive data. |
+[Caption]
