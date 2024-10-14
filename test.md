@@ -12,7 +12,7 @@
 
 > QUOTE or CODE?
 
-![LOGOO](https://dev.azure.com/raboweb/_apis/GraphProfile/MemberAvatars/9ab2f275-ff56-44dc-b0d1-e3d0a56bc8cf?overrideDisplayName=Tribe%20Tech4Engineering&size=2)![](https://dev.azure.com/raboweb/_apis/GraphProfile/MemberAvatars/9ab2f275-ff56-44dc-b0d1-e3d0a56bc8cf?overrideDisplayName=Tribe%20Tech4Engineering&size=2)
+![markdown](https://www.fullstackpython.com/img/logos/markdown.png)
 
 \<u\>mispeled\</u\>
 
