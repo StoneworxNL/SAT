@@ -12,7 +12,7 @@
 
 > QUOTE or CODE?
 
-![markdown](https://www.fullstackpython.com/img/logos/markdown.png)
+![markdown](https://www.fullstackpython.com/img/logos/markdown.png){ width: 200px; }
 
 \<u\>mispeled\</u\>
 
