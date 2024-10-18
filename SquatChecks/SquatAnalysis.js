@@ -24,8 +24,8 @@ class SquatAnalysis {
             if (checkModule.level === 'security') {
                 this.executeCheck(checkModule, model);
             } else if (checkModule.level === 'domainmodel') {
-                this.domains.forEach(entity => {
-                    this.executeCheck(checkModule, entity);
+                model.entities.forEach(entity => {
+                    this.executeCheck(checkModule, model, entity);
                 })
             } else if (checkModule.level === 'menu') {
                 this.menus.forEach(menu => {
@@ -56,11 +56,11 @@ class SquatAnalysis {
             if (document) {
                 module = model.getModule(document.containerID);
             }
-            if (this.includeAppstore || !module.fromAppStore) {
+            if (this.includeAppstore || (checkModule.level === 'app' || !module.fromAppStore)) {
                 if (checkModule.level === 'microflow') {
                     this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
                 } else if (checkModule.level === 'domainmodel') {
-                    this.reportedErrors.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });
+                    this.reportedErrors.push({ type: 'domainmodel', module: module.name, document: document.name, errors: errors });
                 } else if (checkModule.level === 'menu') {
                     this.reportedErrors.push({ type: 'menu', document: document.module + '.' + document.document, errors: errors });
                 } else if (checkModule.level === 'page') {

@@ -136,7 +136,8 @@
             }
         },
         {
-            "fnc": "DomainModel"
+            "fnc": "DomainModel",
+            "squat": true
         },
         {
             "fnc": "MenuStructure"

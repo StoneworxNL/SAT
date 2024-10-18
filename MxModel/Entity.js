@@ -1,12 +1,12 @@
-class Entity{
-    constructor(moduleName, entityName, documentation) {
-        this.moduleID = moduleName,
+class Entity {
+    constructor(containerID, entityName, documentation) {
+        this.containerID = containerID,
         this.documentation = documentation;
         this.name = entityName;
         this.attrs = [];
     }
 
-   static parse(doc, container) {
+    static parse(doc, container) {
         let containerID = container.toString('base64');
         console.log(`Domain for: ${containerID}`);
         let entities = [];
@@ -30,6 +30,15 @@ class Entity{
             });
         }
         return entities;
+    }
+
+    getIgnoreRuleAnnotations() {
+        let documentation = this.documentation;
+        let ignoreRuleAnnotation = documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
+        if (ignoreRuleAnnotation) {
+            return [ignoreRuleAnnotation[1]];
+        }
+        return [];
     }
 }
 

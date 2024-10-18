@@ -24,8 +24,8 @@ class SquatReport {
                             fs.appendFileSync(this.reportFileName, 'APP;' + theDocument + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                             break;
                         case 'domainmodel':
-                            let [domainModel, entityName, mfPrefix] = this.nameParts(theDocument)
-                            fs.appendFileSync(this.reportFileName, domainModel + ';' + entityName + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                            //let [domainModel, entityName, mfPrefix] = this.nameParts(theDocument)
+                            fs.appendFileSync(this.reportFileName, item.module + ';' + theDocument + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                             break;
                         case 'microflow':
                             fs.appendFileSync(this.reportFileName, item.module + ';' + theDocument + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
