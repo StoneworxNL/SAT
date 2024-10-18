@@ -22,8 +22,8 @@ module.exports = class SplitMergeCheck extends CheckModule {
                     this.addErrors("SM1", ignoreRuleAnnotations);
                 }
             } else if (mfAction.type.startsWith('Microflows$ExclusiveMerge')) {
-                let mf = model.findMicroflow(microflow.name);
-                let flows = mf.flows;
+                //let mf = model.findMicroflowInContainer(microflow.containerID, microflow.name);
+                let flows = microflow.flows;
                 let actionsToMerge = flows.filter((flow) => flow.destination === mfAction.id);
                 if (actionsToMerge.length <= 1) {
                     this.addErrors("SM2", ignoreRuleAnnotations);

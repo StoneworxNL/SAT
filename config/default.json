@@ -130,6 +130,7 @@
         },
         {
             "fnc": "NestingTooDeep",
+            "squat": true,
             "options": {
                 "mxNesting": 5
             }

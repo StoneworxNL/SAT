@@ -3,10 +3,10 @@ const Entity = require("./Entity");
 const Microflow = require("./Microflow");
 const Folder = require("./Folder");
 
-class MxModel{
+class MxModel {
     constructor() {
         this.security = {},
-        this.modules = [];
+            this.modules = [];
         this.entities = [];
         this.microflows = [];
         this.folders = {};
@@ -16,25 +16,25 @@ class MxModel{
         this.security = { 'enableDemoUsers': doc['EnableDemoUsers'] };
     }
 
-    parseModule(doc){
+    parseModule(doc) {
         this.modules.push(Module.parse(doc));
     };
 
-    parseDomain(doc, container){
+    parseDomain(doc, container) {
         this.entities.push(...Entity.parse(doc, container))
     }
-    
-    parseMicroflow(doc, container){
+
+    parseMicroflow(doc, container) {
         this.microflows.push(Microflow.parse(doc, container))
     }
 
-    parseFolder(doc, container){
+    parseFolder(doc, container) {
         let folder = Folder.parse(doc, container);
-        this.folders[folder.id] =  folder;
+        this.folders[folder.id] = folder;
     }
 
-    getModule(containerID){
-        let module = this.modules.find(module=> module.id === containerID);
+    getModule(containerID) {
+        let module = this.modules.find(module => module.id === containerID);
         if (module) {
             return module
         } else {
@@ -47,9 +47,15 @@ class MxModel{
         }
     }
 
-    findMicroflow(microflowName){
-        return this.microflows.find(microflow =>{
-            return microflow.name === microflowName
+    findMicroflowInContainer(containerID, microflowName) {
+        let module = this.getModule(containerID);
+        return this.findMicroflow(module, microflowName);
+    }
+
+    findMicroflow(module, microflowName) {
+        return this.microflows.find((microflow) => {
+            let mfModule = this.getModule(microflow.containerID);
+            return microflow.name === microflowName && module === mfModule.name;
         })
     }
 

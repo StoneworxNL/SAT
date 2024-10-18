@@ -58,7 +58,6 @@ class SquatAnalysis {
             }
             if (this.includeAppstore || !module.fromAppStore) {
                 if (checkModule.level === 'microflow') {
-                    console.log(document.moduleID + ' = ' + module);
                     this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
                 } else if (checkModule.level === 'domainmodel') {
                     this.reportedErrors.push({ type: 'domainmodel', document: document.module + '.' + document.name, errors: errors });

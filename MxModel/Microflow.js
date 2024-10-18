@@ -4,7 +4,7 @@ const { Action, JavaAction, ExpressionAction } = require('./Action');
 class Microflow {
     constructor(containerID, microflowName, returnType, returnEntity) {
         this.containerID = containerID,
-            this.name = microflowName;
+        this.name = microflowName;
         this.returnType = returnType;
         this.returnEntity = returnEntity;
         this.flows = [];
@@ -81,6 +81,8 @@ class Microflow {
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$MicroflowCallAction':
+                                actionData = new Action(activityType, actionID);
+                                microflow.addAction(actionData);
                                 let subMF = action['Action']['MicroflowCall']['Microflow'];
                                 microflow.addSubMicroflow(subMF);
                                 break;
@@ -178,6 +180,13 @@ class Microflow {
         })
         return ignoreRuleAnnotations;
     }
+
+    getQualifiedName(model){
+        let module = model.getModule(this.containerID);
+        return `${module.name}.${this.name}`;
+    }
+
+    
 }
 
 module.exports = Microflow;

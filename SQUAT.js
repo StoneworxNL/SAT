@@ -34,7 +34,7 @@ function main() {
         console.log(JSON.stringify(model, null, 2));
         console.log("====================== ANALYSING =======================");
         analysis.analyse(model);
-        console.log(JSON.stringify(analysis.reportedErrors, null, 2));
+        console.log("====================== REPORTING =======================");
         reporter.report(analysis);
     });
 }
