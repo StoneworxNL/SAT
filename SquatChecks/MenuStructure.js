@@ -9,14 +9,16 @@ module.exports = class MenuStructure extends CheckModule {
         this.level = 'menu';
     }
 
-    check = function (mfQuality, menu) {
-        let errors = [];
-        if (menu.actionType === 'microflow') {
-            this.parseMFName(menu.action);
+    check = function (model, menu) {
+        this.setup(model, menu);
+        if (menu.actionType === 'Forms$MicroflowAction') {
+            let actionQName = menu.action;
+            let [moduleName, microflowName] = actionQName.split('.');
+            this.parseMFName(microflowName);
             if (this.mfPrefix != 'ACT') {
-                this.addErrors(errors, "MS1", [], `${menu.action}`);
+                this.addErrors("MS1", [], `${menu.action}`);
             }
         }
-        return errors;
+        return this.errors;
     }
 }

@@ -12,13 +12,13 @@ class CheckModule {
         this.errors = [];
     }
 
-    setup = function(model, microflow){
+    setup = function(model, document){
         if (this.options){
             this.allowedPrefixes = this.options.allowedPrefixes;
             this.exceptionPrefixes = this.options.exceptionPrefixes;
         }
-        this.parseMFName(microflow.name);
-        this.module = model.getModule(microflow.containerID);
+        this.parseMFName(document.name);
+        this.module = model.getModule(document.containerID);
         this.moduleName = module.name;
         this.errors = [];
     }

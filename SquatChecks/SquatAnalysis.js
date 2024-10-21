@@ -28,8 +28,8 @@ class SquatAnalysis {
                     this.executeCheck(checkModule, model, entity);
                 })
             } else if (checkModule.level === 'menu') {
-                this.menus.forEach(menu => {
-                    this.executeCheck(checkModule, menu);
+                model.menus.forEach(menu => {
+                    this.executeCheck(checkModule, model, menu);
                 })
             } else if (checkModule.level === 'page') {
                 this.pages.forEach(page => {
@@ -52,17 +52,18 @@ class SquatAnalysis {
     executeCheck = function (checkModule, model, document) {
         let errors = checkModule.check(model, document);
         if (errors && errors.length > 0) {
-            let module = '';
+            let module;
             if (document) {
                 module = model.getModule(document.containerID);
             }
+            if(!module){module = {'fromAppStore': false};}
             if (this.includeAppstore || (checkModule.level === 'app' || !module.fromAppStore)) {
                 if (checkModule.level === 'microflow') {
                     this.reportedErrors.push({ type: 'microflow', module: module.name, document: document.name, errors: errors });
                 } else if (checkModule.level === 'domainmodel') {
                     this.reportedErrors.push({ type: 'domainmodel', module: module.name, document: document.name, errors: errors });
                 } else if (checkModule.level === 'menu') {
-                    this.reportedErrors.push({ type: 'menu', document: document.module + '.' + document.document, errors: errors });
+                    this.reportedErrors.push({ type: 'menu', document: module.name + '.' + document.menuName, errors: errors });
                 } else if (checkModule.level === 'page') {
                     this.reportedErrors.push({ type: 'page', document: document.module + '.' + document.name, errors: errors });
                 } else {

@@ -16,13 +16,27 @@ class MPRCollector {
                     const doc = BSON.deserialize(row.contents);
                     let container = row.container;
                     let docType = doc['$Type'];
+
+
+                    let containerID = container.toString('base64');
+                    console.log(`COLLECTING: ${containerID}, ${docType}`);
+                    
                     switch (docType) {
                         case 'Security$ProjectSecurity':
                             model.parseSecurity(doc);
                             break;
+                        case 'Navigation$NavigationDocument':
+                            model.parseNavigation(doc, container);
+                            break
+                        case 'Menus$MenuDocument':
+                            model.parseMenu(doc, container);
+                            break
                         case 'Projects$ModuleImpl':
                             model.parseModule(doc);
                             break;
+                        case 'Projects$Project':
+                                model.parseModule(doc);
+                                break;                            
                         case 'DomainModels$DomainModel':
                             model.parseDomain(doc, container);
                             break;
@@ -40,7 +54,8 @@ class MPRCollector {
                             break;
                     }
                 }, () => {
-                   resolve(model);
+                    
+                    resolve(model);
                 });
             });
             db.close();

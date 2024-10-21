@@ -140,7 +140,8 @@
             "squat": true
         },
         {
-            "fnc": "MenuStructure"
+            "fnc": "MenuStructure",
+            "squat": true
         },
         {
             "fnc": "TopLevelFlows",

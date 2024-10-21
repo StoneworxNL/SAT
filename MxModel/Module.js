@@ -7,6 +7,9 @@ class Module {
 
     static parse (doc) {
         let moduleName = doc['Name'];
+        if (doc['$Type']==='Projects$Project') {
+            moduleName = 'Project';
+        }
         let moduleID = doc['$ID'].toString('base64');
         let appStore = doc['FromAppStore'];
         console.log(`MODULE ${moduleID} - ${moduleName}`);
