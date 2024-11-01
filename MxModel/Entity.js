@@ -8,7 +8,6 @@ class Entity {
 
     static parse(doc, container) {
         let containerID = container.toString('base64');
-        console.log(`Domain for: ${containerID}`);
         let entities = [];
         let domainEntities = doc['Entities'];
         if (domainEntities.length > 1) {

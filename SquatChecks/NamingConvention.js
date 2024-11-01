@@ -16,7 +16,7 @@ module.exports = class NamingConvention extends CheckModule {
         this.setup(model, microflow);        
         if (!this.module.fromAppStore){
             let mfNameParts = this.microflowName.split('_');
-            let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
+            let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations();
             let mfPrefix = this.mfPrefix;
             let isExceptionPrefix = this.exceptionPrefixes.find((prefix) => prefix == mfPrefix);
             if (!isExceptionPrefix) {

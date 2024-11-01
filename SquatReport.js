@@ -35,8 +35,7 @@ class SquatReport {
                             fs.appendFileSync(this.reportFileName, 'Menu' + ';' + theDocument + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                             break;
                         case 'page':
-                            let [pageModuleName, pageName] = theDocument.split('.');
-                            fs.appendFileSync(this.reportFileName, pageModuleName + ';' + pageName + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                            fs.appendFileSync(this.reportFileName, item.module + ';' + theDocument + ';' + err.code + ';' + errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                             break;
                         default:
                             console.log('Cannot determine: ' + item.type);

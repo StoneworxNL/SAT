@@ -3,6 +3,7 @@ const Entity = require("./Entity");
 const Microflow = require("./Microflow");
 const Folder = require("./Folder");
 const Menu = require("./Menu");
+const Page = require("./Page");
 
 class MxModel {
     constructor() {
@@ -12,6 +13,7 @@ class MxModel {
         this.microflows = [];
         this.folders = {};
         this.menus = [];
+        this.pages = [];
     }
 
     parseSecurity(doc) {
@@ -33,6 +35,11 @@ class MxModel {
     parseFolder(doc, container) {
         let folder = Folder.parse(doc, container);
         this.folders[folder.id] = folder;
+    }
+
+    parsePage(doc, container) {
+        let page = Page.parse(doc, container);
+        this.pages.push(page);
     }
 
     parseNavigation(doc, container){

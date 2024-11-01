@@ -32,8 +32,8 @@ class SquatAnalysis {
                     this.executeCheck(checkModule, model, menu);
                 })
             } else if (checkModule.level === 'page') {
-                this.pages.forEach(page => {
-                    this.executeCheck(checkModule, page);
+                model.pages.forEach(page => {
+                    this.executeCheck(checkModule, model, page);
                 })
             } 
         })
@@ -65,7 +65,7 @@ class SquatAnalysis {
                 } else if (checkModule.level === 'menu') {
                     this.reportedErrors.push({ type: 'menu', document: module.name + '.' + document.menuName, errors: errors });
                 } else if (checkModule.level === 'page') {
-                    this.reportedErrors.push({ type: 'page', document: document.module + '.' + document.name, errors: errors });
+                    this.reportedErrors.push({ type: 'page', module: module.name, document: document.name, errors: errors });
                 } else {
                     this.reportedErrors.push({ type: 'app', document: checkModule.level, errors: errors });
                 }

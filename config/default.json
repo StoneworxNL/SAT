@@ -145,6 +145,7 @@
         },
         {
             "fnc": "TopLevelFlows",
+            "squat": true,
             "options": {
                 "TopLevelPrefixes": [
                     "ACO",
@@ -164,7 +165,8 @@
             }
         },
         {
-            "fnc": "PageCommit"
+            "fnc": "PageCommit",
+            "squat": true
         },
         {
             "fnc": "IllegalObjectActions",

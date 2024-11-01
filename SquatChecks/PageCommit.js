@@ -10,17 +10,16 @@ module.exports = class PageCommit extends CheckModule {
         this.level = 'page';
     }
 
-    check = function (mfQuality, page) {
-        let errors = [];
-        let ignoreRuleAnnotations = mfQuality.getIgnoreRuleAnnotations(page);
+    check = function (model, page) {
+        this.setup(model, page);  
+        let ignoreRuleAnnotations = page.getIgnoreRuleAnnotations(page);
         page.buttons.forEach(button => {
-            //console.log(`${page.module}:${page.name} ->  ${button.type}`);  
-            if (button.type ==='Pages$SaveChangesClientAction'){
-                this.addErrors(errors, "PC1", ignoreRuleAnnotations);   
-            } else if (button.type ==='Pages$DeleteClientAction'){
-                this.addErrors(errors, "PC2", ignoreRuleAnnotations);   
+            if (button.type ==='Forms$SaveChangesClientAction'){
+                this.addErrors("PC1", ignoreRuleAnnotations);   
+            } else if (button.type ==='Forms$DeleteClientAction'){
+                this.addErrors("PC2", ignoreRuleAnnotations);   
             }          
         });    
-        return errors;
+        return this.errors;
     }
 }

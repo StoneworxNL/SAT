@@ -1,7 +1,7 @@
 class Menu {
     constructor(containerID, menuName, caption, actionType, action) {
         this.containerID = containerID,
-        this.menuName = menuName;
+        this.name = menuName;
         this.caption = caption;
         this.actionType = actionType;
         this.action = action;

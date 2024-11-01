@@ -3,14 +3,14 @@ const sqlite3 = require('sqlite3').verbose();
 const MxModel = require("./MxModel/MxModel");
 
 class MPRCollector {
-    constructor(mpr){
+    constructor(mpr) {
         this.mpr = mpr;
     }
-    
-    collect(){
+
+    collect() {
         const db = new sqlite3.Database(this.mpr);
-        let model = new MxModel();  
-        return new Promise((resolve, reject)=>{
+        let model = new MxModel();
+        return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.each("SELECT UnitID, ContainerID as container, ContainmentName, Contents as contents from Unit", (err, row) => {
                     const doc = BSON.deserialize(row.contents);
@@ -19,8 +19,6 @@ class MPRCollector {
 
 
                     let containerID = container.toString('base64');
-                    console.log(`COLLECTING: ${containerID}, ${docType}`);
-                    
                     switch (docType) {
                         case 'Security$ProjectSecurity':
                             model.parseSecurity(doc);
@@ -35,26 +33,29 @@ class MPRCollector {
                             model.parseModule(doc);
                             break;
                         case 'Projects$Project':
-                                model.parseModule(doc);
-                                break;                            
+                            model.parseModule(doc);
+                            break;
                         case 'DomainModels$DomainModel':
                             model.parseDomain(doc, container);
                             break;
-                        case 'Microflows$Microflow':                          
+                        case 'Microflows$Microflow':
                             model.parseMicroflow(doc, container);
                             break;
                         case 'Projects$ModuleSettings':
-                        //                console.log(JSON.stringify(doc, null, 4));
+                            // console.log(JSON.stringify(doc, null, 4));
                             break;
                         case 'Projects$Folder':
                             model.parseFolder(doc, container);
+                            break;
+                        case 'Forms$Page':
+                            model.parsePage(doc, container);
                             break;
                         default:
                             //console.log('Not Implemented: '+docType);                
                             break;
                     }
                 }, () => {
-                    
+
                     resolve(model);
                 });
             });

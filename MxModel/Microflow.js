@@ -143,6 +143,15 @@ class Microflow {
         })
     }
 
+    static parseQualifiedName(microflowName){
+        let [moduleName, mfName] =  microflowName.split('.');
+        let prefix; let entity; let action;
+        if (mfName) {
+            [prefix, entity, action] = mfName.split('_',3);
+        }
+        return [moduleName, prefix, entity, action];
+    }
+
     checkExpressionComplexity(expression) {
         let result = 0;
         let regex = /(if(\s|\()|and(\s|\()|or(\s|\()|not(\s|\())/g;
@@ -185,6 +194,7 @@ class Microflow {
         let module = model.getModule(this.containerID);
         return `${module.name}.${this.name}`;
     }
+
 
     
 }
