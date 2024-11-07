@@ -10,6 +10,7 @@ module.exports = class SecurityCollector {
                 if (securityIF.structureTypeName === 'Security$ProjectSecurity') {
                     securityIF.load().then((security) => {
                         this.modelQuality.security.enableDemoUsers = security.enableDemoUsers;
+                        this.modelQuality.MxModel.security.enableDemoUsers = security.enableDemoUsers;
                         resolve();
                     })
                 } else resolve();

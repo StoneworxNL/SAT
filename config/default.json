@@ -170,6 +170,7 @@
         },
         {
             "fnc": "IllegalObjectActions",
+            "squat": true,
             "options": {
                 "PrefixesNotAllowed": [
                     "DS",

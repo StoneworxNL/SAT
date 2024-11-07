@@ -31,10 +31,29 @@ class Page {
         this.buttons = [];
     }
 }
+const SquatModule = require("../MxModel/Module");
+const SquatEntity = require("../MxModel/Entity");
+const SquatMicroflow = require("../MxModel/Microflow");
+const SquatFolder = require("../MxModel/Folder");
+const SquatMenu = require("../MxModel/Menu");
+const SquatPage = require("../MxModel/Page");
+
+class MxModel {
+    constructor() {
+        this.security = {},
+        this.modules = [];
+        this.entities = [];
+        this.microflows = [];
+        this.folders = {};
+        this.menus = [];
+        this.pages = [];
+    }
+}
 
 module.exports = class ModelQuality extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
         super(excludes, prefixes, outFileName);
+        this.MxModel = new MxModel();
         this.microflows_by_name;
         this.security = {};
         this.rules = [];

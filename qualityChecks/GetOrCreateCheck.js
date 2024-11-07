@@ -56,7 +56,7 @@ module.exports = class IllegalCommit extends CheckModule {
     }
     
     checkPattern = function (mfQuality, microflowHierarchy, errors) {
-        console.log(JSON.stringify(microflowHierarchy.flows, null, 2));
+        //console.log(JSON.stringify(microflowHierarchy.flows, null, 2));
         
     }
 }

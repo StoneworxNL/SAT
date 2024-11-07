@@ -9,5 +9,7 @@ Upskill/
 *.cmd
 *.svg
 *.csv
+*.log
+*.json
 *_analysis.csv
 RESTO_analysis.old
