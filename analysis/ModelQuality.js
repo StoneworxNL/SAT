@@ -32,6 +32,8 @@ class Page {
         this.buttons = [];
     }
 }
+
+const MxModel = require("../MxModel/MxModel");
 const SquatModule = require("../MxModel/Module");
 const SquatEntity = require("../MxModel/Entity");
 const SquatMicroflow = require("../MxModel/Microflow");
@@ -39,17 +41,17 @@ const SquatFolder = require("../MxModel/Folder");
 const SquatMenu = require("../MxModel/Menu");
 const SquatPage = require("../MxModel/Page");
 
-class MxModel {
-    constructor() {
-        this.security = {},
-        this.modules = [];
-        this.entities = [];
-        this.microflows = [];
-        this.folders = {};
-        this.menus = [];
-        this.pages = [];
-    }
-}
+// class MxModel {
+//     constructor() {
+//         this.security = {},
+//         this.modules = [];
+//         this.entities = [];
+//         this.microflows = [];
+//         this.folders = {};
+//         this.menus = [];
+//         this.pages = [];
+//     }
+// }
 
 module.exports = class ModelQuality extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
