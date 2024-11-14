@@ -10,6 +10,7 @@ const Entity = require("./Entity");
 const AnalysisModule = require("./AnalysisModule");
 const DomainCollector = require("./DomainCollector");
 const SecurityCollector = require("./SecurityCollector");
+const ModuleCollector = require("./ModuleCollector");
 const { log } = require("console");
 
 class Menu {
@@ -63,6 +64,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.pages = [];
         this.domainCollector = new DomainCollector(this);
         this.securityCollector = new SecurityCollector(this);
+        this.moduleCollector =  new ModuleCollector(this);
 
         const checks = config.get("checks");
         let checksFolder = config.get("checksFolder");
@@ -88,6 +90,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         var promises = [];
 
         this.securityCollector.collect(promises);
+        this.moduleCollector.collect(promises);
         this.collectMicroflows(promises);
         this.collectRules(promises);
         this.domainCollector.collect(promises, this.domains);
