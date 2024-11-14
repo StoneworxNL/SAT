@@ -26,7 +26,7 @@ class Menu {
 class Page {
     constructor(moduleName, pageName, documentation) {
         this.module = moduleName,
-        this.documentation = documentation;
+            this.documentation = documentation;
         this.name = pageName;
         this.allowedRoles = [];
         this.buttons = [];
@@ -41,18 +41,6 @@ const SquatFolder = require("../MxModel/Folder");
 const SquatMenu = require("../MxModel/Menu");
 const SquatPage = require("../MxModel/Page");
 
-// class MxModel {
-//     constructor() {
-//         this.security = {},
-//         this.modules = [];
-//         this.entities = [];
-//         this.microflows = [];
-//         this.folders = {};
-//         this.menus = [];
-//         this.pages = [];
-//     }
-// }
-
 module.exports = class ModelQuality extends AnalysisModule {
     constructor(excludes, prefixes, outFileName) {
         super(excludes, prefixes, outFileName);
@@ -66,7 +54,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.pages = [];
         this.domainCollector = new DomainCollector(this);
         this.securityCollector = new SecurityCollector(this);
-        this.moduleCollector =  new ModuleCollector(this);
+        this.moduleCollector = new ModuleCollector(this);
 
         const checks = config.get("checks");
         let checksFolder = config.get("checksFolder");
@@ -165,9 +153,9 @@ module.exports = class ModelQuality extends AnalysisModule {
         var now = new Date();
         let dateTimeString = this.getDateTimeString();
 
-        let folder = config.get("outputFolder")||'./';
+        let folder = config.get("outputFolder") || './';
         this.reportFile = `${folder}/${nickName}_${this.branch}_${dateTimeString}.csv`;
-        console.log("Writing to "+this.reportFile);
+        console.log("Writing to " + this.reportFile);
         if (nickName) {
             try {
                 fs.writeFileSync(this.reportFile, 'Module;Microflow;Code;Description;Info\n');
@@ -186,7 +174,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                                 break;
                             case 'domainmodel':
                                 let [domainModel, entityName, mfPrefix] = this.nameParts(theDocument)
-                                fs.appendFileSync(this.reportFile, domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code]+ ';' + (err.comment || '')  + '\n');
+                                fs.appendFileSync(this.reportFile, domainModel + ';' + entityName + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             case 'microflow':
                                 let moduleName = this.getModuleName(theDocument);
@@ -198,7 +186,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                                 break;
                             case 'page':
                                 let [pageModuleName, pageName] = theDocument.split('.');
-                                fs.appendFileSync(this.reportFile, pageModuleName  + ';' + pageName + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
+                                fs.appendFileSync(this.reportFile, pageModuleName + ';' + pageName + ';' + err.code + ';' + this.errorCodes[err.code] + ';' + (err.comment || '') + '\n');
                                 break;
                             default:
                                 console.log('Cannot determine: ' + item.type);
@@ -250,6 +238,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                 if (!excludeThis) {
                     microflowIF.load().then((microflow) => {
                         this.parseMicroflow(microflow);
+                        this.parseMxMicroflow(microflow);
                         resolve();
                     })
                         .catch((err) => { console.log(err) })
@@ -330,15 +319,31 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }
 
+    parseMxMicroflow(mf) {
+        let [returnType, returnEntity] = this.getReturnTypeEntity(mf);
+        let microflow = new SquatMicroflow(mf.container.id, mf.name, returnType, returnEntity);
+        if (mf.flows) {
+            let flowsJSON = JSON.parse(JSON.stringify(mf.flows, null, 2));
+            let flows = flowsJSON.map((flow) => {
+                return {
+                    origin: flow.origin, originIndex: flow.originConnectionIndex
+                    , desitination: flow.destination, destinationIndex: flow.destinationConnectionIndex,
+                    value: ((flow.caseValue && flow.caseValue.value) ? flow.caseValue.value : '')
+                }
+            })
+            microflow.flows = flows;
+        } else { microflow.flows = [] }
+        this.MxModel.microflows.push(microflow);
+    }
 
     parseMicroflow = function (mf, parentMF) {
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
         let returnType = mf.microflowReturnType;
-        let mfReturnType = '';let mfReturnEntity = '';
-        if (returnType && returnType.structureTypeName){
+        let mfReturnType = ''; let mfReturnEntity = '';
+        if (returnType && returnType.structureTypeName) {
             mfReturnType = returnType.structureTypeName;
-            if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType' ){
-                if(returnType.entity){
+            if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType') {
+                if (returnType.entity) {
                     mfReturnEntity = returnType.entity.name;
                 } else {
                     mfReturnEntity = returnType.toJSON().entity;
@@ -354,7 +359,7 @@ module.exports = class ModelQuality extends AnalysisModule {
             }
             if (json['$Type'] === 'Microflows$LoopedActivity') {
                 let action_type = 'LoopAction';
-                this.updateHierarchy(parentMF || mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId});
+                this.updateHierarchy(parentMF || mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId });
                 this.parseMicroflow(obj, parentMF || mf);
             }
             else if (json['$Type'] === 'Microflows$ActionActivity') {
@@ -380,15 +385,15 @@ module.exports = class ModelQuality extends AnalysisModule {
                 this.updateHierarchy(mf, action_type, parentMF, subMF, mfReturnType, mfReturnEntity, { 'id': actionId, 'complexity': complexity, 'commit': commit });
             } else if (json['$Type'] === 'Microflows$StartEvent') {
                 let action_type = 'StartEvent';
-                this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId});
+                this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId });
             } else if (json['$Type'] === 'Microflows$EndEvent') {
                 let action_type = 'EndEvent';
-                this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId});
-            } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {                
+                this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId });
+            } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
                 let action_type = 'ExclusiveSplit';
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
                 let complexity = this.checkExpressionComplexity(condition);
-                this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, {'id': actionId, 'caption': json['caption'], 'complexity': complexity });
+                this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId, 'caption': json['caption'], 'complexity': complexity });
             } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
                 let action_type = 'ExclusiveMerge';
                 this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId, });
@@ -396,16 +401,33 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
         let microflowName = this.getMicroflowName(mf, parentMF);
         let microflowData = this.hierarchy[microflowName];
-        if (mf.flows){
+        if (mf.flows) {
             let flowsJSON = JSON.parse(JSON.stringify(mf.flows, null, 2));
-            let flows = flowsJSON.map((flow)=>{
-                return {origin: flow.origin, originIndex: flow.originConnectionIndex
-                    , desitination: flow.destination, destinationIndex: flow.destinationConnectionIndex, 
-                    value: ((flow.caseValue && flow.caseValue.value)? flow.caseValue.value:'')
+            let flows = flowsJSON.map((flow) => {
+                return {
+                    origin: flow.origin, originIndex: flow.originConnectionIndex
+                    , desitination: flow.destination, destinationIndex: flow.destinationConnectionIndex,
+                    value: ((flow.caseValue && flow.caseValue.value) ? flow.caseValue.value : '')
                 }
             })
             microflowData.flows = flows;
-        } else { microflowData.flows = []}
+        } else { microflowData.flows = [] }
+    }
+
+    getReturnTypeEntity(mf) {
+        let returnType = mf.microflowReturnType;
+        let mfReturnType = ''; let mfReturnEntity = '';
+        if (returnType && returnType.structureTypeName) {
+            mfReturnType = returnType.structureTypeName;
+            if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType') {
+                if (returnType.entity) {
+                    mfReturnEntity = returnType.entity.qualifiedName;
+                } else {
+                    mfReturnEntity = returnType.toJSON().entity;
+                }
+            }
+        };
+        return [mfReturnType,mfReturnEntity];
     }
 
     checkExpressionComplexity(expression) {
@@ -419,16 +441,16 @@ module.exports = class ModelQuality extends AnalysisModule {
     }
 
 
-    getMicroflowName = function(microflow, parentMicroflow){
+    getMicroflowName = function (microflow, parentMicroflow) {
         let microflowName = '';
         if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) { //working on top level or nested (looped) MF?
             microflowName = parentMicroflow.qualifiedName
         } else { microflowName = microflow.qualifiedName };
-        return  microflowName;             
+        return microflowName;
     }
 
     updateHierarchy = function (microflow, action, parentMicroflow, subMF, mfReturnType, mfReturnEntity, data) {
-        let actions; let subMFs; let annotations;let returnType;let returnEntity;
+        let actions; let subMFs; let annotations; let returnType; let returnEntity;
         let microflowName = this.getMicroflowName(microflow, parentMicroflow);
         let microflowData = this.hierarchy[microflowName];  //fetch existing info
         if (microflowData) {                                            //retrieve
@@ -443,7 +465,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                 if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) {
                     mfToAdd = parentMicroflow;
                 }
-                this.hierarchy[microflowName] = { mf: mfToAdd, returnType: returnType, returnEntity: returnEntity};
+                this.hierarchy[microflowName] = { mf: mfToAdd, returnType: returnType, returnEntity: returnEntity };
             }
         }
         let actionInfo = { 'type': action };
