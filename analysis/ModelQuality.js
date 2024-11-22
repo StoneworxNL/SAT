@@ -37,6 +37,7 @@ const MxModel = require("../MxModel/MxModel");
 const SquatModule = require("../MxModel/Module");
 const SquatEntity = require("../MxModel/Entity");
 const SquatMicroflow = require("../MxModel/Microflow");
+const { Action, JavaAction, ExpressionAction } = require('../MxModel/Action');
 const SquatFolder = require("../MxModel/Folder");
 const SquatMenu = require("../MxModel/Menu");
 const SquatPage = require("../MxModel/Page");
@@ -333,7 +334,77 @@ module.exports = class ModelQuality extends AnalysisModule {
             })
             microflow.flows = flows;
         } else { microflow.flows = [] }
+        this.parseMFActions(mf, microflow);
         this.MxModel.microflows.push(microflow);
+    }
+
+    parseMFActions(mf, microflowData) {
+        let actions = mf.objectCollection.objects;
+        
+        actions.forEach(action => {
+            let json = action.toJSON();
+            let actionId = json['$ID'];
+            let actionType = json['$Type'];
+            let complexity = 0;
+            if (actionType === 'Microflows$Annotation') {
+                let annotation = json['caption'];
+                microflowData.addAnnotation(annotation);
+            }
+            if (actionType === 'Microflows$LoopedActivity') {
+                let actionData = new Action(actionType, actionId);
+                microflowData.addAction(actionData);
+                this.parseMFActions(action, microflowData);
+            }
+            else if (json['$Type'] === 'Microflows$ActionActivity') {
+                let action_type = json['action']['$Type'];
+                let subMF = null;
+                let commit = false;
+                if (action_type === 'Microflows$MicroflowCallAction') {
+                    let actionData = new Action(action_type, actionId);
+                    microflowData.addAction(actionData);
+                    subMF = json['action']['microflowCall']['microflow'];
+                    microflowData.addSubMicroflow(subMF);
+                } else if (action_type === 'Microflows$CreateVariableAction') {
+                    complexity = this.checkExpressionComplexity(json['action']['initialValue']);
+                    let caption = json['caption'];
+                    let actionData = new ExpressionAction(action_type, actionId, false, complexity, caption);
+                    microflowData.addAction(actionData);
+                } else if (action_type === 'Microflows$ChangeVariableAction') {
+                    complexity = this.checkExpressionComplexity(json['action']['value']);
+                    let caption = json['caption'];
+                    let actionData = new ExpressionAction(action_type, actionId, false, complexity, caption);
+                    microflowData.addAction(actionData);
+                } else if (action_type === 'Microflows$CreateObjectAction' || action_type === 'Microflows$ChangeObjectAction') {
+                    json['action']['items'].forEach((item) => {
+                        let count = this.checkExpressionComplexity(item['value']);
+                        if (count > complexity) { complexity = count };
+                    })
+                    if (json['action']['commit'] === 'Yes') {
+                        commit = true;
+                    }
+                    let actionData = new ExpressionAction(action_type, actionId, commit, complexity);
+                    microflowData.addAction(actionData);
+                }  else {
+                    let actionData = new Action(action_type, actionId);
+                    microflowData.addAction(actionData);
+                } 
+            }  else if (json['$Type'] === 'Microflows$StartEvent') {
+                let actionData = new Action(actionType, actionId);
+                microflowData.addAction(actionData);
+            } else if (json['$Type'] === 'Microflows$EndEvent') {
+                let actionData = new Action(actionType, actionId);
+                microflowData.addAction(actionData);
+            } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
+                let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
+                complexity = this.checkExpressionComplexity(condition);
+                let caption = json['caption'];
+                let actionData = new ExpressionAction(actionType, actionId, false, complexity, caption);
+                microflowData.addAction(actionData);
+            } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
+                let actionData = new Action(actionType, actionId);
+                microflowData.addAction(actionData);
+            }           
+        });
     }
 
     parseMicroflow = function (mf, parentMF) {
@@ -427,7 +498,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                 }
             }
         };
-        return [mfReturnType,mfReturnEntity];
+        return [mfReturnType, mfReturnEntity];
     }
 
     checkExpressionComplexity(expression) {
