@@ -335,6 +335,10 @@ module.exports = class ModelQuality extends AnalysisModule {
             microflow.flows = flows;
         } else { microflow.flows = [] }
         this.parseMFActions(mf, microflow);
+        let allowedRoles = mf['allowedModuleRoles'];
+        if (allowedRoles.length > 1) {
+            microflow.roles  = allowedRoles;
+        }
         this.MxModel.microflows.push(microflow);
     }
 

@@ -31,7 +31,7 @@ function main() {
     console.log("==================================== COLLECTING DATA: " + mpr);
 
     mprCollector.collect().then((model) => {
-        console.log(JSON.stringify(model, null, 2));
+        fs.writeFileSync(outFile+'.json',JSON.stringify(model, null, 2));
         console.log("====================== ANALYSING =======================");
         analysis.analyse(model);
         console.log("====================== REPORTING =======================");

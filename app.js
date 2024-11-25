@@ -64,7 +64,7 @@ function main() {
 
     wc.loadWorkingCopy(appID, nickname, branch, clear).then(([model, workingCopy]) => {
         analysis.collect(model, branch, workingCopy, documentName).then(() => {
-            console.log(JSON.stringify(analysis.MxModel, null, 2));
+            fs.writeFileSync(outFileName+'.json',JSON.stringify(analysis.MxModel, null, 2));
             
             analysis.analyse().then(() => {
                 analysis.report(nickname);

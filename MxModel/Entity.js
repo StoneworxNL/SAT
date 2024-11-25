@@ -1,3 +1,5 @@
+const Attribute = require("./Attribute");
+
 class Entity {
     constructor(containerID, entityName, documentation) {
         this.containerID = containerID,
@@ -13,15 +15,40 @@ class Entity {
         if (domainEntities.length > 1) {
             domainEntities.forEach(domainEntity => {
                 if (typeof domainEntity != 'number') {
-                    let attributes = [];
                     let entityName = domainEntity['Name'];
+                    let attributes = [];
                     let documentation = domainEntity['Documentation'];
                     let attrs = domainEntity['Attributes'];
                     attrs.forEach(attr => {
                         if (attr['$Type'] && attr['$Type'] === 'DomainModels$Attribute') {
-                            attributes.push(attr['Name']);
+                            let attribute= new Attribute(attr['Name']);
+                            attributes.push(attribute);
                         }
                     });
+                    domainEntity['AccessRules'].forEach(accessRule=>{
+                        if (typeof accessRule === 'object'){
+                            let allowedRoles = accessRule['AllowedModuleRoles'].flatMap(allowedModuleRole=>{
+                                if (typeof allowedModuleRole === 'string'){
+                                    return allowedModuleRole
+                                } return [];
+                            })
+                            accessRule['MemberAccesses'].forEach(memberAccess=>{
+                                let rights = memberAccess['AccessRights'];
+                                let association = memberAccess['Association'];
+                                let attributeQName = memberAccess['Attribute'];
+                                if (attributeQName){
+                                    let parts = attributeQName.split('.');
+                                    let attrName = parts[2]; //Allways 3 long: Module.Entity.Attr
+                                    let attribute = this.findAttribute(attributes, attrName);
+                                    if (attribute){
+                                        allowedRoles.forEach(role =>{
+                                            attribute.addAccessRights({role: role, rights: rights })
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    })
                     let entity = new Entity(containerID, entityName, documentation);
                     entity.attrs = attributes
                     entities.push(entity);
@@ -29,6 +56,10 @@ class Entity {
             });
         }
         return entities;
+    }
+
+    static findAttribute(attrs, name){
+        return attrs.find(attr=> attr.name === name);
     }
 
     getIgnoreRuleAnnotations() {

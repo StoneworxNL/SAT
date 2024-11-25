@@ -14,10 +14,11 @@ module.exports = class DomainModel extends CheckModule {
         this.setup(model, entity);
         let ignoreRuleAnnotations = entity.getIgnoreRuleAnnotations();
         entity.attrs.forEach(attr => {
-            if (attr.startsWith(entity.name)) {
+            let attrName = attr.name;
+            if (attrName.startsWith(entity.name)) {
                 this.addErrors("DM1", ignoreRuleAnnotations, `${entity.name}.${attr}`);
             }
-            if (attr.includes('_')) {
+            if (attrName.includes('_')) {
                 this.addErrors("DM2", ignoreRuleAnnotations, `${entity.name}.${attr}`);
             }
         })

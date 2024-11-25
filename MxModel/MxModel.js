@@ -1,3 +1,4 @@
+const UserRole = require("./UserRole");
 const Module = require("./Module");
 const Entity = require("./Entity");
 const Microflow = require("./Microflow");
@@ -6,18 +7,30 @@ const Menu = require("./Menu");
 const Page = require("./Page");
 
 class MxModel {
-    constructor() {
-        this.security = {},
-        this.modules = [];
-        this.entities = [];
-        this.microflows = [];
-        this.folders = {};
-        this.menus = [];
-        this.pages = [];
+    constructor(model) {
+        this.security = model?.security || {},
+        this.modules = model?.modules || [];
+        this.entities = model?.entities || [];
+        this.microflows = model?.microflows || [];
+        this.folders = model?.folders || {};
+        this.menus = model?.menus || [];
+        this.pages = model?.pages || [];
     }
 
     parseSecurity(doc) {
         this.security = { 'enableDemoUsers': doc['EnableDemoUsers'] };
+        let userRoles = doc['UserRoles'];
+        this.security.roles = userRoles.flatMap(userRole =>{
+            if (typeof userRole ==='object'){
+                let name = userRole['Name'];                
+                let moduleRoles = userRole['ModuleRoles'].flatMap(moduleRole=>{
+                    if (typeof moduleRole ==='string'){
+                        return moduleRole
+                    } return [];
+                })
+                return new UserRole(name, moduleRoles)
+            } return [];
+        })
     }
 
     parseModule(doc) {
@@ -84,6 +97,12 @@ class MxModel {
             let mfModule = this.getModule(microflow.containerID);
             return microflow.name === microflowName && module === mfModule.name;
         })
+    }
+
+    findAppRolesByModuleRole(roleName){
+        return this.security.roles.filter(role=>
+            role.moduleRoles.find(moduleRole=> moduleRole === roleName)
+        )
     }
 
 
