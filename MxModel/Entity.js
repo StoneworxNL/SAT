@@ -30,14 +30,14 @@ class Entity {
                     let attrs = domainEntity['Attributes'];
                     attrs.forEach(attr => {
                         if (attr['$Type'] && attr['$Type'] === 'DomainModels$Attribute') {
-                            let attribute= new Attribute(attr['Name']);
+                            let attribute= new Attribute(attr['Name'], 'attr');
                             attributes.push(attribute);
                         }
                     });
                     associations.forEach(association=>{
                         let parentID = association['ParentPointer'].toString('base64');
                         if (parentID === id){
-                            let attribute= new Attribute(association['Name']);
+                            let attribute= new Attribute(association['Name'], 'assoc');
                             attributes.push(attribute);
                         }
                     })
@@ -52,6 +52,8 @@ class Entity {
                             let defaultAccesRights = accessRule['DefaultMemberAccessRights'];
                             let isCreateAllowed = accessRule['AllowCreate'];
                             let isDeleteAllowed = accessRule['AllowDelete'];
+                            let xPath = accessRule['XPathConstraint'].replace(/\n/g, " ");
+;
                             accessRule['MemberAccesses'].forEach(memberAccess=>{
                                 let rights = memberAccess['AccessRights'];
                                 let associationQName = memberAccess['Association'];
@@ -61,7 +63,7 @@ class Entity {
                                     let attribute = this.findAttribute(attributes, attrName);
                                     if (attribute){
                                         allowedRoles.forEach(role =>{
-                                            attribute.addAccessRights({role: role, rights: rights, defaults: defaultAccesRights, create: isCreateAllowed, delete: isDeleteAllowed })
+                                            attribute.addAccessRights({role: role, rights: rights, defaults: defaultAccesRights, create: isCreateAllowed, delete: isDeleteAllowed, xpath: xPath })
                                         })
                                     }
                                 }
@@ -72,7 +74,7 @@ class Entity {
                                     let attribute = this.findAttribute(attributes, attrName);
                                     if (attribute){
                                         allowedRoles.forEach(role =>{
-                                            attribute.addAccessRights({role: role, rights: rights, defaults: defaultAccesRights, create: isCreateAllowed, delete: isDeleteAllowed })
+                                            attribute.addAccessRights({role: role, rights: rights, defaults: defaultAccesRights, create: isCreateAllowed, delete: isDeleteAllowed, xpath: xPath })
                                         })
                                     }
                                 }

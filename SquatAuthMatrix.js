@@ -26,7 +26,7 @@ main();
 function main() {
     let inFile = options.in;
     let outFile = options.out;
-    let report='module;entity;persistent;attribute;app role;module role;rights;defaults;create;delete\n';
+    let report='module;fromAppstore;entity;persistent;attribute;type;app role;module role;rights;defaults;create;delete;xpath\n';
     let modelJSON = JSON.parse(fs.readFileSync(inFile, 'utf8'));
     let model = new MxModel(modelJSON);
     model.entities.forEach(entity=>{
@@ -41,7 +41,7 @@ function main() {
                 let appRoleInfo = (appRoles? ' ['+appRoles.join('/')+']':'');
                 //report += (`${module.name};${entity.name};${entity.isPersistent};${attribute.name};${role}${appRoleInfo};${right.rights}\n`);
                 appRoles.forEach(appRole=> 
-                    report += (`${module.name};${entity.name};${entity.isPersistent};${attribute.name};${appRole};${role};${right.rights};${right.defaults};${right.create};${right.delete}\n`)
+                    report += (`${module.name};${module.fromAppStore};${entity.name};${entity.isPersistent};${attribute.name};${attribute.type};${appRole};${role};${right.rights};${right.defaults};${right.create};${right.delete};${right.xpath}\n`)
                 )
             })
         })
