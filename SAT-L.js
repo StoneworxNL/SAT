@@ -25,17 +25,15 @@ main();
 function main() {
     let mpr = options.mpr;
     let outFile = options.out;
+    let folder = config.get("outputFolder");
     let mprCollector = new MPRCollector(mpr);
-    let analysis = new SquatAnalysis();
-    let reporter = new SquatReport(outFile);
-    console.log("==================================== COLLECTING DATA: " + mpr);
+    // let analysis = new SquatAnalysis();
+    // let reporter = new SquatReport(outFile);
+    // console.log("==================================== COLLECTING DATA: " + mpr);
 
     mprCollector.collect().then((model) => {
-        fs.writeFileSync(outFile+'.json',JSON.stringify(model, null, 2));
-        console.log("====================== ANALYSING =======================");
-        analysis.analyse(model);
-        console.log("====================== REPORTING =======================");
-        reporter.report(analysis);
+        fs.writeFileSync(folder+'/'+outFile+'.json',JSON.stringify(model, null, 2));
+        console.log("====================== Ready =======================");
     });
 }
 

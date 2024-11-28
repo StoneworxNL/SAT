@@ -1,13 +1,21 @@
 const Attribute = require("./Attribute");
 
 class Entity {
-    constructor(containerID, id, entityName, documentation, isPersistent) {
+    constructor(containerID, id, entityName, documentation, isPersistent, attrs) {
         this.containerID = containerID,
         this.id = id;
         this.documentation = documentation;
         this.name = entityName;
         this.isPersistent = isPersistent;
-        this.attrs = [];
+        this.attrs = attrs || [];
+    }
+
+    static builder(entities){
+        return entities.map(obj => {
+            let ent = new Entity(obj.containerID,obj.id,obj.name,obj.documentation,obj.isPersistent);
+            ent.attrs = Attribute.builder(obj.attrs);
+            return ent;
+        });
     }
 
     static parse(doc, container) {

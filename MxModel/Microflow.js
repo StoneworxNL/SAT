@@ -14,6 +14,17 @@ class Microflow {
         this.roles = [];
     }
 
+    static builder(microflows){
+        return microflows.map(obj => {
+            let mf = new Microflow(obj.containerID,obj.name,obj.returnType, obj.returnEntity)
+            mf.flows = obj.flows;
+            mf.actions = obj.actions;
+            mf.annotations = obj.annotations;
+            mf.subMicroflows = obj.subMicroflows;
+            mf.roles = obj.roles;
+            return mf;
+        });
+    }
 
     static parse(doc, container) {
         let containerID = container.toString('base64');

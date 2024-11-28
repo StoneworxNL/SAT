@@ -24,7 +24,7 @@ class MPRCollector {
                             model.parseSecurity(doc);
                             break;
                         case 'Navigation$NavigationDocument':
-                            model.parseNavigation(doc, container);
+                            model.parseMenus(doc, container);
                             break
                         case 'Menus$MenuDocument':
                             model.parseMenu(doc, container);

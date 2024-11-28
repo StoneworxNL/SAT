@@ -1,10 +1,15 @@
 class Page {
     constructor(containerID, pageName, documentation) {
         this.containerID = containerID,
-            this.documentation = documentation;
+        this.documentation = documentation;
         this.name = pageName;
         this.allowedRoles = [];
         this.buttons = [];
+    }
+
+    
+    static builder(pages){
+        return pages.map(p => new Page(p.containerID, p.documentation, p.name, p.allowedRoles, p.buttons));
     }
 
     static parse(doc, container) {

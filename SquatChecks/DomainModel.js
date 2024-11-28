@@ -11,6 +11,7 @@ module.exports = class DomainModel extends CheckModule {
     }
 
     check = function (model, entity) {
+        
         this.setup(model, entity);
         let ignoreRuleAnnotations = entity.getIgnoreRuleAnnotations();
         entity.attrs.forEach(attr => {

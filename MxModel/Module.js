@@ -5,6 +5,10 @@ class Module {
         this.fromAppStore = fromAppStore;
     }
 
+    static builder(modules){
+        return modules.map(m => new Module(m.id, m.name, m.fromAppStore));
+    }
+
     static parse (doc) {
         let moduleName = doc['Name'];
         if (doc['$Type']==='Projects$Project') {

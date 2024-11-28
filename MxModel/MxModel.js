@@ -3,34 +3,35 @@ const Module = require("./Module");
 const Entity = require("./Entity");
 const Microflow = require("./Microflow");
 const Folder = require("./Folder");
-const Menu = require("./Menu");
+const {Menus, Menu} = require("./Menu");
 const Page = require("./Page");
+const Security = require("./Security");
 
 class MxModel {
-    constructor(model) {
-        this.security = model?.security || {},
-        this.modules = model?.modules || [];
-        this.entities = model?.entities || [];
-        this.microflows = model?.microflows || [];
-        this.folders = model?.folders || {};
-        this.menus = model?.menus || [];
-        this.pages = model?.pages || [];
+    constructor() {
+        this.security =  {},
+        this.modules = [];
+        this.entities = [];
+        this.microflows = [];
+        this.folders = {};
+        this.menus = [];
+        this.pages = [];
+    }
+
+    static builder(obj){
+        let mxModel = new MxModel();
+        mxModel.security = Security.builder(obj.security);
+        mxModel.modules = Module.builder(obj.modules);
+        mxModel.entities = Entity.builder(obj.entities);
+        mxModel.microflows = Microflow.builder(obj.microflows);
+        mxModel.folders = Folder.builder(obj.folders);
+        mxModel.menus = Menus.builder(obj.menus);
+        mxModel.pages = Page.builder(obj.pages);
+        return  mxModel
     }
 
     parseSecurity(doc) {
-        this.security = { 'enableDemoUsers': doc['EnableDemoUsers'] };
-        let userRoles = doc['UserRoles'];
-        this.security.roles = userRoles.flatMap(userRole =>{
-            if (typeof userRole ==='object'){
-                let name = userRole['Name'];                
-                let moduleRoles = userRole['ModuleRoles'].flatMap(moduleRole=>{
-                    if (typeof moduleRole ==='string'){
-                        return moduleRole
-                    } return [];
-                })
-                return new UserRole(name, moduleRoles)
-            } return [];
-        })
+        this.security = Security.parse(doc);
     }
 
     parseModule(doc) {
@@ -55,18 +56,9 @@ class MxModel {
         this.pages.push(page);
     }
 
-    parseNavigation(doc, container){
-        let profiles = doc['Profiles'];
-        if (profiles && profiles.length > 1){
-            profiles.forEach(profile => {
-                if (typeof profile != 'number'){
-                    let menu = profile['Menu']['Items'];
-                    let menuName = profile['Name'];
-                    let menuItems = Menu.parseItems(menu, container, menuName);
-                    this.menus.push(...menuItems);
-                }
-            });
-        }
+    parseMenus(doc, container){
+        let menus = Menus.parse(doc, container);
+        this.menus.push(...menus);
     }
     parseMenu(doc, container){
         let menuItems = Menu.parse(doc, container);
@@ -105,7 +97,9 @@ class MxModel {
         )
     }
 
-
+    instantiateEntity(obj){
+        return Entity.builder(obj);
+    }
 }
 
 module.exports = MxModel;
