@@ -15,6 +15,7 @@ commander
     .requiredOption('-n, --nickname <nickname>', 'Nickname under which data is stored')
     .requiredOption('-a, --appid <appid>', 'AppID of the mendix project')
     .requiredOption('-b, --branch <branch name>', 'Branch of the mendix project')
+    .requiredOption('-o, --out <output file>', 'Filenam of the result')
     .option('-c, --clear', 'Clear workingcopy')
     .option('-d, --documentName <document>', 'Qualified name of document to analyse.')
     .requiredOption('-m, --module <module name', 'Analysis module to use: SD=sequence Diagram, MQ=MicroflowQuality')
@@ -41,11 +42,12 @@ function main() {
     const documentName = options.documentName || '';
     appID = options.appid;
     branch = options.branch;
+    outFileName = options.out;
     excludes = options.excludes ? options.excludes : undefined;
     prefixes = options.prefixes ? options.prefixes : undefined;
     moduleCode = options.module ? options.module : 'SD';
     clear = options.clear ? options.clear : false;
-
+    let folder = config.get("outputFolder");
 
     switch (moduleCode) {
         case 'SD':
@@ -64,15 +66,23 @@ function main() {
 
     wc.loadWorkingCopy(appID, nickname, branch, clear).then(([model, workingCopy]) => {
         analysis.collect(model, branch, workingCopy, documentName).then(() => {
-            fs.writeFileSync(outFileName+'.json',JSON.stringify(analysis.MxModel, null, 2));
-            
-            analysis.analyse().then(() => {
-                analysis.report(nickname);
-                console.log("READY");
-            }).catch((e) => { console.log(e) });
+            fs.writeFileSync(folder + '/' + outFileName + '.json', JSON.stringify(analysis.MxModel, null, 2));
+            // analysis.analyse().then(() => {
+            //     analysis.report(nickname);
+            //     console.log("READY");
+            // }).catch((e) => { console.log(e) });
         });
     }).catch((e) => {
         console.log(e.message)
     });
 }
 
+function getDateTimeString(){
+    let now = new  Date();
+    let year = now.getFullYear();
+    let month = ('00'+(now.getMonth()+1).toString()).slice(-2);
+    let day = ('00'+now.getDate().toString()).slice(-2);
+    let hour = ('00'+ now.getHours().toString()).slice(-2);
+    let minute = ('00'+now.getMinutes().toString()).slice(-2);
+    return `${year}${month}${day}_${hour}${minute}`;
+}

@@ -93,8 +93,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }
 
-
-    analyse = function () {
+/*    analyse = function () {
         console.log("===================================ANALYSIS ==============================\n");
         let dms = this.model.allDomainModels();
         let dmPromises = [];
@@ -201,6 +200,7 @@ module.exports = class ModelQuality extends AnalysisModule {
             })
         })
     }
+*/
 
     getIgnoreRuleAnnotations = function (document) {
         let ignoreRuleAnnotations = [];
@@ -238,7 +238,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                 }
                 if (!excludeThis) {
                     microflowIF.load().then((microflow) => {
-                        this.parseMicroflow(microflow);
+//                        this.parseMicroflow(microflow);
                         this.parseMxMicroflow(microflow);
                         resolve();
                     })
@@ -336,8 +336,8 @@ module.exports = class ModelQuality extends AnalysisModule {
         } else { microflow.flows = [] }
         this.parseMFActions(mf, microflow);
         let allowedRoles = mf['allowedModuleRoles'];
-        if (allowedRoles.length > 1) {
-            microflow.roles  = allowedRoles;
+        if (allowedRoles && allowedRoles.length > 1) {
+            microflow.roles  = allowedRoles.flatMap(allowedRole => allowedRole.name);
         }
         this.MxModel.microflows.push(microflow);
     }
@@ -411,7 +411,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }
 
-    parseMicroflow = function (mf, parentMF) {
+/*    parseMicroflow = function (mf, parentMF) {
         let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
         let returnType = mf.microflowReturnType;
         let mfReturnType = ''; let mfReturnEntity = '';
@@ -489,42 +489,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         } else { microflowData.flows = [] }
     }
 
-    getReturnTypeEntity(mf) {
-        let returnType = mf.microflowReturnType;
-        let mfReturnType = ''; let mfReturnEntity = '';
-        if (returnType && returnType.structureTypeName) {
-            mfReturnType = returnType.structureTypeName;
-            if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType') {
-                if (returnType.entity) {
-                    mfReturnEntity = returnType.entity.qualifiedName;
-                } else {
-                    mfReturnEntity = returnType.toJSON().entity;
-                }
-            }
-        };
-        return [mfReturnType, mfReturnEntity];
-    }
-
-    checkExpressionComplexity(expression) {
-        let result = 0;
-        let regex = /(if(\s|\()|and(\s|\()|or(\s|\()|not(\s|\())/g;
-        let matches = expression.match(regex) || [];
-        if (matches.length > 0) {
-            result = matches.length;
-        }
-        return result;
-    }
-
-
-    getMicroflowName = function (microflow, parentMicroflow) {
-        let microflowName = '';
-        if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) { //working on top level or nested (looped) MF?
-            microflowName = parentMicroflow.qualifiedName
-        } else { microflowName = microflow.qualifiedName };
-        return microflowName;
-    }
-
-    updateHierarchy = function (microflow, action, parentMicroflow, subMF, mfReturnType, mfReturnEntity, data) {
+        updateHierarchy = function (microflow, action, parentMicroflow, subMF, mfReturnType, mfReturnEntity, data) {
         let actions; let subMFs; let annotations; let returnType; let returnEntity;
         let microflowName = this.getMicroflowName(microflow, parentMicroflow);
         let microflowData = this.hierarchy[microflowName];  //fetch existing info
@@ -569,9 +534,44 @@ module.exports = class ModelQuality extends AnalysisModule {
         }
     }
 
+*/
+    getReturnTypeEntity(mf) {
+        let returnType = mf.microflowReturnType;
+        let mfReturnType = ''; let mfReturnEntity = '';
+        if (returnType && returnType.structureTypeName) {
+            mfReturnType = returnType.structureTypeName;
+            if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType') {
+                if (returnType.entity) {
+                    mfReturnEntity = returnType.entity.qualifiedName;
+                } else {
+                    mfReturnEntity = returnType.toJSON().entity;
+                }
+            }
+        };
+        return [mfReturnType, mfReturnEntity];
+    }
+
+    checkExpressionComplexity(expression) {
+        let result = 0;
+        let regex = /(if(\s|\()|and(\s|\()|or(\s|\()|not(\s|\())/g;
+        let matches = expression.match(regex) || [];
+        if (matches.length > 0) {
+            result = matches.length;
+        }
+        return result;
+    }
+
+
+    getMicroflowName = function (microflow, parentMicroflow) {
+        let microflowName = '';
+        if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) { //working on top level or nested (looped) MF?
+            microflowName = parentMicroflow.qualifiedName
+        } else { microflowName = microflow.qualifiedName };
+        return microflowName;
+    }
 
     parseRule = function (mf) {
-        this.parseMicroflow(mf, null);
+        this.parseMxMicroflow(mf);
     }
 
     parseMenuItems = function (menuItems, module, document) {
@@ -614,6 +614,5 @@ module.exports = class ModelQuality extends AnalysisModule {
             thePage.buttons.push({ type: button.action.$Type })
         })
         this.pages.push(thePage);
-
     }
 }

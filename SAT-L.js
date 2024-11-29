@@ -6,8 +6,8 @@ const { program: commander } = require('commander');
 
 const MxModel = require("./MxModel/MxModel.js");
 const MPRCollector = require("./MPRCollector.js")
-const SquatAnalysis = require("./SquatChecks/SquatAnalysis.js");
-const SquatReport = require("./SquatReport.js");
+//const SquatAnalysis = require("./SquatChecks/SquatAnalysis.js");
+//const SquatReport = require("./SquatReport.js");
 const { log } = require("console");
 
 let model = new MxModel();
@@ -37,3 +37,13 @@ function main() {
     });
 }
 
+
+getDateTimeString(){
+    let now = new  Date();
+    let year = now.getFullYear();
+    let month = ('00'+(now.getMonth()+1).toString()).slice(-2);
+    let day = ('00'+now.getDate().toString()).slice(-2);
+    let hour = ('00'+ now.getHours().toString()).slice(-2);
+    let minute = ('00'+now.getMinutes().toString()).slice(-2);
+    return `${year}${month}${day}_${hour}${minute}`;
+}
