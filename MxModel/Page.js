@@ -7,25 +7,42 @@ class Page {
         this.buttons = [];
     }
 
-    
-    static builder(pages){
+    static builder(pages) {
         return pages.map(p => new Page(p.containerID, p.documentation, p.name, p.allowedRoles, p.buttons));
     }
 
     static parse(doc, container) {
         let containerID = container.toString('base64');
-        let page = new Page(containerID, doc['Name'], doc['Documentation']);
-        let allowedRoles = doc['AllowedRoled'];
-        if (allowedRoles && allowedRoles.length > 1) {
-            page.allowedRoles = allowedRoles.slice(1);
-        }
-        let args = doc['FormCall']['Arguments'];
-        args.forEach(arg => {
-            if (typeof arg != 'number') {
-                let widgets = arg['Widgets'];
-                page.parseWidgets(widgets);
+        let page;
+        let allowedRoles;
+        let args;
+        if (doc['$ID']) {
+            page = new Page(containerID, doc['Name'], doc['Documentation']);
+            allowedRoles = doc['AllowedModuleRoles'];
+            if (allowedRoles && allowedRoles.length > 1) {
+
+                page.allowedRoles = allowedRoles.slice(1);
             }
-        });
+            args = doc['FormCall']['Arguments'];
+            args.forEach(arg => {
+                if (typeof arg != 'number') {
+                    let widgets = arg['Widgets'];
+                    page.parseWidgets(widgets);
+                }
+            });
+        } else {
+            page = new Page(containerID, doc['name'], doc['documentation']);
+            allowedRoles = doc['allowedRoles'];
+            page.allowedRoles = allowedRoles.flatMap(allowedRole => allowedRole.name);
+            
+            args = doc['layoutCall']['arguments'];
+            args.forEach(arg => {
+                if (typeof arg != 'number') {
+                    let widgets = arg['widgets'];
+                    page.parseWidgets(widgets);
+                }
+            });
+        }
 
         return page;
     }
@@ -40,31 +57,35 @@ class Page {
 
     parseWidget(widget) {
         if (typeof widget != 'number') {
-            let widgetType = widget['$Type'];
+            let widgetType = widget['$Type'] || widget['structureTypeName'];
             switch (widgetType) {
                 case 'Forms$ActionButton':
-                    let button = {'type': widget['Action']['$Type']}
+                case 'Pages$ActionButton':
+                    let button;
+                    if (widget['Action'] ){
+                        button = { 'type': widget['Action']['$Type'] }
+                    } else {
+                        button = { 'type': widget['action']['structureTypeName'] }
+                    }
                     this.buttons.push(button);
                     break;
                 default:
-                    let rows = widget['Rows'];
-                    let columns = widget['Columns'];
-                    let widgets = widget['Widgets'];
-                    let footerWidgets = widget['FooterWidgets'];
-                    if (rows){
+                    let rows = widget['Rows'] ||widget['rows'];
+                    let columns = widget['Columns'] ||widget['columns'];
+                    let widgets = widget['Widgets']||widget['widgets'];
+                    let footerWidgets = widget['FooterWidgets']||widget['footerWidgets'];;
+                    if (rows) {
                         this.parseWidgets(rows);
                     }
-                    if (columns){
+                    if (columns) {
                         this.parseWidgets(columns);
                     }
-                    if (widgets){
+                    if (widgets) {
                         this.parseWidgets(widgets);
                     }
-                    if (footerWidgets){
+                    if (footerWidgets) {
                         this.parseWidgets(footerWidgets);
                     }
-
-
             }
         }
     }

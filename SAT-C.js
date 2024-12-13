@@ -69,7 +69,7 @@ function main() {
             fs.writeFileSync(folder + '/' + outFileName + '.json', JSON.stringify(analysis.MxModel, null, 2));
             // analysis.analyse().then(() => {
             //     analysis.report(nickname);
-            //     console.log("READY");
+            console.log("READY");
             // }).catch((e) => { console.log(e) });
         });
     }).catch((e) => {

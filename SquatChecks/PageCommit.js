@@ -14,9 +14,9 @@ module.exports = class PageCommit extends CheckModule {
         this.setup(model, page);  
         let ignoreRuleAnnotations = page.getIgnoreRuleAnnotations(page);
         page.buttons.forEach(button => {
-            if (button.type ==='Forms$SaveChangesClientAction'){
+            if (button.type.includes('SaveChangesClientAction')){
                 this.addErrors("PC1", ignoreRuleAnnotations);   
-            } else if (button.type ==='Forms$DeleteClientAction'){
+            } else if (button.type.includes('DeleteClientAction')){
                 this.addErrors("PC2", ignoreRuleAnnotations);   
             }          
         });    

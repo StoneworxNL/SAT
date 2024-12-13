@@ -38,7 +38,7 @@ function main() {
 }
 
 
-getDateTimeString(){
+function getDateTimeString(){
     let now = new  Date();
     let year = now.getFullYear();
     let month = ('00'+(now.getMonth()+1).toString()).slice(-2);

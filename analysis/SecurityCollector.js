@@ -20,7 +20,7 @@ class SecurityCollector {
                                 let name = userRole['name'];
                                 let moduleRoles = userRole['moduleRoles'].flatMap(moduleRole => {
                                     if (typeof moduleRole === 'object') {
-                                        return moduleRole ? moduleRole['name']: [];
+                                        return moduleRole ? moduleRole['qualifiedName']: [];
                                     } return [];
                                 })
                                 return new UserRole(name, moduleRoles)
