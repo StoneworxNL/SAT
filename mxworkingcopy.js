@@ -1,8 +1,8 @@
 const mendixplatformsdk_1 = require("mendixplatformsdk");
 const fs = require("fs");
 
-exports.loadWorkingCopy = function (appID, nickname, branch, clear) {
-    workingCopyFile = nickname + '.workingcopy'; //beetje ugly: global variabele keertje fixen
+exports.loadWorkingCopy = function (appID, branch, clear) {
+    workingCopyFile = branch + '.workingcopy'; //beetje ugly: global variabele keertje fixen
     return new Promise((resolve, reject) => {
         const client = new mendixplatformsdk_1.MendixPlatformClient();
         if (clear) {

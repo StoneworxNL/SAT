@@ -1,9 +1,11 @@
-Tool for analysis and some documentation of Mendix apps. 
+Tool for analysis and documentation of Mendix apps. 
 Brought to you by Stoneworx
 
 **Implemented features**
+* Parse a local .mpr file or a working copy in the cloud
 * Generate Sequence Diagram from a (top) Microflow
-* Analyse (some) coding quality rules on Microflows:
+* Generate Authorisation Matrix from a project
+* Analyse an extensible set of coding quality rules on a model:
   
             NC1: format: [PRE]_[Entity(s)]_description
             NC2: Prefix must be allowed
@@ -28,38 +30,89 @@ Brought to you by Stoneworx
 ** checksFolder: should point to folder that contains all checks that are specified in the 'checks' array 
 ** outputFolder: should point to folder where reports are written. Make sure that it exists
 
-**Usage**
-node app.js [OPTIONS]...
+**SAT-C**
+Extract model information from a workingcopy in the mendix cloud.
+***Usage***
+```node SAT-C.js  [OPTIONS]...```
 
+ -n RestoServe -a 7b100ded-837d-41c5-a239-838f8a91d59e -b %1 -e SSO %2 -o SATCModel
 Options:
   -v, --version                  output the version number
-  
-  -n, --nickname <nickname>      Nickname under which data is stored
-  
-  -d, --documentName <document>  Qualified name of document to analyse.
   
   -a, --appid <appid>            AppID of the mendix project
   
   -b, --branch <branch name>     Branch of the mendix project, use the branch name, or 'trunk' for SVN main line, 'main' for git main line
-  
-  -m, --module <module name>      Analysis module to use: SD=sequence Diagram, MQ=
-  
-  -e, --excludes [exclude....]   Modules to exclude from analysis
-  
-  -p, --prefixes [prefix...]     Prefixes to aggregate as one
-  
+   
+  -o, --out <output file>   Filename of the result
+
   -h, --help                     display help for command
 
   -c, --clear                    Clear working copy, create new
 
-  **Examples**
+***Example***
+```node SAT-C.js -a [APPID] -b [BRANCH] -o [RESULTFILE]```
 
-  * Sequence Diagram: node app.js -m SD -n [NICKNAME] -d [MODULE].[MICROFLOW] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]
-  * Microflow Quality: node app.js -m MQ -n [NICKNAME] -a [APPID] -b [BRANCH] -e [MODULE(S)] -p [PREFIXES]
+**SAT-L**
+Extract model information from a local .mpr file.
+***Usage***
+```node SAT-L.js  [OPTIONS]...```
 
-  **Accept notifications**
+ -n RestoServe -a 7b100ded-837d-41c5-a239-838f8a91d59e -b %1 -e SSO %2 -o SATCModel
+Options:
+  -v, --version                  output the version number
+  
+  -m, --mpr <mpr file>    MPR file to parse
+
+  -o, --out <output file>   Filename of the result
+
+  -h, --help                     display help for command
+
+***Example***
+```node SAT-L.js -m [MPR FILE] -o [RESULTFILE]```
+
+**SAT-AM**
+Create Authorisation Matrix based on model information
+
+***Usage***
+```node SAT-AM.js  [OPTIONS]...```
+
+ Options:
+  -v, --version                  output the version number
+  
+  -i, --input <model file>    Model json file, result of SAT-C or SAT-L
+
+  -o, --out <output file>   Output filename in csv format
+
+  -h, --help                     display help for command
+
+***Example***
+```node SAT-AM.js -i [INPUT] -o [OUTPUT]```
+
+**SAT-Q**
+Applies coding quality rules to model information
+
+***Usage***
+```node SAT-Q.js  [OPTIONS]...```
+
+ Options:
+  -v, --version                  output the version number
+  
+  -i, --input <model file>    Model json file, result of SAT-C or SAT-L
+
+  -o, --out <output file>   Output filename in csv format
+
+  -h, --help                     display help for command
+
+***Example***
+```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
+
+***Accept notifications***
   To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
   @SAT-[CODE]: explanation. Where [CODE] is the finding code (like NC1)
+
+
+
+
 
   **Diff tool**
   To compare two results with each other, use node diff.js -1 [FIRST FILE] -2 [SECOND FILE] -o [OUTPUT FILE]

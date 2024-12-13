@@ -2,34 +2,28 @@
 
 const fs = require("fs");
 const config = require("config");
-
 const { program: commander } = require('commander');
-var wc = require('./mxworkingcopy');
 const { OnlineWorkingCopy } = require("mendixplatformsdk");
+
+var wc = require('./mxworkingcopy');
+const AnalysisModule = require("./analysis/ModelQuality");
 
 // Usage: node app.js --help for help
 
 commander
-    .version('1.0.0', '-v, --version')
+    .version('1.5.0', '-v, --version')
     .usage('[OPTIONS]...')
-    .requiredOption('-n, --nickname <nickname>', 'Nickname under which data is stored')
     .requiredOption('-a, --appid <appid>', 'AppID of the mendix project')
     .requiredOption('-b, --branch <branch name>', 'Branch of the mendix project')
     .requiredOption('-o, --out <output file>', 'Filenam of the result')
     .option('-c, --clear', 'Clear workingcopy')
-    .option('-d, --documentName <document>', 'Qualified name of document to analyse.')
-    .requiredOption('-m, --module <module name', 'Analysis module to use: SD=sequence Diagram, MQ=MicroflowQuality')
     .option('-e, --excludes [exclude....]', 'Modules to exclude from analysis', commaSeparatedList)
-    .option('-p, --prefixes [prefix...]', 'Prefixes to aggregate as one', commaSeparatedList)
     .parse();
 
 const options = commander.opts();
 let outFileName;
 var appID = "";
 var branch = "";
-var excludes;
-var prefixes;
-var moduleCode;
 var clear;
 main();
 
@@ -38,39 +32,18 @@ function commaSeparatedList(value) {
 }
 
 function main() {
-    const nickname = options.nickname;
-    const documentName = options.documentName || '';
     appID = options.appid;
     branch = options.branch;
     outFileName = options.out;
-    excludes = options.excludes ? options.excludes : undefined;
-    prefixes = options.prefixes ? options.prefixes : undefined;
-    moduleCode = options.module ? options.module : 'SD';
     clear = options.clear ? options.clear : false;
     let folder = config.get("outputFolder");
 
-    switch (moduleCode) {
-        case 'SD':
-            module = "./analysis/SequenceDiagram";
-            break
-        case 'MQ':
-            module = "./analysis/ModelQuality";
-            break
-        default:
-            console.log("No module specified");
-            break
-    }
-    const AnalysisModule = require(module);
-
     let analysis = new AnalysisModule(appID, excludes, prefixes);
 
-    wc.loadWorkingCopy(appID, nickname, branch, clear).then(([model, workingCopy]) => {
-        analysis.collect(model, branch, workingCopy, documentName).then(() => {
+    wc.loadWorkingCopy(appID, branch, clear).then(([model, workingCopy]) => {
+        analysis.collect(model, branch, workingCopy).then(() => {
             fs.writeFileSync(folder + '/' + outFileName + '.json', JSON.stringify(analysis.MxModel, null, 2));
-            // analysis.analyse().then(() => {
-            //     analysis.report(nickname);
             console.log("READY");
-            // }).catch((e) => { console.log(e) });
         });
     }).catch((e) => {
         console.log(e.message)

@@ -6,8 +6,6 @@ const { program: commander } = require('commander');
 
 const MxModel = require("./MxModel/MxModel.js");
 const MPRCollector = require("./MPRCollector.js")
-//const SquatAnalysis = require("./SquatChecks/SquatAnalysis.js");
-//const SquatReport = require("./SquatReport.js");
 const { log } = require("console");
 
 let model = new MxModel();
@@ -27,9 +25,6 @@ function main() {
     let outFile = options.out;
     let folder = config.get("outputFolder");
     let mprCollector = new MPRCollector(mpr);
-    // let analysis = new SquatAnalysis();
-    // let reporter = new SquatReport(outFile);
-    // console.log("==================================== COLLECTING DATA: " + mpr);
 
     mprCollector.collect().then((model) => {
         fs.writeFileSync(folder+'/'+outFile+'.json',JSON.stringify(model, null, 2));
