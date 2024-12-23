@@ -1,147 +1,116 @@
+const c = require("config");
+const { log } = require("console");
 const fs = require("fs");
-const AnalysisModule = require("../analysis/AnalysisModule");
 
-module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
-    constructor(excludes, prefixes, outFileName){
-        super(excludes, prefixes, outFileName);
-        this.microflows_by_name;
+
+module.exports = class AnalysisSequenceDiagram {
+    constructor(model, excludes, prefixes, outFileName) {
+        this.model = model;
+        this.excludes = excludes;
+        this.prefixes = prefixes;
+        this.outFileName = outFileName;
+        this.calls = [];
+        this.participants = {};
     }
-    
-    report = function (nickname) {
-        console.log("REPORT");
-        let participants = {};
-        let calls = [];
-        let excludeModule;
-        let aggregatePrefixCaller;
-        let outFileName = nickname + "_sd.txt";
-        Object.keys(this.hierarchy).forEach((caller) => {
-            let parts = caller.split('.');
-            let moduleName = '';
-            let callerMicroflow = caller;
-            if (parts.length == 2) {
-                moduleName = parts[0];
-                callerMicroflow = parts[1];
-            }
-            if (this.excludes) {
-                excludeModule = this.excludes.find((exclude) => { return exclude === moduleName });
-            }
-            if (this.prefixes) {
-                aggregatePrefixCaller = this.prefixes.find((prefix) => { return callerMicroflow.startsWith(prefix) });
-            }
-            if (!excludeModule) {
-                if (!aggregatePrefixCaller) {
-                    participants[callerMicroflow] = {};
-                    participants[callerMicroflow].qualifiedName = caller;
-                }
-                this.hierarchy[caller].forEach((callee) => {
-                    if (callee.startsWith('Commit')) {
-                        let commitVar = callee.replace("Commit ", "");
-                        calls.push(`${callerMicroflow} ---> Commit: "${commitVar}"\n`);
-                    } else {
-                        let calleeParts = callee.split('.');
-                        let calleeModuleName = ''
-                        let calleeMicroflow = callee;
-                        let excludeCallee;
-                        let aggregatePrefixCallee;
-                        if (calleeParts.length == 2) {
-                            calleeModuleName = calleeParts[0];
-                            calleeMicroflow = calleeParts[1];
-                        }
-                        if (this.excludes) {
-                            excludeCallee = this.excludes.find((exclude) => { return exclude === calleeModuleName });
-                        }
-                        if (this.prefixes) {
-                            aggregatePrefixCallee = this.prefixes.find((prefix) => { return calleeMicroflow.startsWith(prefix) });
-                        }
-                        if (aggregatePrefixCaller) { callerMicroflow = aggregatePrefixCaller }
-                        if (aggregatePrefixCallee) { calleeModuleName = aggregatePrefixCallee }
-                        if (!excludeCallee && !aggregatePrefixCallee) {
-                            participants[calleeMicroflow] = {};
-                            participants[calleeMicroflow].qualifiedName = callee;
-                            calls.push(`${callerMicroflow} --> "${calleeMicroflow}"\n`);
-                        } else {
-                            calls.push(`${callerMicroflow} --> "${calleeModuleName}": "${calleeMicroflow}"\n`);
-                        }
-                    }
-                })
-            }
 
+    analyse = function (model, microflowName) {
+        this.parseMicroflow(microflowName);
+    }
+
+    parseMicroflow(microflowName) {
+        let microflow = this.findMicroflowByName(microflowName);
+        let module = this.model.getModule(microflow.containerID);
+        let qName = module.name + '.' + microflow.name;
+        let [moduleName, microflowNm, prefix] = this.getNameParts(qName);
+        let [participantCaller, isExcluded] = this.getParticipant(moduleName, microflow.name, prefix);
+        this.participants[participantCaller] = isExcluded;
+        microflow.subMicroflows.forEach(subMF => {
+            let [moduleNameSUB, microflowSUB, prefixSUB] = this.getNameParts(subMF);
+            let [participantCallee, isExcluded] = this.getParticipant(moduleNameSUB, microflowSUB, prefixSUB);
+            this.participants[participantCallee] = isExcluded;
+            if (isExcluded) {
+                this.calls.push({ caller: participantCaller, callee: participantCallee, parameter: microflowSUB, isExcluded: true })
+            } else this.calls.push({ caller: participantCaller, callee: participantCallee, isExcluded: false })
+            if (!isExcluded) {
+                this.parseMicroflow(subMF);
+            }
         })
-        if (this.excludes && this.excludes.length > 0) {
-            this.excludes.forEach((exclude) => {
-                participants[exclude] = '';
-            })
+        microflow.actions.forEach(action => {
+            if (action.type === 'Microflows$CommitAction') {
+                this.participants['Çommit'] = isExcluded;
+                this.calls.push({ caller: microflowNm, callee: "Commit", parameter: action.commitVariable })
+            }
+        })
+    }
+
+    getParticipant(moduleName, microflowName, prefix) {
+        let excludeModule; let prefixAggregate;
+        let participant = '';
+        let isExcluded = false;
+        if (this.excludes) {
+            excludeModule = this.excludes.find(exclude => exclude === moduleName);
         }
-        if (this.prefixes && this.prefixes.length > 0) {
-            this.prefixes.forEach((prefix) => {
-                participants[prefix] = '';
-            })
+        if (this.prefixes) {
+            prefixAggregate = this.prefixes.find(prefixAgg => prefixAgg === prefix);
         }
-        participants['Commit'] = '';
+        if (excludeModule) {
+            participant = moduleName;
+            isExcluded = true;
+        } else if (prefixAggregate) {
+            participant = prefixAggregate
+            isExcluded = true;
+        } else participant = microflowName;
+        return [participant, isExcluded];
+    }
+
+    findMicroflowByName(microflowname) {
+        return this.model.microflows.find(mf => {
+            let module = this.model.getModule(mf.containerID)
+            let qName = module.name + '.' + mf.name;
+            return qName === microflowname;
+        });
+    }
+
+    getNameParts(qualifiedMicroflowName) {
+        if (qualifiedMicroflowName) {
+            let [moduleName, microflowName] = qualifiedMicroflowName.split('.');
+            let mfNameParts = microflowName.split('_');
+            let mfPrefix = mfNameParts[0];
+            return [moduleName, microflowName, mfPrefix];
+        } else return [];
+    }
+
+    report(outFileName) {
         fs.writeFileSync(outFileName, `@startuml\n`, function (err) {
             if (err) throw err;
         });
-        Object.keys(participants).forEach((participant) => {
-            fs.appendFileSync(outFileName, `participant "${participant}" as ${participant}\n`, function (err) {
-                if (err) throw err;
-            });
-        })
-        calls.forEach((call) => {
-            fs.appendFileSync(outFileName, call, function (err) {
-                if (err) throw err;
-            });
-        })
+        Object.keys(this.participants).forEach(participant => {
+            if (!this.participants[participant]){
+                fs.appendFileSync(outFileName, `participant "${participant}" as ${participant}\n`, function (err) {
+                    if (err) throw err;
+                });
+            }
+        })        
+        Object.keys(this.participants).forEach(participant => {
+            if (this.participants[participant]){
+                fs.appendFileSync(outFileName, `participant "${participant}" as ${participant}\n`, function (err) {
+                    if (err) throw err;
+                });
+            }
+        })        
+        this.calls.forEach(call => {
+                let parm = '';
+                if (call.parameter) {
+                    parm = ": " + call.parameter;
+                }
+                fs.appendFileSync(outFileName, `${call.caller} --> "${call.callee}" ${parm}\n`, function (err) {
+                    if (err) throw err;
+                });
+            })
         fs.appendFileSync(outFileName, `@enduml\n`, function (err) {
             if (err) throw err;
         });
-
-    }
-
-    parseObjects= function(mf, parentMF) {
-        var nestedMicroflows = [];
-        let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
-        mfObjects.forEach((obj) => {
-            let json = obj.toJSON();
-            if (json['$Type'] === 'Microflows$LoopedActivity') {
-                let nestedFromThis = this.parseObjects( obj, mf);
-                nestedMicroflows.push(...nestedFromThis);
-            }
-            else if (json['$Type'] === 'Microflows$ActionActivity') {
-                let action_type = json['action']['$Type'];
-                if (action_type === 'Microflows$MicroflowCallAction') {
-                    let mf_call = json['action']['microflowCall'];
-                    if ((mf.name && mf.name != undefined) || (parentMF && parentMF.name != undefined)) {
-                        this.updateHierarchy(mf.qualifiedName, mf_call.microflow, parentMF);
-                    }
-                    nestedMicroflows.push(mf_call['microflow']);
-                }
-                if (action_type === 'Microflows$CommitAction') {
-                    this.updateHierarchy(mf.qualifiedName, `Commit ${json['action']['commitVariableName']}`);
-                }
-                if (action_type === 'Microflows$ChangeObjectAction') {
-                    if (json['action']['commit'] && json['action']['commit']==='Yes'){
-                        this.updateHierarchy(mf.qualifiedName, `Commit ${json['action']['changeVariableName']}`);
-                    }
-                }
-                if (action_type === 'Microflows$LoopedActivity') {
-                }
-            }
-        });
-        return nestedMicroflows;
-    }
-
-    updateHierarchy= function(caller, callee, parent) {
-        if (!caller && parent && parent.name) { caller = parent.qualifiedName };
-        let callees = this.hierarchy[caller];
-        let hit;
-        if (callees) {
-            hit = callees.find((existingCallee) => {
-                return existingCallee === callee;
-            })
-            if (!hit || hit.length == 0) { callees.push(callee); }
-        } else {
-            this.hierarchy[caller] = [callee];
-        }
     }
 
 }
+

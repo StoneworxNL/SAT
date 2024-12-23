@@ -70,7 +70,7 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.model = model;
         this.branch = branch;
         this.workingCopy = workingCopy;
-        this.filterMarketplace();
+        //this.filterMarketplace();
         if (!this.model) {
             return
         }

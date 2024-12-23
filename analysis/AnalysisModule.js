@@ -1,15 +1,13 @@
 
 module.exports = class AnalysisModule {
-    constructor(appID,excludes, prefixes) {
+    constructor(appID,  outFileName) {
         this.model;
         this.branch;
         this.hierarchy = {};
         this.reports = [];
         this.complexity = {};
         this.appID = appID;
-        this.excludes = excludes;
-        this.prefixes = prefixes;
-        this.reportFile = '';
+        this.reportFile = outFileName || '';
     }
 
     getDateTimeString(){

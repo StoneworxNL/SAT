@@ -122,6 +122,11 @@ class Microflow {
                                 actionData = new ExpressionAction(activityType, actionID, commit, complexity);
                                 microflow.addAction(actionData);
                                 break
+                            case 'Microflows$CommitAction':
+                                let commitVariable = action['Action']['CommitVariableName'];                                
+                                actionData = new Action(activityType, actionID, commitVariable);
+                                microflow.addAction(actionData);
+                                break
                             case 'Microflows$JavaActionCallAction':
                                 let errorHandling = action['Action']['ErrorHandlingType'];
                                 let JavaActionName = action['Action']['JavaAction'];

@@ -17,7 +17,6 @@ commander
     .requiredOption('-b, --branch <branch name>', 'Branch of the mendix project')
     .requiredOption('-o, --out <output file>', 'Filenam of the result')
     .option('-c, --clear', 'Clear workingcopy')
-    .option('-e, --excludes [exclude....]', 'Modules to exclude from analysis', commaSeparatedList)
     .parse();
 
 const options = commander.opts();
@@ -38,7 +37,7 @@ function main() {
     clear = options.clear ? options.clear : false;
     let folder = config.get("outputFolder");
 
-    let analysis = new AnalysisModule(appID, excludes, prefixes);
+    let analysis = new AnalysisModule(appID);
 
     wc.loadWorkingCopy(appID, branch, clear).then(([model, workingCopy]) => {
         analysis.collect(model, branch, workingCopy).then(() => {

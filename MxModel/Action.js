@@ -1,7 +1,8 @@
 class Action{
-    constructor(Type, ID) {
+    constructor(Type, ID, commitVariable) {
         this.type = Type;
         this.id = ID.toString('base64');
+        this.commitVariable = commitVariable;
     }
 }
 

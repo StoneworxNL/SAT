@@ -10,9 +10,13 @@ class MPRCollector {
     collect() {
         const db = new sqlite3.Database(this.mpr);
         let model = new MxModel();
+        console.log("FOOBAR");
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.each("SELECT UnitID, ContainerID as container, ContainmentName, Contents as contents from Unit", (err, row) => {
+                    if (err) {
+                        console.log(err.message)
+                    };
                     const doc = BSON.deserialize(row.contents);
                     let container = row.container;
                     let docType = doc['$Type'];
