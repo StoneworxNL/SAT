@@ -1,6 +1,5 @@
 const fs = require("fs");
-const AnalysisModule = require("./AnalysisModule");
-const { error } = require("console");
+const AnalysisModule = require("../analysis/AnalysisModule");
 
 module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
     constructor(excludes, prefixes, outFileName){
@@ -8,54 +7,6 @@ module.exports = class AnalysisSequenceDiagram  extends AnalysisModule{
         this.microflows_by_name;
     }
     
-    collect = function(model, branch, workingCopy, microflowname) {
-        this.model = model;
-        this.branch = branch;
-        this.workingCopy = workingCopy;
-        if (!this.model || !microflowname) {
-            throw new Error('Document parameter required');
-        
-        }
-        if (this.hierarchy[microflowname]) {
-            return;
-        }
-        return new Promise((resolve, reject) => {
-            this.microflows_by_name = this.findMicroflowByName(microflowname);
-            if (this.microflows_by_name.length < 1) {
-                reject(`Cannot find microflow for ${microflowname}`);
-            }
-            else {
-                try {
-                    const microflowinterface = this.microflows_by_name[0];
-                    microflowinterface.load().then((microflow) => {
-                        var nestedMicroflows = this.parseObjects(microflow);
-                        resolve(nestedMicroflows);
-
-                    });
-                }
-                catch (e) {
-                    console.log(`Error occured: ${e}`);
-                    reject(e);
-                }
-            }
-        }).then((nestedMicroflows) => {
-            if (nestedMicroflows.length > 0) {
-                var promises = [];
-                nestedMicroflows.forEach(nestedMicroflow => {
-                    promises.push(this.collect(this.model, this.branch, this.workingCopy, nestedMicroflow));
-                });
-                return Promise.all(promises);
-            } else return
-        })
-    }
-
-    analyse = function(){
-        console.log("ANALYSE");
-        return new Promise((resolve, reject) => {
-            resolve();
-        })
-    }
-
     report = function (nickname) {
         console.log("REPORT");
         let participants = {};
