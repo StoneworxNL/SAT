@@ -180,6 +180,7 @@
         },
         {
             "fnc": "GetOrCreateCheck",
+            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "SUB"

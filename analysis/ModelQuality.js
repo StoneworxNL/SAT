@@ -155,25 +155,6 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }  
 
-    // collectPages(promises) {
-    //     let pages = this.findAllPages();
-    //     pages.forEach((pageIF) => {
-    //         promises.push(new Promise((resolve, reject) => {
-    //             let moduleName = this.getModuleName(pageIF);
-    //             let excludeThis = false;
-    //             if (this.excludes) {
-    //                 excludeThis = this.excludes.find((exclude) => { return exclude === moduleName });
-    //             }
-    //             if (!excludeThis) {
-    //                 pageIF.load().then((page) => {
-    //                     this.parsePage(page, moduleName, pageIF.name);
-    //                     resolve();
-    //                 });
-    //             } else { resolve() };
-    //         }))
-    //     });
-    // }
-
     parseMxMicroflow(mf) {
         let [returnType, returnEntity] = this.getReturnTypeEntity(mf);
         let microflow = new SquatMicroflow(mf.container.id, mf.name, returnType, returnEntity);
@@ -265,130 +246,6 @@ module.exports = class ModelQuality extends AnalysisModule {
         });
     }
 
-    /*    parseMicroflow = function (mf, parentMF) {
-            let mfObjects = mf ? mf.objectCollection.objects : parentMF.objectCollection.objects;
-            let returnType = mf.microflowReturnType;
-            let mfReturnType = ''; let mfReturnEntity = '';
-            if (returnType && returnType.structureTypeName) {
-                mfReturnType = returnType.structureTypeName;
-                if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType') {
-                    if (returnType.entity) {
-                        mfReturnEntity = returnType.entity.name;
-                    } else {
-                        mfReturnEntity = returnType.toJSON().entity;
-                    }
-                }
-            };
-            mfObjects.forEach((obj) => {
-                let json = obj.toJSON();
-                let actionId = json['$ID'];
-                if (json['$Type'] === 'Microflows$Annotation') {
-                    let action_type = 'Annotation';
-                    this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId, 'caption': json['caption'] });
-                }
-                if (json['$Type'] === 'Microflows$LoopedActivity') {
-                    let action_type = 'LoopAction';
-                    this.updateHierarchy(parentMF || mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId });
-                    this.parseMicroflow(obj, parentMF || mf);
-                }
-                else if (json['$Type'] === 'Microflows$ActionActivity') {
-                    let action_type = json['action']['$Type'];
-                    let subMF = null;
-                    let complexity = 0;
-                    let commit = false;
-                    if (action_type === 'Microflows$MicroflowCallAction') {
-                        subMF = json['action']['microflowCall']['microflow'];
-                    } else if (action_type === 'Microflows$CreateVariableAction') {
-                        complexity = this.checkExpressionComplexity(json['action']['initialValue']);
-                    } else if (action_type === 'Microflows$ChangeVariableAction') {
-                        complexity = this.checkExpressionComplexity(json['action']['value']);
-                    } else if (action_type === 'Microflows$CreateObjectAction' || action_type === 'Microflows$ChangeObjectAction') {
-                        json['action']['items'].forEach((item) => {
-                            let count = this.checkExpressionComplexity(item['value']);
-                            if (count > complexity) { complexity = count };
-                        })
-                        if (json['action']['commit'] === 'Yes') {
-                            commit = true;
-                        }
-                    }
-                    this.updateHierarchy(mf, action_type, parentMF, subMF, mfReturnType, mfReturnEntity, { 'id': actionId, 'complexity': complexity, 'commit': commit });
-                } else if (json['$Type'] === 'Microflows$StartEvent') {
-                    let action_type = 'StartEvent';
-                    this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId });
-                } else if (json['$Type'] === 'Microflows$EndEvent') {
-                    let action_type = 'EndEvent';
-                    this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId });
-                } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
-                    let action_type = 'ExclusiveSplit';
-                    let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
-                    let complexity = this.checkExpressionComplexity(condition);
-                    this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId, 'caption': json['caption'], 'complexity': complexity });
-                } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
-                    let action_type = 'ExclusiveMerge';
-                    this.updateHierarchy(mf, action_type, parentMF, null, mfReturnType, mfReturnEntity, { 'id': actionId, });
-                }
-            });
-            let microflowName = this.getMicroflowName(mf, parentMF);
-            let microflowData = this.hierarchy[microflowName];
-            if (mf.flows) {
-                let flowsJSON = JSON.parse(JSON.stringify(mf.flows, null, 2));
-                let flows = flowsJSON.map((flow) => {
-                    return {
-                        origin: flow.origin, originIndex: flow.originConnectionIndex
-                        , desitination: flow.destination, destinationIndex: flow.destinationConnectionIndex,
-                        value: ((flow.caseValue && flow.caseValue.value) ? flow.caseValue.value : '')
-                    }
-                })
-                microflowData.flows = flows;
-            } else { microflowData.flows = [] }
-        }
-    
-            updateHierarchy = function (microflow, action, parentMicroflow, subMF, mfReturnType, mfReturnEntity, data) {
-            let actions; let subMFs; let annotations; let returnType; let returnEntity;
-            let microflowName = this.getMicroflowName(microflow, parentMicroflow);
-            let microflowData = this.hierarchy[microflowName];  //fetch existing info
-            if (microflowData) {                                            //retrieve
-                actions = microflowData.actions;
-                subMFs = microflowData.subMFs;
-                annotations = microflowData.annotations;
-                returnType = microflowData.returnType;
-                returnEntity = microflowData.returnEntity;
-            } else {                                                        //or add new
-                if (!this.hierarchy[microflowName]) {
-                    let mfToAdd = microflow;
-                    if (!(microflow && microflow.qualifiedName) && parentMicroflow && parentMicroflow.name) {
-                        mfToAdd = parentMicroflow;
-                    }
-                    this.hierarchy[microflowName] = { mf: mfToAdd, returnType: returnType, returnEntity: returnEntity };
-                }
-            }
-            let actionInfo = { 'type': action };
-            Object.assign(actionInfo, data);
-            if (actions) {                                                  //update or create actions
-                actions.push(actionInfo);
-            } else {
-                this.hierarchy[microflowName].actions = [actionInfo];
-            }
-            if (subMF && subMFs) {                                          //update or create sub microflows
-                subMFs.push(subMF);
-            } else {
-                if (subMF) {
-                    this.hierarchy[microflowName].subMFs = [subMF];
-                }
-            }
-            if (returnType) {                                                  //update or create actions
-                returnType = mfReturnType;
-            } else {
-                this.hierarchy[microflowName].returnType = mfReturnType;
-            }
-            if (returnEntity) {                                                  //update or create actions
-                returnEntity = mfReturnEntity;
-            } else {
-                this.hierarchy[microflowName].returnEntity = mfReturnEntity;
-            }
-        }
-    
-    */
     getReturnTypeEntity(mf) {
         let returnType = mf.microflowReturnType;
         let mfReturnType = ''; let mfReturnEntity = '';
@@ -428,19 +285,4 @@ module.exports = class ModelQuality extends AnalysisModule {
         this.parseMxMicroflow(mf);
     }
 
-    // parsePage = function (page, module, pageName) {
-    //     let thePage = new Page(module, pageName, page.documentation);
-    //     let json = JSON.parse(JSON.stringify(page));
-    //     const footerButtons = jspath.apply('..footerWidgets{.$Type==="Pages$ActionButton"}', json);
-    //     const buttons = jspath.apply("..widgets{.$Type==='Pages$ActionButton'}", json);
-    //     let allowedRoles = jspath.apply('.allowedRoles', json);
-    //     thePage.allowedRoles = allowedRoles;
-    //     footerButtons.forEach((button) => {
-    //         thePage.buttons.push({ type: button.action.$Type })
-    //     })
-    //     buttons.forEach((button) => {
-    //         thePage.buttons.push({ type: button.action.$Type })
-    //     })
-    //     this.pages.push(thePage);
-    // }
 }

@@ -1,7 +1,7 @@
 const { microflows } = require("mendixmodelsdk");
 const CheckModule = require("./CheckModule");
 
-module.exports = class IllegalCommit extends CheckModule {
+module.exports = class GetOrCreateCheck extends CheckModule {
     constructor(options) {
         super(options);
 
