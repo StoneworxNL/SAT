@@ -5,8 +5,8 @@ const config = require("config");
 const { program: commander } = require('commander');
 
 const MxModel = require("./MxModel/MxModel.js");
-const SequenceDiagram = require("./SAT-SD/SequenceDiagram.js");
-const SquatReport = require("./SquatReport.js");
+const SequenceDiagram = require("./SAT-Analysis/SequenceDiagram.js");
+const SquatReport = require("./SAT-Analysis/QualityReport.js");
 
 commander
     .version('1.0.0', '-v, --version')
@@ -25,8 +25,10 @@ function main() {
     let inFile = folder+'/'+options.in;
     let outFile = folder+'/'+options.out+'.txt';
     let microflowName = options.microflow;
-    let excludes = options.exclude.split(' ');
-    let prefixes = options.prefix.split(' ');
+    let excludes;
+    if (options.exclude) {excludes = options.exclude.split(' ');}
+    let prefixes;
+    if (options.prefix) {prefixes = options.prefix.split(' ');}
     let modelJSON = JSON.parse(fs.readFileSync(inFile, 'utf8'));
     let model = MxModel.builder(modelJSON);
     

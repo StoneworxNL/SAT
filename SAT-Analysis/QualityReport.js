@@ -2,7 +2,7 @@
 const fs = require("fs");
 const config = require("config");
 
-class SquatReport {
+class QualityReport {
     constructor(reportName) {
         this.reportName = reportName;
     }
@@ -58,4 +58,4 @@ class SquatReport {
         return `${year}${month}${day}_${hour}${minute}`;
     }
 }
-module.exports = SquatReport;
+module.exports = QualityReport;
