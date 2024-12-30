@@ -1,8 +1,8 @@
 class Action{
-    constructor(Type, ID, commitVariable) {
+    constructor(Type, ID, variableName) {
         this.type = Type;
         this.id = ID.toString('base64');
-        this.commitVariable = commitVariable;
+        this.variableName = variableName;
     }
 }
 
@@ -15,11 +15,12 @@ class JavaAction extends Action{
 }
 
 class ExpressionAction extends Action{
-    constructor(Type, ID, IsCommit, Complexity, Caption) {
+    constructor(Type, ID, IsCommit, Complexity, Caption, Expression) {
         super(Type, ID);
         this.isCommit = IsCommit;
         this.complexity = Complexity;
         this.caption = Caption;
+        this.expression = Expression;
     }
 }
 

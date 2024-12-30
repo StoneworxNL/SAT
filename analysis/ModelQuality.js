@@ -222,8 +222,14 @@ module.exports = class ModelQuality extends AnalysisModule {
                         commit = true;
                     }
                     let actionData = new ExpressionAction(action_type, actionId, commit, complexity);
+                    actionData.variableName = json['action']['outputVariableName'] ? json['action']['outputVariableName'] : json['action']['changeVariableName'];
                     microflowData.addAction(actionData);
-                } else {
+                } else if (action_type === 'Microflows$RetrieveAction') {
+                    let returnValue = action.action.outputVariableName;
+                    let actionData = new Action(action_type, actionId, returnValue);
+                    microflowData.addAction(actionData);
+                }
+                else {
                     let actionData = new Action(action_type, actionId);
                     microflowData.addAction(actionData);
                 }
@@ -231,13 +237,13 @@ module.exports = class ModelQuality extends AnalysisModule {
                 let actionData = new Action(actionType, actionId);
                 microflowData.addAction(actionData);
             } else if (json['$Type'] === 'Microflows$EndEvent') {
-                let actionData = new Action(actionType, actionId);
+                let actionData = new Action(actionType, actionId, action.returnValue);
                 microflowData.addAction(actionData);
             } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
                 complexity = this.checkExpressionComplexity(condition);
                 let caption = json['caption'];
-                let actionData = new ExpressionAction(actionType, actionId, false, complexity, caption);
+                let actionData = new ExpressionAction(actionType, actionId, false, complexity, caption, condition);
                 microflowData.addAction(actionData);
             } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
                 let actionData = new Action(actionType, actionId);

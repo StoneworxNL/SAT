@@ -19,12 +19,14 @@ module.exports = class AnalysisSequenceDiagram {
 
     parseMicroflow(microflowName) {
         let microflow = this.findMicroflowByName(microflowName);
+        if (!microflow) {console.log("Microflow not found: "+microflowName);}
+        
         let module = this.model.getModule(microflow.containerID);
         let qName = module.name + '.' + microflow.name;
         let [moduleName, microflowNm, prefix] = this.getNameParts(qName);
         let [participantCaller, isExcluded] = this.getParticipant(moduleName, microflow.name, prefix);
         this.participants[participantCaller] = isExcluded;
-        microflow.subMicroflows.forEach(subMF => {
+        microflow.subMicroflows.forEach(subMF => { 
             let [moduleNameSUB, microflowSUB, prefixSUB] = this.getNameParts(subMF);
             let [participantCallee, isExcluded] = this.getParticipant(moduleNameSUB, microflowSUB, prefixSUB);
             this.participants[participantCallee] = isExcluded;
@@ -35,10 +37,11 @@ module.exports = class AnalysisSequenceDiagram {
                 this.parseMicroflow(subMF);
             }
         })
-        microflow.actions.forEach(action => {
+        let sortedActions = microflow.sortActions();
+        sortedActions.forEach(action => {
             if (action.type === 'Microflows$CommitAction') {
                 this.participants['Çommit'] = isExcluded;
-                this.calls.push({ caller: microflowNm, callee: "Commit", parameter: action.commitVariable })
+                this.calls.push({ caller: microflowNm, callee: "Commit", parameter: action.variableName })
             }
         })
     }

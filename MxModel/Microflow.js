@@ -82,15 +82,7 @@ class Microflow {
                         break;
                     case 'Microflows$ActionActivity':
                         let activityType = action['Action']['$Type'];
-                        switch (activityType) {
-                            case 'Microflows$StartEvent':
-                                actionData = new Action(activityType, actionID);
-                                microflow.addAction(actionData);
-                                break;
-                            case 'Microflows$EndEvent':
-                                actionData = new Action(activityType, actionID);
-                                microflow.addAction(actionData);
-                                break;
+                        switch (activityType) {                        
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
                                 microflow.addAction(actionData);
@@ -120,6 +112,7 @@ class Microflow {
                                     commit = true;
                                 }
                                 actionData = new ExpressionAction(activityType, actionID, commit, complexity);
+                                actionData.variableName = action['Action']['VariableName'] ? action['Action']['VariableName'] : action['Action']['ChangeVariableName'];
                                 microflow.addAction(actionData);
                                 break
                             case 'Microflows$CommitAction':
@@ -133,6 +126,10 @@ class Microflow {
                                 actionData = new JavaAction(activityType, action['$ID'], errorHandling, JavaActionName);
                                 microflow.addAction(actionData);
                                 break;
+                            case 'Microflows$RetrieveAction':
+                                actionData = new Action(activityType, action['$ID'], action['Action']['ResultVariableName']);
+                                microflow.addAction(actionData);
+                                break;
                             default:
                                 actionData = new Action(activityType, actionID);
                                 microflow.addAction(actionData);
@@ -143,13 +140,21 @@ class Microflow {
                         let caption = action['Caption'];;
                         let condition = action.SplitCondition.Expression ? action.SplitCondition.Expression : '';
                         complexity = microflow.checkExpressionComplexity(condition);
-                        actionData = new ExpressionAction(actionType, actionID, false, complexity, caption);
+                        actionData = new ExpressionAction(actionType, actionID, false, complexity, caption, condition);
                         microflow.addAction(actionData);
                         break;
                     case 'Microflows$ExclusiveMerge':
                         actionData = new Action(actionType, actionID);
                         microflow.addAction(actionData);
                         break;
+                    case 'Microflows$StartEvent':
+                            actionData = new Action(actionType, actionID);
+                            microflow.addAction(actionData);
+                            break;
+                    case 'Microflows$EndEvent':
+                            actionData = new Action(actionType, actionID, action['ReturnValue']);
+                            microflow.addAction(actionData);
+                            break;
                     default:
                         actionData = new Action(actionType, actionID);
                         microflow.addAction(actionData);
@@ -211,6 +216,38 @@ class Microflow {
         return `${module.name}.${this.name}`;
     }
 
+    sortActions(){
+        let sortedActions = [];
+        let startEvnt = this.findActionByType("Microflows$StartEvent");
+        sortedActions.push(startEvnt);
+        this.parseFlows(startEvnt.id, sortedActions);
+        return sortedActions;
+    }
+
+    parseFlows(id, sortedActions){
+        let flows = this.findFlows(id);       
+        if (flows.length > 1){
+            flows = flows.sort((flowA, flowB) => (flowB.flowValue === 'true') - (flowA.flowValue === 'true'));
+        }
+        flows.forEach(flow =>{
+            let action = this.findActionById(flow.destination);
+            sortedActions.push(action);
+            let id = flow.destination;
+            this.parseFlows(id, sortedActions);
+        })
+    }
+
+    findActionByType(actionType){
+        return this.actions.find(action => action.type === actionType);
+    }
+
+    findActionById(id){
+        return this.actions.find(action => action.id === id);
+    }
+
+    findFlows(id){
+        return this.flows.filter(flow => flow.origin === id);
+    }
 
     
 }
