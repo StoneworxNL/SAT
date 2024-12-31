@@ -27,6 +27,7 @@ function main() {
     let mprCollector = new MPRCollector(mpr);
 
     mprCollector.collect().then((model) => {
+        model.sortAll();
         fs.writeFileSync(folder+'/'+outFile+'.json',JSON.stringify(model, null, 2));
         console.log("====================== Ready =======================");
     });

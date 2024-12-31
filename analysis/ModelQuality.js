@@ -153,7 +153,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                 } else { resolve() };
             }))
         });
-    }  
+    }
 
     parseMxMicroflow(mf) {
         let [returnType, returnEntity] = this.getReturnTypeEntity(mf);
@@ -162,9 +162,9 @@ module.exports = class ModelQuality extends AnalysisModule {
             let flowsJSON = JSON.parse(JSON.stringify(mf.flows, null, 2));
             let flows = flowsJSON.map((flow) => {
                 return {
-                    origin: flow.origin, originIndex: flow.originConnectionIndex
-                    , desitination: flow.destination, destinationIndex: flow.destinationConnectionIndex,
-                    value: ((flow.caseValue && flow.caseValue.value) ? flow.caseValue.value : '')
+                    origin: flow.origin, destination: flow.destination,
+                    isErrorHandler: flow.isErrorHandler,
+                    flowValue: ((flow.caseValue && flow.caseValue.value) ? flow.caseValue.value == 'true' : false)
                 }
             })
             microflow.flows = flows;
@@ -221,15 +221,44 @@ module.exports = class ModelQuality extends AnalysisModule {
                     if (json['action']['commit'] === 'Yes') {
                         commit = true;
                     }
+                    if (action_type === 'Microflows$CreateObjectAction') {
+                        action_type = 'Microflows$CreateChangeAction';
+                    } else {
+                        action_type = 'Microflows$ChangeAction';
+                    }
                     let actionData = new ExpressionAction(action_type, actionId, commit, complexity);
                     actionData.variableName = json['action']['outputVariableName'] ? json['action']['outputVariableName'] : json['action']['changeVariableName'];
                     microflowData.addAction(actionData);
+                } else if (action_type=== 'Microflows$CommitAction'){
+                    let commitVariable = json['action']['commitVariableName'];
+                    let actionData = new Action(action_type, actionId, commitVariable);
+                    microflowData.addAction(actionData);
+
                 } else if (action_type === 'Microflows$RetrieveAction') {
                     let returnValue = action.action.outputVariableName;
                     let actionData = new Action(action_type, actionId, returnValue);
                     microflowData.addAction(actionData);
-                }
-                else {
+                } else if (action_type === 'Microflows$JavaActionCallAction') {
+                    let errorHandling = json['action']['errorHandlingType'];
+                    let javaActionName = json['action']['javaAction'];
+                    let actionData = new JavaAction(action_type, actionId, errorHandling, javaActionName);
+                    microflowData.addAction(actionData);
+                } else {
+                    //console.log(action_type);
+                    switch (action_type) {
+                        case 'Microflows$ShowPageAction':
+                            action_type = 'Microflows$ShowFormAction';
+                            break;
+                        case 'Microflows$ListOperationAction':
+                            action_type = 'Microflows$ListOperationsAction';
+                            break;
+                        case 'Microflows$AggregateListAction':
+                            action_type = 'Microflows$AggregateAction';
+                            break;
+                        default:
+                            break;
+
+                    }
                     let actionData = new Action(action_type, actionId);
                     microflowData.addAction(actionData);
                 }
@@ -246,6 +275,19 @@ module.exports = class ModelQuality extends AnalysisModule {
                 let actionData = new ExpressionAction(actionType, actionId, false, complexity, caption, condition);
                 microflowData.addAction(actionData);
             } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
+                let actionData = new Action(actionType, actionId);
+                microflowData.addAction(actionData);
+            } else {
+                switch (actionType) {
+                    case 'Microflows$MicroflowParameterObject':
+                        actionType = 'Microflows$MicroflowParameter';
+                        break;
+                    case 'Microflows$ListOperationAction':
+                        actionType = 'Microflows$ListOperationsAction';
+                        break;
+                    default:
+                        break;
+                }
                 let actionData = new Action(actionType, actionId);
                 microflowData.addAction(actionData);
             }

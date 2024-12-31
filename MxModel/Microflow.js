@@ -46,12 +46,14 @@ class Microflow {
                 // console.log(JSON.stringify(flow, null, 2));
                 let origin = flow['OriginPointer'].toString('base64');
                 let destination = flow['DestinationPointer'].toString('base64');
-                let flowValue = '';
-                if (flow['NewCaseValue']['Value']) {
-                    flowValue = flow['NewCaseValue']['Value'];
+                let flowValue = false;              
+                if (flow['NewCaseValue']) {
+                    flowValue = flow['NewCaseValue']['Value'] == 'true';
                 }
                 let isError = flow['IsErrorHandler'];
                 let flowData = new Flow(origin, destination, isError, flowValue)
+                
+                
                 microflow.addFlow(flowData);
             }
         })
@@ -78,10 +80,13 @@ class Microflow {
                         microflow.addAnnotation(annotation);
                         break;
                     case 'Microflows$LoopedActivity':
+                        actionData = new Action(actionType, actionID);
+                        microflow.addAction(actionData);
                         Microflow.parseMFActions(action, microflow);
                         break;
                     case 'Microflows$ActionActivity':
                         let activityType = action['Action']['$Type'];
+                        let caption;
                         switch (activityType) {                        
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
@@ -91,12 +96,14 @@ class Microflow {
                                 break;
                             case 'Microflows$CreateVariableAction':
                                 complexity = microflow.checkExpressionComplexity(action['Action']['InitialValue']);
-                                actionData = new ExpressionAction(activityType, actionID, false, complexity);
+                                caption = action['Caption'];
+                                actionData = new ExpressionAction(activityType, actionID, false, complexity, caption);
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$ChangeVariableAction':
                                 complexity = microflow.checkExpressionComplexity(action['Action']['Value']);
-                                actionData = new ExpressionAction(activityType, actionID, false, complexity);
+                                caption = action['Caption'];
+                                actionData = new ExpressionAction(activityType, actionID, false, complexity, caption);
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$CreateChangeAction':

@@ -3,14 +3,14 @@ const Module = require("./Module");
 const Entity = require("./Entity");
 const Microflow = require("./Microflow");
 const Folder = require("./Folder");
-const {Menus, Menu} = require("./Menu");
+const { Menus, Menu } = require("./Menu");
 const Page = require("./Page");
 const Security = require("./Security");
 
 class MxModel {
     constructor() {
-        this.security =  {},
-        this.modules = [];
+        this.security = {},
+            this.modules = [];
         this.entities = [];
         this.microflows = [];
         this.folders = {};
@@ -18,7 +18,7 @@ class MxModel {
         this.pages = [];
     }
 
-    static builder(obj){
+    static builder(obj) {
         let mxModel = new MxModel();
         mxModel.security = Security.builder(obj.security);
         mxModel.modules = Module.builder(obj.modules);
@@ -27,7 +27,7 @@ class MxModel {
         mxModel.folders = Folder.builder(obj.folders);
         mxModel.menus = Menus.builder(obj.menus);
         mxModel.pages = Page.builder(obj.pages);
-        return  mxModel
+        return mxModel
     }
 
     parseSecurity(doc) {
@@ -56,11 +56,11 @@ class MxModel {
         this.pages.push(page);
     }
 
-    parseMenus(doc, container){
+    parseMenus(doc, container) {
         let menus = Menus.parse(doc, container);
         this.menus.push(...menus);
     }
-    parseMenu(doc, container){
+    parseMenu(doc, container) {
         let menuItems = Menu.parse(doc, container);
         this.menus.push(...menuItems);
     }
@@ -91,14 +91,48 @@ class MxModel {
         })
     }
 
-    findAppRolesByModuleRole(roleName){
-        return this.security.roles.filter(role=>
-            role.moduleRoles.find(moduleRole=> moduleRole === roleName)
+    findAppRolesByModuleRole(roleName) {
+        return this.security.roles.filter(role =>
+            role.moduleRoles.find(moduleRole => moduleRole === roleName)
         )
     }
 
-    instantiateEntity(obj){
+    instantiateEntity(obj) {
         return Entity.builder(obj);
+    }
+
+    sortAll() {
+        let modulesSorted = this.modules.sort((a, b) => {
+            if (a.fromAppStore !== b.fromAppStore) {
+                return b.fromAppStore - a.fromAppStore;
+            }
+            return a.name.localeCompare(b.name);
+        });
+
+        let entitiesSorted = this.entities.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        });
+
+        let microflowsSorted = this.microflows.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        });
+
+        let foldersSorted = Object.entries(this.folders).sort(([, a], [, b]) => a.name.localeCompare(b.name))
+
+        let menusSorted = this.menus.sort((a, b) => {
+            return a.caption.localeCompare(b.caption);
+        });
+
+        let pagesSorted = this.pages.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        });
+
+        this.modules = modulesSorted;
+        this.entities =  entitiesSorted;
+        this.microflows = microflowsSorted;
+        this.folders = foldersSorted;
+        this.menus = menusSorted;
+        this.pages = pagesSorted;
     }
 }
 

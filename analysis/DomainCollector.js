@@ -53,7 +53,8 @@ module.exports = class DomainCollector {
             let associations = domain['associations'].filter(association => typeof association != 'number');
             let crossAssociations = domain['crossAssociations'].filter(association => typeof association != 'number');
             associations.splice(0, 0, ...crossAssociations);
-            let mXEntity = new MxEntity(domain.container.id, entity.id, entity.name, entity.documentation || '',);
+            let isPersistable = entity.generalization.persistable;
+            let mXEntity = new MxEntity(domain.container.id, entity.id, entity.name, entity.documentation || '', isPersistable);
             attributes.forEach((attribute) => {
                 let mXAttribute = new MxAttribute(attribute['name'], 'attr');
                 mXEntity.attrs.push(mXAttribute);

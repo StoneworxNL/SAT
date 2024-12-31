@@ -41,6 +41,7 @@ function main() {
 
     wc.loadWorkingCopy(appID, branch, clear).then(([model, workingCopy]) => {
         analysis.collect(model, branch, workingCopy).then(() => {
+            analysis.MxModel.sortAll();
             fs.writeFileSync(folder + '/' + outFileName + '.json', JSON.stringify(analysis.MxModel, null, 2));
             console.log("READY");
         });

@@ -11,11 +11,15 @@ class Module {
 
     static parse (doc) {
         let moduleName = doc['Name'];
+        let moduleID = doc['$ID'].toString('base64');
+        let appStore = false;
         if (doc['$Type']==='Projects$Project') {
             moduleName = 'Project';
+            appStore = true;
+
+        } else {
+            appStore = doc['FromAppStore'];
         }
-        let moduleID = doc['$ID'].toString('base64');
-        let appStore = doc['FromAppStore'];
         return new Module(moduleID, moduleName, appStore)
     }
     
