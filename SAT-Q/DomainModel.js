@@ -22,10 +22,10 @@ module.exports = class DomainModel extends CheckModule {
         entity.attrs.forEach(attr => {
             let attrName = attr.name;
             if (attrName.startsWith(entity.name)) {
-                this.addErrors("DM1", ignoreRuleAnnotations, `${entity.name}.${attr}`);
+                this.addErrors("DM1", ignoreRuleAnnotations, `${entity.name}.${attr.name}`);
             }
             if (attrName.includes('_')) {
-                this.addErrors("DM2", ignoreRuleAnnotations, `${entity.name}.${attr}`);
+                this.addErrors("DM2", ignoreRuleAnnotations, `${entity.name}.${attr.name}`);
             }
         })
         return this.errors;

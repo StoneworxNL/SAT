@@ -41,7 +41,7 @@ class Quality {
         })
 
         this.model.microflows.forEach((microflow) => {
-            if (microflow && microflow != 'undefined') {
+            if (microflow && microflow != 'undefined') {                
                 this.checkModules.forEach((checkModule) => {
                     if (checkModule.level === 'microflow') {
                         this.executeCheck(checkModule, microflow);

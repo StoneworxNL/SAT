@@ -20,7 +20,7 @@ module.exports = class ErrorHandling extends CheckModule {
             javaActions.forEach((javaAction) => {
                 let isAllowed = allowedJava.find((allowedJavaName) => allowedJavaName === javaAction.javaActionName);
                 if (!isAllowed) {
-                    let errorHandling = javaAction.errorHandlingType||'';
+                    let errorHandling = javaAction.errorHandling||'';
                     if (!(errorHandling.startsWith('Custom'))) {
                         this.addErrors("EH1", ignoreRuleAnnotations);
                     }
