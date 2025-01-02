@@ -48,17 +48,18 @@ class Menu {
             if (typeof menuItem != 'number') {
                 let caption = menuItem['Caption']['Items'][1]['Text'];
                 let actionType = menuItem['Action']['$Type'];
+                actionType = actionType.replace(/^(Pages|Forms)\$/, "");
                 let action = '';
                 switch (actionType) {
-                    case 'Forms$MicroflowAction':
+                    case 'MicroflowAction':
                         action = menuItem['Action']['MicroflowSettings']['Microflow'];
                         menuItems.push(new Menu(containerID, menuName, caption, actionType, action));
                         break;
-                    case 'Forms$FormAction':
+                    case 'FormAction':
                         action = menuItem['Action']['FormSettings']['Form'];
                         menuItems.push(new Menu(containerID, menuName, caption, actionType, action));
                         break
-                    case 'Forms$NoAction':
+                    case 'NoAction':
                         let subMenu = menuItem['Items'];
                         if (subMenu && subMenu.length > 1) {
                             let subMenuItems = Menu.parseItems(subMenu, containerID, menuName);

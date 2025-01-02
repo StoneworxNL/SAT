@@ -1,4 +1,4 @@
-const {Menus, Menu} = require("../MxModel/Menu");
+const { Menus, Menu } = require("../MxModel/Menu");
 
 module.exports = class MenuCollector {
     constructor(modelQuality) {
@@ -17,7 +17,7 @@ module.exports = class MenuCollector {
                     let profiles = navigation.profiles;
                     profiles.forEach(profile => {
                         let menuItems = profile.menuItemCollection.items;
-                        this.parseMenuItems(containerID, containerID, profile.name, menuItems );
+                        this.parseMenuItems(containerID, containerID, profile.name, menuItems);
                     })
                     resolve();
                 });
@@ -48,18 +48,18 @@ module.exports = class MenuCollector {
             let itemJSON = menuItem.toJSON();
             let menu;
             let caption = itemJSON.caption.translations[0].text;
-            switch (itemJSON.action.$Type) {
-                case 'Pages$PageClientAction':
+            let actionType = itemJSON.action.$Type.replace(/^(Pages|Forms)\$/, "");
+            actionType = actionType.replace(/Client/,"");
+            switch (actionType) {
+                case 'PageAction':
+                    actionType = 'FormAction';
                     let page = itemJSON.action.pageSettings.page;
-                    //menu = new Menu(module, document, caption, 'page', page)
-                    //this.menus.push(menu);
-                    //containerID, menuName, caption, actionType, action
-                    menu = new Menu(module, menuName, caption, 'page', page);
+                    menu = new Menu(module, menuName, caption, actionType, page);
                     this.modelQuality.MxModel.menus.push(menu);
                     break
-                case 'Pages$MicroflowClientAction':
+                case 'MicroflowAction':
                     let microflow = itemJSON.action.microflowSettings.microflow;
-                    menu = new Menu(containerID, menuName, caption, 'microflow', microflow);
+                    menu = new Menu(containerID, menuName, caption, actionType, microflow);
                     this.modelQuality.MxModel.menus.push(menu);
                     break
                 default:
