@@ -160,7 +160,8 @@ class Microflow {
                             microflow.addAction(actionData);
                             break;
                     case 'Microflows$EndEvent':
-                            actionData = new Action(actionType, actionID, action['ReturnValue']);
+                            let returnVariable = action['ReturnValue'].replace(/^\$/, "");
+                            actionData = new Action(actionType, actionID, returnVariable);
                             microflow.addAction(actionData);
                             break;
                     default:

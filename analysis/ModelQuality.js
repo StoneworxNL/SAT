@@ -266,7 +266,8 @@ module.exports = class ModelQuality extends AnalysisModule {
                 let actionData = new Action(actionType, actionId);
                 microflowData.addAction(actionData);
             } else if (json['$Type'] === 'Microflows$EndEvent') {
-                let actionData = new Action(actionType, actionId, action.returnValue);
+                let returnValue = action.returnValue.replace(/^\$/, "");
+                let actionData = new Action(actionType, actionId, returnValue);
                 microflowData.addAction(actionData);
             } else if (json['$Type'] === 'Microflows$ExclusiveSplit') {
                 let condition = json.splitCondition.expression ? json.splitCondition.expression : '';
