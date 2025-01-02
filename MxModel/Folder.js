@@ -7,10 +7,11 @@ class Folder{
 
     static builder(folders){
         let folderMap = {};
-        for (const id in folders){
-            let folderData = folders[id];
+        folders.forEach(folder =>{
+            let [id, folderData] = folder;
             folderMap[id] =  new Folder(folderData.id, folderData.container, folderData.name);
-        }
+
+        })
         return folderMap;
     }
 

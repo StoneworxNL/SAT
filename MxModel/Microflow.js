@@ -138,6 +138,7 @@ class Microflow {
                                 microflow.addAction(actionData);
                                 break;
                             default:
+                                //console.log(activityType);                               
                                 actionData = new Action(activityType, actionID);
                                 microflow.addAction(actionData);
                                 break;

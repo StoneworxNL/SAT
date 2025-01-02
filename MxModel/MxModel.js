@@ -10,7 +10,7 @@ const Security = require("./Security");
 class MxModel {
     constructor() {
         this.security = {},
-            this.modules = [];
+        this.modules = [];
         this.entities = [];
         this.microflows = [];
         this.folders = {};

@@ -1,7 +1,7 @@
 {
     "checksFolder": "../qualityChecks/",
     "outputFolder": "./output",
-    "SquatChecksFolder": "../SquatChecks/",
+    "SquatChecksFolder": "../SAT-Q/",
     "includeAppstore": false,
     "checks": [
         {
@@ -184,6 +184,15 @@
             "options": {
                 "allowedPrefixes": [
                     "SUB"
+                ]
+            }
+        },
+        {
+            "fnc": "RestCall",
+            "squat": true,
+            "options": {
+                "allowedPrefixes": [
+                    "CRS"
                 ]
             }
         }

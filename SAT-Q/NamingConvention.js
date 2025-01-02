@@ -35,7 +35,7 @@ module.exports = class NamingConvention extends CheckModule {
                     })
                     if (entitiesForMF && entitiesForMF.length > 0) { //one or more entities with same name found
                         let entityForMFInModule = entitiesForMF.find((entity) => {
-                            return this.module.id === entity.moduleID;
+                            return this.module.id === entity.containerID;
                         })
                         if (!entityForMFInModule || entityForMFInModule.length == 0) {
                             this.addErrors("NC4", ignoreRuleAnnotations);
