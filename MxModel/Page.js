@@ -1,7 +1,7 @@
 class Page {
     constructor(containerID, pageName, documentation) {
         this.containerID = containerID,
-        this.documentation = documentation;
+            this.documentation = documentation;
         this.name = pageName;
         this.allowedRoles = [];
         this.buttons = [];
@@ -33,8 +33,8 @@ class Page {
         } else {
             page = new Page(containerID, doc['name'], doc['documentation']);
             allowedRoles = doc['allowedRoles'];
-            page.allowedRoles = allowedRoles.flatMap(allowedRole => allowedRole.name);
-            
+            page.allowedRoles = allowedRoles.flatMap(allowedRole => allowedRole.qualifiedName);
+
             args = doc['layoutCall']['arguments'];
             args.forEach(arg => {
                 if (typeof arg != 'number') {
@@ -61,19 +61,51 @@ class Page {
             switch (widgetType) {
                 case 'Forms$ActionButton':
                 case 'Pages$ActionButton':
+                    widgetType = 'Forms$ActionButton';
                     let button;
-                    if (widget['Action'] ){
-                        button = { 'type': widget['Action']['$Type'] }
+                    let actionType;
+                    if (widget['Action']) {
+                        actionType = widget['Action']['$Type']
                     } else {
-                        button = { 'type': widget['action']['structureTypeName'] }
+                        actionType = widget['action']['structureTypeName']
                     }
+                    switch (actionType) {
+                        case 'Pages$MicroflowClientAction':
+                            actionType = 'Forms$MicroflowAction';
+                            break;
+                        case 'Pages$SaveChangesClientAction':
+                            actionType = 'Forms$SaveChangesClientAction';
+                            break;
+                        case 'Pages$DeleteClientAction':
+                            actionType = 'Forms$DeleteClientAction';
+                            break;
+                        case 'Pages$CancelChangesClientAction':
+                            actionType = 'Forms$CancelChangesClientAction';
+                            break;
+                        case 'Pages$OpenLinkClientAction':
+                            actionType = 'Forms$OpenLinkClientAction';
+                            break;
+                        case 'Pages$ClosePageClientAction':
+                            actionType = 'Forms$ClosePageClientAction';
+                            break;
+                        case 'Pages$PageClientAction':
+                            actionType = 'Forms$FormAction';
+                            break;
+                        case 'Pages$NoClientAction':
+                            actionType = 'Forms$NoAction';
+                            break;
+                        case 'Pages$CallNanoflowClientAction':
+                            actionType = 'Forms$CallNanoflowClientAction';
+                            break;
+                    }
+                    button = { 'type': actionType };
                     this.buttons.push(button);
                     break;
                 default:
-                    let rows = widget['Rows'] ||widget['rows'];
-                    let columns = widget['Columns'] ||widget['columns'];
-                    let widgets = widget['Widgets']||widget['widgets'];
-                    let footerWidgets = widget['FooterWidgets']||widget['footerWidgets'];;
+                    let rows = widget['Rows'] || widget['rows'];
+                    let columns = widget['Columns'] || widget['columns'];
+                    let widgets = widget['Widgets'] || widget['widgets'];
+                    let footerWidgets = widget['FooterWidgets'] || widget['footerWidgets'];;
                     if (rows) {
                         this.parseWidgets(rows);
                     }

@@ -74,6 +74,7 @@ class Microflow {
                 let actionType = action['$Type'];
                 let actionData;
                 let complexity = 0;
+                let caption;
                 switch (actionType) {
                     case 'Microflows$Annotation':
                         let annotation = action['Caption'];
@@ -86,7 +87,6 @@ class Microflow {
                         break;
                     case 'Microflows$ActionActivity':
                         let activityType = action['Action']['$Type'];
-                        let caption;
                         switch (activityType) {                        
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
@@ -144,7 +144,7 @@ class Microflow {
                         }
                         break;
                     case 'Microflows$ExclusiveSplit':
-                        let caption = action['Caption'];;
+                        caption = action['Caption'];;
                         let condition = action.SplitCondition.Expression ? action.SplitCondition.Expression : '';
                         complexity = microflow.checkExpressionComplexity(condition);
                         actionData = new ExpressionAction(actionType, actionID, false, complexity, caption, condition);
