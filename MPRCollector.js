@@ -44,6 +44,9 @@ class MPRCollector {
                         case 'Microflows$Microflow':
                             model.parseMicroflow(doc, container);
                             break;
+                        case 'Microflows$Rule':
+                            model.parseMicroflow(doc, container);
+                            break;
                         case 'Projects$ModuleSettings':
                             // console.log(JSON.stringify(doc, null, 4));
                             break;
@@ -54,7 +57,7 @@ class MPRCollector {
                             model.parsePage(doc, container);
                             break;
                         default:
-                            //console.log('Not Implemented: '+docType);                
+                            //console.log('Not Implemented: ' + docType);
                             break;
                     }
                 }, () => {

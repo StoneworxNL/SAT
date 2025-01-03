@@ -59,7 +59,7 @@ class Microflow {
         })
 
         let allowedRoles = doc['AllowedModuleRoles'];
-        if (allowedRoles.length > 1) {
+        if (allowedRoles && allowedRoles.length > 1) {
             microflow.roles  = allowedRoles.slice(1);
         }
         Microflow.parseMFActions(doc, microflow, container, microflowName);
