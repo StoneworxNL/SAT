@@ -196,6 +196,14 @@
                     "CRS"
                 ]
             }
+        },
+        {
+            "fnc": "TodoCheckDomainModel",
+            "squat": true
+        },
+        {
+            "fnc": "TodoCheckMicroflow",
+            "squat": true
         }
     ]
 }
