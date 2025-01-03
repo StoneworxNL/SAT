@@ -5,8 +5,8 @@ module.exports = class SplitMergeCheck extends CheckModule {
         super(options);
 
         this.errorCodes = {
-            "SM1": "Missing caption for Exclusive split"
-            , "SM2": "Useless merge action"
+            "SM1": "Missing caption for Exclusive split",
+            "SM2": "Useless merge action"
         };
     }
 
