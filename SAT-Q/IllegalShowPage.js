@@ -20,7 +20,7 @@ module.exports = class IllegalShowPage extends CheckModule {
             if (!allowedPrefixes.includes(this.mfPrefix)) {
                 let mfActions = microflow.actions;
                 let showPage = mfActions.find((action) => {
-                    return action.type == 'Microflows$ShowFormAction'
+                    return action.type == 'Microflows$ShowFormAction' || action.type == 'Microflows$ShowHomePageAction'
                 })
                 if (showPage) {
                     this.addErrors("IP1", ignoreRuleAnnotations);
