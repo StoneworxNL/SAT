@@ -15,7 +15,7 @@ class Module {
         let appStore = false;
         if (doc['$Type']==='Projects$Project') {
             moduleName = 'Project';
-            appStore = true;
+            appStore = false;
 
         } else {
             appStore = doc['FromAppStore'];

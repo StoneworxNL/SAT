@@ -11,7 +11,7 @@ module.exports = class MenuStructure extends CheckModule {
 
     check = function (model, menu) {
         this.setup(model, menu);
-        if (menu.actionType === 'Forms$MicroflowAction') {
+        if (menu.actionType === 'MicroflowAction') {
             let actionQName = menu.action;
             let [moduleName, microflowName] = actionQName.split('.');
             this.parseMFName(microflowName);

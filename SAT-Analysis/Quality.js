@@ -70,7 +70,7 @@ class Quality {
                     } else if (checkModule.level === 'domainmodel') {
                         this.reportedErrors.push({ type: 'domainmodel', module: module.name, document: document.name, errors: errors });
                     } else if (checkModule.level === 'menu') {
-                        this.reportedErrors.push({ type: 'menu', document: module.name + '.' + document.menuName, errors: errors });
+                        this.reportedErrors.push({ type: 'menu', document: module.name+'.'+document.name, errors: errors });
                     } else if (checkModule.level === 'page') {
                         this.reportedErrors.push({ type: 'page', module: module.name, document: document.name, errors: errors });
                     } else {
