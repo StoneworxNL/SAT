@@ -36,7 +36,7 @@ module.exports = class NestingTooDeep extends CheckModule {
             if (!isSubMF) {
                 this.maxLevel = 0;
                 this.digDeep(model, microflow, 0, maxNesting);
-                if (this.maxLevel > maxNesting + 1) { // level is allways 1
+                if (this.maxLevel > maxNesting + 1 && !this.isRecursionFound) { // level is allways 1
                     this.addErrors("ND1", ignoreRuleAnnotations, this.maxLevel);
                 }
                 if (this.isRecursionFound) {
