@@ -21,7 +21,7 @@ module.exports = class IllegalObjectActions extends CheckModule {
                     return action.type == 'Microflows$CommitAction'
                 })
                 let createOrChange = mfActions.find((action) => {
-                    return action.type == 'Microflows$CreateObjectAction' || action.type == 'Microflows$ChangeObjectAction'
+                    return action.type == 'Microflows$CreateAction' || action.type == 'Microflows$ChangeAction' || action.type == 'Microflows$CreateChangeAction'
                 })
                 if (commit) {
                     this.addErrors("OA1", ignoreRuleAnnotations);

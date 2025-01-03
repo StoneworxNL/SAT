@@ -107,6 +107,7 @@ class Microflow {
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$CreateChangeAction':
+                            case 'Microflows$CreateAction':
                             case 'Microflows$ChangeAction':
                                 let commit = false;
                                 action['Action']['Items'].forEach((item) => {
