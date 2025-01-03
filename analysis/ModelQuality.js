@@ -218,7 +218,7 @@ module.exports = class ModelQuality extends AnalysisModule {
                         let count = this.checkExpressionComplexity(item['value']);
                         if (count > complexity) { complexity = count };
                     })
-                    if (json['action']['commit'] === 'Yes') {
+                    if (json['action']['commit'].includes('Yes')) {
                         commit = true;
                     }
                     if (action_type === 'Microflows$CreateObjectAction') {

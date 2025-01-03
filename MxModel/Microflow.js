@@ -115,7 +115,7 @@ class Microflow {
                                         if (count > complexity) { complexity = count };
                                     }
                                 })
-                                if (action['Action']['Commit'] === 'Yes') {
+                                if (action['Action']['Commit'].includes('Yes')) {
                                     commit = true;
                                 }
                                 actionData = new ExpressionAction(activityType, actionID, commit, complexity);
