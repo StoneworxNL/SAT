@@ -24,7 +24,7 @@ module.exports = class DomainModel extends CheckModule {
             if (attrName.startsWith(entity.name)) {
                 this.addErrors("DM1", ignoreRuleAnnotations, `${entity.name}.${attr.name}`);
             }
-            if (attrName.includes('_')) {
+            if (attr.type === 'attr' && attrName.includes('_')) {
                 this.addErrors("DM2", ignoreRuleAnnotations, `${entity.name}.${attr.name}`);
             }
         })
