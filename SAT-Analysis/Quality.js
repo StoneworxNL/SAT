@@ -11,13 +11,11 @@ class Quality {
         this.reportedErrors = [];
         this.includeAppstore = config.get("includeAppstore");
         checks.forEach((check) => {
-            if (check.squat) {
-                let moduleName = checksFolder + check.fnc;
-                let CheckModule = require(moduleName);
-                let checkMod = new CheckModule(check.options);
-                Object.assign(this.errorCodes, checkMod.getErrorCodes());
-                this.checkModules.push(checkMod);
-            }
+            let moduleName = checksFolder + check.fnc;
+            let CheckModule = require(moduleName);
+            let checkMod = new CheckModule(check.options);
+            Object.assign(this.errorCodes, checkMod.getErrorCodes());
+            this.checkModules.push(checkMod);
         });
     }
 
@@ -37,11 +35,11 @@ class Quality {
                 this.model.pages.forEach(page => {
                     this.executeCheck(checkModule, page);
                 })
-            } 
+            }
         })
 
         this.model.microflows.forEach((microflow) => {
-            if (microflow && microflow != 'undefined') {                
+            if (microflow && microflow != 'undefined') {
                 this.checkModules.forEach((checkModule) => {
                     if (checkModule.level === 'microflow') {
                         this.executeCheck(checkModule, microflow);
@@ -59,10 +57,10 @@ class Quality {
             if (document) {
                 module = this.model.getModule(document.containerID);
             }
-            if(!module){module = {'fromAppStore': false};}
+            if (!module) { module = { 'fromAppStore': false }; }
             if (this.excludes) {
                 excludeModule = this.excludes.find(exclude => exclude === module.name);
-            }   
+            }
             if (!excludeModule) {
                 if (this.includeAppstore || (checkModule.level === 'app' || !module.fromAppStore)) {
                     if (checkModule.level === 'microflow') {
@@ -70,7 +68,7 @@ class Quality {
                     } else if (checkModule.level === 'domainmodel') {
                         this.reportedErrors.push({ type: 'domainmodel', module: module.name, document: document.name, errors: errors });
                     } else if (checkModule.level === 'menu') {
-                        this.reportedErrors.push({ type: 'menu', document: module.name+'.'+document.name, errors: errors });
+                        this.reportedErrors.push({ type: 'menu', document: module.name + '.' + document.name, errors: errors });
                     } else if (checkModule.level === 'page') {
                         this.reportedErrors.push({ type: 'page', module: module.name, document: document.name, errors: errors });
                     } else {

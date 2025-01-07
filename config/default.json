@@ -6,7 +6,6 @@
     "checks": [
         {
             "fnc": "NamingConvention",
-            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "ACO",
@@ -55,7 +54,6 @@
         },
         {
             "fnc": "ErrorHandling",
-            "squat": true,
             "options": {
                 "allowedJava": [
                     "CommunityCommons.EndTransaction",
@@ -66,7 +64,6 @@
         },
         {
             "fnc": "TooComplexMicroflow",
-            "squat": true,
             "options": {
                 "maxActions": 25,
                 "maxComplexity": 30,
@@ -78,14 +75,13 @@
                 "cxLoopCount": 4,
                 "cxExclusiveSplit": 5,
                 "cxObjectAction": 2,
-                "cxMaxObjectExpression": 3,
                 "cxVariableAction": 1,
+                "cxMaxObjectExpression": 3,
                 "cxMaxVariableExpression": 5
             }
         },
         {
             "fnc": "IllegalCommit",
-            "squat": true,
             "options": {
                 "allowedTopLevelPrefixes": [
                     "ACT",
@@ -101,7 +97,6 @@
         },
         {
             "fnc": "IllegalShowPage",
-            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "ACT"
@@ -109,12 +104,10 @@
             }
         },
         {
-            "fnc": "SplitMergeCheck",
-            "squat": true
+            "fnc": "SplitMergeCheck",        
         },
         {
             "fnc": "MissingPermissions",
-            "squat": true,
             "options": {
                 "permissionPrefixes": [
                     "ACT",
@@ -126,27 +119,22 @@
             }
         },
         {
-            "fnc": "DemoUsers",
-            "squat": true
+            "fnc": "DemoUsers"            
         },
         {
             "fnc": "NestingTooDeep",
-            "squat": true,
             "options": {
                 "mxNesting": 5
             }
         },
         {
-            "fnc": "DomainModel",
-            "squat": true
+            "fnc": "DomainModel"
         },
         {
-            "fnc": "MenuStructure",
-            "squat": true
+            "fnc": "MenuStructure"
         },
         {
             "fnc": "TopLevelFlows",
-            "squat": true,
             "options": {
                 "TopLevelPrefixes": [
                     "ACO",
@@ -166,12 +154,10 @@
             }
         },
         {
-            "fnc": "PageCommit",
-            "squat": true
+            "fnc": "PageCommit"
         },
         {
             "fnc": "IllegalObjectActions",
-            "squat": true,
             "options": {
                 "PrefixesNotAllowed": [
                     "DS",
@@ -181,7 +167,6 @@
         },
         {
             "fnc": "GetOrCreateCheck",
-            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "SUB"
@@ -190,7 +175,6 @@
         },
         {
             "fnc": "RestCall",
-            "squat": true,
             "options": {
                 "allowedPrefixes": [
                     "CRS"
@@ -198,12 +182,10 @@
             }
         },
         {
-            "fnc": "TodoCheckDomainModel",
-            "squat": true
+            "fnc": "TodoCheckDomainModel"
         },
         {
-            "fnc": "TodoCheckMicroflow",
-            "squat": true
+            "fnc": "TodoCheckMicroflow"
         }
     ]
 }
