@@ -81,7 +81,9 @@ class Quality {
     }
 
     logErrorCodes(){
-        Object.keys(this.errorCodes).forEach(code =>{            
+        let sorted = Object.keys(this.errorCodes).sort();
+        
+        sorted.forEach(code =>{            
             console.log('\t\t\t\t'+code+': '+this.errorCodes[code])
         })
         

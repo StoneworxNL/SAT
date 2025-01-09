@@ -7,44 +7,44 @@ Brought to you by Stoneworx
 * Generate Authorisation Matrix from a project
 * Analyse an extensible set of coding quality rules on a model:
   
-				NC1: format: [PRE]_[Entity(s)]_description
-				NC2: Prefix must be allowed
-				NC3: Entity must exist 
-				NC4: Entity must exist in same module
-				EH1: Java Action without custom error handling
+				CM1: Commit not on correct hierarchy level(ACT or one level down)
+				CM2: Commit not allowed in this type of microflow
+				CM3: Create or Change object with commit  not on correct hierarchy level(ACT or one level down)
 				CX1: Too many actions in a single microflow
 				CX2: Too complex microflow
 				CX3: Too complex expression in Create/ Change Object
 				CX4: Too complex expression in Create / Change Variable
 				CX5: Too complex expression in Exclusive Split
-				CM1: Commit not on correct hierarchy level(ACT or one level down)
-				CM2: Commit not allowed in this type of microflow
-				CM3: Create or Change object with commit  not on correct hierarchy level(ACT or one level down)
-				IP1: Show Page action outside of ACT
-				IP2: Close Page action outside of ACT
-				SM1: Missing caption for Exclusive split
-				SM2: Useless merge action
-				PM1: Microflow of this type should contain permissions
-				DU1: Demo users not allowed in production app
-				ND1: Nesting of subs to deep
-				ND2: Recursion detected
 				DM1: Attribute name should not starts with the entity name
 				DM2: Attribute name should not contain underscores '_'
 				DM3: Entity name should be singular
-				MS1: Menu microflows must be ACTs
-				TL1: Microflow may not call a Top level microflow
-				PC1: Commit button on page in stead of micro/nanoflow
-				PC2: Delete button on page in stead of micro/nanoflow
-				OA1: Commit object not allowed in a microflow with this prefix
-				OA2: Create or Change object not allowed in a microflow with this prefix
+				DU1: Demo users not allowed in production app
+				EH1: Java Action without custom error handling
 				GC1: Naming convention not as SUB_[ENTITYNAME]_GetOrCreate
 				GC2: Get or Create does not return a (list of) object(s)
 				GC3: Create or Change object with commit is not allowed in GetOrCreate
 				GC4: Change object not allowed for existing object
 				GC5: Get or Create does not return the existing object
+				IP1: Show Page action outside of ACT
+				IP2: Close Page action outside of ACT
+				MS1: Menu microflows must be ACTs
+				NC1: format: [PRE]_[Entity(s)]_description
+				NC2: Prefix must be allowed
+				NC3: Entity must exist 
+				NC4: Entity must exist in same module
+				ND1: Nesting of subs to deep
+				ND2: Recursion detected
+				OA1: Commit object not allowed in a microflow with this prefix
+				OA2: Create or Change object not allowed in a microflow with this prefix
+				PC1: Commit button on page in stead of micro/nanoflow
+				PC2: Delete button on page in stead of micro/nanoflow
+				PM1: Microflow of this type should contain permissions
 				RC1: Rest calls only allowed within a CRS Microflow
+				SM1: Missing caption for Exclusive split
+				SM2: Useless merge action
 				TD1: There should be no TODO annotations on the domain model
 				TD2: There should be no TODO annotations in microflows
+				TL1: Microflow may not call a Top level microflow
 
   
 **Installation**
