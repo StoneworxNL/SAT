@@ -79,6 +79,13 @@ class Quality {
         }
 
     }
+
+    logErrorCodes(){
+        Object.keys(this.errorCodes).forEach(code =>{            
+            console.log('\t\t\t\t'+code+': '+this.errorCodes[code])
+        })
+        
+    }
 }
 
 module.exports = Quality;

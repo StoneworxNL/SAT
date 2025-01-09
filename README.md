@@ -7,20 +7,45 @@ Brought to you by Stoneworx
 * Generate Authorisation Matrix from a project
 * Analyse an extensible set of coding quality rules on a model:
   
-            NC1: format: [PRE]_[Entity(s)]_description
-            NC2: Prefix must be allowed
-            NC3: entity must exist
-            NC4: entity must exist in same module
-            IP1: Show Page action outside of ACT
-            IP2: Close Page action outside of ACT
-            CM1: Commit not on correct hierarchy level(ACT or one level down)
-            PM1: Microflow of this type should contain permissions
-            EH1: Java Action without custom error handling
-            CX1: Too many actions in a single microflow
-            CX2: Too complex microflow
-            CX3: Too complex expression in Create/ Change Object
-            CX4: Too complex expression in Create / Change Variable
-            MC1: Missing caption for Exclusive split
+				NC1: format: [PRE]_[Entity(s)]_description
+				NC2: Prefix must be allowed
+				NC3: Entity must exist 
+				NC4: Entity must exist in same module
+				EH1: Java Action without custom error handling
+				CX1: Too many actions in a single microflow
+				CX2: Too complex microflow
+				CX3: Too complex expression in Create/ Change Object
+				CX4: Too complex expression in Create / Change Variable
+				CX5: Too complex expression in Exclusive Split
+				CM1: Commit not on correct hierarchy level(ACT or one level down)
+				CM2: Commit not allowed in this type of microflow
+				CM3: Create or Change object with commit  not on correct hierarchy level(ACT or one level down)
+				IP1: Show Page action outside of ACT
+				IP2: Close Page action outside of ACT
+				SM1: Missing caption for Exclusive split
+				SM2: Useless merge action
+				PM1: Microflow of this type should contain permissions
+				DU1: Demo users not allowed in production app
+				ND1: Nesting of subs to deep
+				ND2: Recursion detected
+				DM1: Attribute name should not starts with the entity name
+				DM2: Attribute name should not contain underscores '_'
+				DM3: Entity name should be singular
+				MS1: Menu microflows must be ACTs
+				TL1: Microflow may not call a Top level microflow
+				PC1: Commit button on page in stead of micro/nanoflow
+				PC2: Delete button on page in stead of micro/nanoflow
+				OA1: Commit object not allowed in a microflow with this prefix
+				OA2: Create or Change object not allowed in a microflow with this prefix
+				GC1: Naming convention not as SUB_[ENTITYNAME]_GetOrCreate
+				GC2: Get or Create does not return a (list of) object(s)
+				GC3: Create or Change object with commit is not allowed in GetOrCreate
+				GC4: Change object not allowed for existing object
+				GC5: Get or Create does not return the existing object
+				RC1: Rest calls only allowed within a CRS Microflow
+				TD1: There should be no TODO annotations on the domain model
+				TD2: There should be no TODO annotations in microflows
+
   
 **Installation**
 * requirements: Node & npm
@@ -35,8 +60,7 @@ Extract model information from a workingcopy in the mendix cloud.
 ***Usage***
 ```node SAT-C.js  [OPTIONS]...```
 
- -n RestoServe -a 7b100ded-837d-41c5-a239-838f8a91d59e -b %1 -e SSO %2 -o SATCModel
-Options:
+ ptions:
   -v, --version                  output the version number
   
   -a, --appid <appid>            AppID of the mendix project
@@ -45,9 +69,10 @@ Options:
    
   -o, --out <output file>   Filename of the result
 
+  -c, --clear                    Clear working copy, create new
+
   -h, --help                     display help for command
 
-  -c, --clear                    Clear working copy, create new
 
 ***Example***
 ```node SAT-C.js -a [APPID] -b [BRANCH] -o [RESULTFILE]```
@@ -57,7 +82,6 @@ Extract model information from a local .mpr file.
 ***Usage***
 ```node SAT-L.js  [OPTIONS]...```
 
- -n RestoServe -a 7b100ded-837d-41c5-a239-838f8a91d59e -b %1 -e SSO %2 -o SATCModel
 Options:
   -v, --version                  output the version number
   
@@ -88,6 +112,31 @@ Create Authorisation Matrix based on model information
 ***Example***
 ```node SAT-AM.js -i [INPUT] -o [OUTPUT]```
 
+**SAT-SD**
+Generate Sequence Diagram (PlantUML format) for a microflow
+
+***Usage***
+```node SAT-SD.js  [OPTIONS]...```
+
+ Options:
+  -v, --version                  output the version number
+  
+  -i, --input <model file>    Model json file, result of SAT-C or SAT-L
+
+  -o, --out <output file>   Output filename in csv format
+
+  -m, --microflow <microflow> Name of the microflow to parse
+
+  -e, --exclude <modules>  List of modules to exclude from analysis
+
+  -p, --prefix <prefixes> List of prefixes to aggregate
+ 
+  -h, --help                     display help for command
+
+***Example***
+```node SAT-SD.js -i [INPUT] -o [OUTPUT] -m [module.microflow] -e SSO -p VAL```
+
+
 **SAT-Q**
 Applies coding quality rules to model information
 
@@ -100,11 +149,34 @@ Applies coding quality rules to model information
   -i, --input <model file>    Model json file, result of SAT-C or SAT-L
 
   -o, --out <output file>   Output filename in csv format
-
+   
+  -e, --exclude <modules>  List of modules to exclude from analysis
+ 
   -h, --help                     display help for command
 
 ***Example***
 ```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
+
+**SAT-D**
+Diff tool to compare 2 ouput files of SAT-Q
+
+***Usage***
+```node SAT-D.js  [OPTIONS]...```
+
+ Options:
+  -v, --version                  output the version number
+  
+  -1, --first <SAT-L>    First SAT-L Output file (with folder to have autocomplete in windows)
+
+  -2, --second <SAT-L>    Second SAT-L Output file (with folder to have autocomplete in windows)
+
+  -o, --out <output file>   Output filename (prepended with folder in default.json)
+ 
+  -h, --help                     display help for command
+
+***Example***
+```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
+
 
 ***Accept notifications***
   To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
