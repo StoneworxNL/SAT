@@ -1,5 +1,8 @@
-class Module {
+const MxModelObject = require('./MxModelObject');
+
+class Module extends MxModelObject{
     constructor(id, name, fromAppStore) {
+        super();
         this.id = id,
         this.name = name;
         this.fromAppStore = fromAppStore;
@@ -10,9 +13,9 @@ class Module {
     }
 
     static parse (doc) {
-        let moduleName = doc['Name'];
+        let moduleName = Module.findKey(doc,'Name');
         let moduleID = doc['$ID'].toString('base64');
-        let appStore = false;
+        let appStore = false;        
         if (doc['$Type']==='Projects$Project') {
             moduleName = 'Project';
             appStore = false;

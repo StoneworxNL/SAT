@@ -27,10 +27,10 @@ class MPRCollector {
                             model.parseSecurity(doc);
                             break;
                         case 'Navigation$NavigationDocument':
-                            model.parseMenus(doc, container);
+                            model.parseMenus(doc, containerID);
                             break
                         case 'Menus$MenuDocument':
-                            model.parseMenu(doc, container);
+                            model.parseMenu(doc, containerID);
                             break
                         case 'Projects$ModuleImpl':
                             model.parseModule(doc);
@@ -39,22 +39,22 @@ class MPRCollector {
                             model.parseModule(doc);
                             break;
                         case 'DomainModels$DomainModel':
-                            model.parseDomain(doc, container);
+                            model.parseDomain(doc, containerID);
                             break;
                         case 'Microflows$Microflow':
-                            model.parseMicroflow(doc, container);
+                            model.parseMicroflow(doc, containerID);
                             break;
                         case 'Microflows$Rule':
-                            model.parseMicroflow(doc, container);
+                            model.parseMicroflow(doc, containerID);
                             break;
                         case 'Projects$ModuleSettings':
                             // console.log(JSON.stringify(doc, null, 4));
                             break;
                         case 'Projects$Folder':
-                            model.parseFolder(doc, container);
+                            model.parseFolder(doc, containerID);
                             break;
                         case 'Forms$Page':
-                            model.parsePage(doc, container);
+                            model.parsePage(doc, containerID);
                             break;
                         default:
                             //console.log('Not Implemented: ' + docType);

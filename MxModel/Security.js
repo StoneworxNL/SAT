@@ -1,7 +1,10 @@
+const MxModelObject = require('./MxModelObject');
 const UserRole = require('./UserRole');
 
-class Security {
+
+class Security extends MxModelObject {
     constructor(enableDemoUsers) {
+        super();
         this.enableDemoUsers = enableDemoUsers,
         this.roles = [];
     }
@@ -14,12 +17,13 @@ class Security {
     }
 
     static parse(doc) {
-        let security = new Security(doc['EnableDemoUsers']);
-        let userRoles = doc['UserRoles'];
+        let enableDemoUsers = Security.findKey(doc, 'EnableDemoUsers');
+        let security = new Security(enableDemoUsers);
+        let userRoles = Security.findKey(doc,'userRoles');
         security.roles = userRoles.flatMap(userRole =>{
             if (typeof userRole ==='object'){
-                let name = userRole['Name'];                
-                let moduleRoles = userRole['ModuleRoles'].flatMap(moduleRole=>{
+                let name = Security.findKey(userRole, 'Name');
+                let moduleRoles = Security.findKey(userRole, 'ModuleRoles').flatMap(moduleRole=>{
                     if (typeof moduleRole ==='string'){
                         return moduleRole
                     } return [];
@@ -29,7 +33,6 @@ class Security {
         })
         return security;
     }
-
 }
 
 module.exports = Security;

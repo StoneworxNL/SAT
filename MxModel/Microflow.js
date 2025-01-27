@@ -1,8 +1,10 @@
+const MxModelObject = require('./MxModelObject');
 const Flow = require('./Flow');
 const { Action, JavaAction, ExpressionAction } = require('./Action');
 
-class Microflow {
+class Microflow extends MxModelObject {
     constructor(containerID, microflowName, returnType, returnEntity) {
+        super();
         this.containerID = containerID,
         this.name = microflowName;
         this.returnType = returnType;
@@ -27,38 +29,39 @@ class Microflow {
     }
 
     static parse(doc, container) {
-        let containerID = container.toString('base64');
-        let microflowName = doc['Name'];
-        let returnType = ''; let returnEntity = '';
-        if (doc['MicroflowReturnType']) {
-            returnType = doc['MicroflowReturnType']['$Type']
+        let containerID = container;
+        let microflowName = Microflow.findKey(doc, 'Name');
+        let returnType = Microflow.findKey(doc, 'MicroflowReturnType'); 
+        let returnEntity = '';
+        if (returnType) {
+            returnType = returnType['$Type'];
             if (returnType === 'DataTypes$ObjectType' || returnType === 'DataTypes$ListType') {
-                returnEntity = doc['MicroflowReturnType']['Entity'];
+                returnEntity = Microflow.findKey(returnType, 'Entity');
             }
         }
 
         let microflow = new Microflow(containerID, microflowName, returnType, returnEntity);
-        let flows = doc['Flows'];
+        let flows = Microflow.findKey(doc, 'Flows');
 
         flows.forEach(flow => {
             if (flow['$Type'] && flow['$Type'] === 'Microflows$SequenceFlow') {
                 // console.log('FLOW');
                 // console.log(JSON.stringify(flow, null, 2));
-                let origin = flow['OriginPointer'].toString('base64');
-                let destination = flow['DestinationPointer'].toString('base64');
-                let flowValue = false;              
-                if (flow['NewCaseValue']) {
-                    flowValue = flow['NewCaseValue']['Value'] == 'true';
+                let origin = flow['OriginPointer'] ? flow['OriginPointer'].toString('base64') : flow['origin'];
+                let destination = flow['DestinationPointer'] ? flow['DestinationPointer'].toString('base64') : flow['destination'];
+                let flowValue = false;
+                let newCase = Microflow.findKey(flow, 'NewCaseValue');
+                if (newCase) {
+                    flowValue = Microflow.findKey(newCase, 'Value') == 'true';
                 }
-                let isError = flow['IsErrorHandler'];
-                let flowData = new Flow(origin, destination, isError, flowValue)
-                
+                let isError = Microflow.findKey(flow, 'IsErrorHandler');
+                let flowData = new Flow(origin, destination, isError, flowValue)                
                 
                 microflow.addFlow(flowData);
             }
         })
 
-        let allowedRoles = doc['AllowedModuleRoles'];
+        let allowedRoles = Microflow.findKey(doc, 'AllowedModuleRoles');
         if (allowedRoles && allowedRoles.length > 1) {
             microflow.roles  = allowedRoles.slice(1);
         }
@@ -67,7 +70,8 @@ class Microflow {
     }
 
     static parseMFActions(doc, microflow, module, microflowName) {
-        let actions = doc['ObjectCollection']['Objects'];
+        let objectCollection = Microflow.findKey(doc, 'ObjectCollection');
+        let actions = Microflow.findKey(objectCollection, 'Objects');
         actions.forEach(action => {
             if (action['$Type']) {
                 let actionID = action['$ID'].toString('base64');
@@ -77,7 +81,7 @@ class Microflow {
                 let caption;
                 switch (actionType) {
                     case 'Microflows$Annotation':
-                        let annotation = action['Caption'];
+                        let annotation = Microflow.findKey(action, 'Caption');
                         microflow.addAnnotation(annotation);
                         break;
                     case 'Microflows$LoopedActivity':
@@ -86,23 +90,26 @@ class Microflow {
                         Microflow.parseMFActions(action, microflow);
                         break;
                     case 'Microflows$ActionActivity':
-                        let activityType = action['Action']['$Type'];
+                        let actionActivity = Microflow.findKey(action, 'Action');
+                        let activityType = actionActivity['$Type'];
                         switch (activityType) {                        
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
                                 microflow.addAction(actionData);
-                                let subMF = action['Action']['MicroflowCall']['Microflow'];
+                                let microflowCall = Microflow.findKey(actionActivity, 'MicroflowCall');
+                                let subMF = Microflow.findKey(microflowCall, 'Microflow');
                                 microflow.addSubMicroflow(subMF);
                                 break;
                             case 'Microflows$CreateVariableAction':
-                                complexity = microflow.checkExpressionComplexity(action['Action']['InitialValue']);
+                                let initialValue = Microflow.findKey(actionActivity, 'InitialValue');
+                                complexity = microflow.checkExpressionComplexity(initialValue);
                                 caption = action['Caption'];
                                 actionData = new ExpressionAction(activityType, actionID, false, complexity, caption);
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$ChangeVariableAction':
-                                complexity = microflow.checkExpressionComplexity(action['Action']['Value']);
-                                caption = action['Caption'];
+                                complexity = microflow.checkExpressionComplexity(Microflow.findKey(actionActivity, 'Value'));                                
+                                caption = Microflow.findKey(action, 'Caption');
                                 actionData = new ExpressionAction(activityType, actionID, false, complexity, caption);
                                 microflow.addAction(actionData);
                                 break;
@@ -123,19 +130,20 @@ class Microflow {
                                 actionData.variableName = action['Action']['VariableName'] ? action['Action']['VariableName'] : action['Action']['ChangeVariableName'];
                                 microflow.addAction(actionData);
                                 break
-                            case 'Microflows$CommitAction':
-                                let commitVariable = action['Action']['CommitVariableName'];                                
+                            case 'Microflows$CommitAction':                                
+                                let commitVariable = Microflow.findKey(actionActivity, 'CommitVariableName');
                                 actionData = new Action(activityType, actionID, commitVariable);
                                 microflow.addAction(actionData);
                                 break
                             case 'Microflows$JavaActionCallAction':
-                                let errorHandling = action['Action']['ErrorHandlingType'];
-                                let JavaActionName = action['Action']['JavaAction'];
+                                let errorHandling = Microflow.findKey(actionActivity, 'ErrorHandlingType');
+                                let JavaActionName = Microflow.findKey(actionActivity, 'JavaAction');
                                 actionData = new JavaAction(activityType, action['$ID'], errorHandling, JavaActionName);
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$RetrieveAction':
-                                actionData = new Action(activityType, action['$ID'], action['Action']['ResultVariableName']);
+                                let resultVariableName = Microflow.findKey(actionActivity, 'ResultVariableName');
+                                actionData = new Action(activityType, action['$ID'], resultVariableName);
                                 microflow.addAction(actionData);
                                 break;
                             default:
@@ -146,8 +154,9 @@ class Microflow {
                         }
                         break;
                     case 'Microflows$ExclusiveSplit':
-                        caption = action['Caption'];;
-                        let condition = action.SplitCondition.Expression ? action.SplitCondition.Expression : '';
+                        caption = Microflow.findKey(action, 'Caption');
+                        let splitCondition = Microflow.findKey(action, 'SplitCondition');
+                        let condition = splitCondition ? Microflow.findKey(splitCondition, 'Expression') : '';
                         complexity = microflow.checkExpressionComplexity(condition);
                         actionData = new ExpressionAction(actionType, actionID, false, complexity, caption, condition);
                         microflow.addAction(actionData);
@@ -161,7 +170,8 @@ class Microflow {
                             microflow.addAction(actionData);
                             break;
                     case 'Microflows$EndEvent':
-                            let returnVariable = action['ReturnValue'].replace(/^\$/, "");
+                        let returnValue = Microflow.findKey(action,'ReturnValue');
+                            let returnVariable = returnValue.replace(/^\$/, "");
                             actionData = new Action(actionType, actionID, returnVariable);
                             microflow.addAction(actionData);
                             break;
@@ -184,6 +194,7 @@ class Microflow {
     }
 
     checkExpressionComplexity(expression) {
+        if (!expression) return 0;
         let result = 0;
         let regex = /(if(\s|\()|and(\s|\()|or(\s|\()|not(\s|\())/g;
         let matches = expression.match(regex) || [];

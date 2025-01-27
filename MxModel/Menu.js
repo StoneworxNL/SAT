@@ -1,5 +1,8 @@
-class Menus {
+const MxModelObject = require('./MxModelObject');
+
+class Menus extends MxModelObject {
     constructor() {        
+        super();
     }
 
     static builder(obj) {
@@ -7,12 +10,13 @@ class Menus {
     }
 
     static parse(doc, container) {
-        let profiles = doc['Profiles'];
+        let profiles = Menus.findKey(doc, 'Profiles');
         let menuItems = [];
         if (profiles && profiles.length > 1) {
             profiles.forEach(profile => {
                 if (typeof profile != 'number') {
-                    let menu = profile['Menu']['Items'];
+                    let menu = Menus.findKey(profile, 'Menu', 'Items');
+                    //profile['Menu']['Items'];
                     let menuName = profile['Name'];
                     menuItems.push(...Menu.parseItems(menu, container, menuName));
                 }
@@ -34,9 +38,10 @@ class Menu {
 
 
     static parse(doc, container) {
-        let menuName = doc['Name'];
-        if (doc['ItemCollection']) {
-            let items = doc['ItemCollection']['Items'];
+        let menuName = Menus.findKey(doc, 'Name');
+        let itemCollection = Menus.findKey(doc, 'ItemCollection');
+        if (itemCollection) {
+            let items = Menus.findKey(itemCollection, 'Items');
             return Menu.parseItems(items, container, menuName);
         }
     }
@@ -46,21 +51,28 @@ class Menu {
         let containerID = container.toString('base64');
         items.forEach(menuItem => {
             if (typeof menuItem != 'number') {
-                let caption = menuItem['Caption']['Items'][1]['Text'];
-                let actionType = menuItem['Action']['$Type'];
+                let caption = Menus.findKey(menuItem, 'Caption');
+                let captionText;
+                if (caption['Items']){
+                    captionText = caption['Items'][1]['Text'];
+                } else {
+                    captionText = caption['translations'][0]['text'];
+                }
+                let actionType = Menus.findKey(menuItem, 'Action','$Type');
+                //menuItem['Action']['$Type'];
                 actionType = actionType.replace(/^(Pages|Forms)\$/, "");
                 let action = '';
                 switch (actionType) {
-                    case 'MicroflowAction':
-                        action = menuItem['Action']['MicroflowSettings']['Microflow'];
-                        menuItems.push(new Menu(containerID, menuName, caption, actionType, action));
+                    case 'MicroflowAction':                        
+                        action = Menus.findKey(menuItem,'Action','MicroflowSettings','Microflow');
+                        menuItems.push(new Menu(containerID, menuName, captionText, actionType, action));
                         break;
                     case 'FormAction':
-                        action = menuItem['Action']['FormSettings']['Form'];
-                        menuItems.push(new Menu(containerID, menuName, caption, actionType, action));
+                        action = Menus.findKey(menuItem,'Action','FormSettings','Form');
+                        menuItems.push(new Menu(containerID, menuName, captionText, actionType, action));
                         break
                     case 'NoAction':
-                        let subMenu = menuItem['Items'];
+                        let subMenu = Menus.findKey(menuItem, 'Items');
                         if (subMenu && subMenu.length > 1) {
                             let subMenuItems = Menu.parseItems(subMenu, containerID, menuName);
                             menuItems.push(...subMenuItems);

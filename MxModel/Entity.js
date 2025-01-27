@@ -1,7 +1,9 @@
+const MxModelObject = require('./MxModelObject');
 const Attribute = require("./Attribute");
 
-class Entity {
+class Entity extends MxModelObject {
     constructor(containerID, id, entityName, documentation, isPersistent, attrs) {
+        super();
         this.containerID = containerID,
         this.id = id;
         this.documentation = documentation;
@@ -21,9 +23,10 @@ class Entity {
     static parse(doc, container) {
         let containerID = container.toString('base64');
         let entities = [];
-        let domainEntities = doc['Entities'];
-        let associations = doc['Associations'].filter(association => typeof association != 'number');
-        let crossAssociations = doc['CrossAssociations'].filter(association => typeof association != 'number');
+        let domainEntities = Entity.findKey(doc, 'Entities');
+        Entity.findKey(doc, 'Associations');
+        let associations = Entity.findKey(doc, 'Associations').filter(association => typeof association != 'number');
+        let crossAssociations = Entity.findKey(doc, 'CrossAssociations').filter(association => typeof association != 'number');
         associations.splice(0,0, ...crossAssociations);
 
 
@@ -31,40 +34,45 @@ class Entity {
             domainEntities.forEach(domainEntity => {
                 if (typeof domainEntity != 'number') {
                     let id = domainEntity['$ID'].toString('base64');
-                    let entityName = domainEntity['Name'];
+                    let entityName = Entity.findKey(domainEntity, 'Name');
                     let attributes = [];
-                    let isPersistent = domainEntity['MaybeGeneralization']['Persistable'];
-                    let documentation = domainEntity['Documentation'];
-                    let attrs = domainEntity['Attributes'];
+                    let generalization = Entity.findKey(domainEntity,'MaybeGeneralization')|| Entity.findKey(domainEntity,'generalization');
+                    let isPersistent = Entity.findKey(generalization,'Persistable');
+                    let documentation = Entity.findKey(domainEntity,'Documentation');
+                    let attrs = Entity.findKey(domainEntity,'Attributes');
                     attrs.forEach(attr => {
                         if (attr['$Type'] && attr['$Type'] === 'DomainModels$Attribute') {
-                            let attribute= new Attribute(attr['Name'], 'attr');
+                            let attribute= new Attribute(Entity.findKey(attr,'Name'), 'attr');
                             attributes.push(attribute);
                         }
                     });
                     associations.forEach(association=>{
-                        let parentID = association['ParentPointer'].toString('base64');
+                        let parent = association['ParentPointer'] || association['parent'] ;
+                        let parentID = parent.toString('base64');
                         if (parentID === id){
-                            let attribute= new Attribute(association['Name'], 'assoc');
+                            let attribute= new Attribute(Entity.findKey(association, 'Name'), 'assoc');
                             attributes.push(attribute);
                         }
                     })
                     
-                    domainEntity['AccessRules'].forEach(accessRule=>{
+                    let accessRules = Entity.findKey(domainEntity, 'AccessRules');
+                    accessRules.forEach(accessRule=>{
                         if (typeof accessRule === 'object'){
-                            let allowedRoles = accessRule['AllowedModuleRoles'].flatMap(allowedModuleRole=>{
+                            const allowedModuleRoles = accessRule['AllowedModuleRoles'] || accessRule['moduleRoles'];
+                            let allowedRoles = allowedModuleRoles.flatMap(allowedModuleRole=>{
                                 if (typeof allowedModuleRole === 'string'){
                                     return allowedModuleRole
                                 } return [];
                             })
-                            let defaultAccesRights = accessRule['DefaultMemberAccessRights'];
-                            let isCreateAllowed = accessRule['AllowCreate'];
-                            let isDeleteAllowed = accessRule['AllowDelete'];
-                            let xPath = accessRule['XPathConstraint'].replace(/\n/g, " ");
+                            let defaultAccesRights = Entity.findKey(accessRule,'DefaultMemberAccessRights');
+                            let isCreateAllowed = Entity.findKey(accessRule, 'AllowCreate');
+                            let isDeleteAllowed = Entity.findKey(accessRule, 'AllowDelete');
+                            let xPath = Entity.findKey(accessRule, 'XPathConstraint').replace(/\n/g, " ");
 ;
-                            accessRule['MemberAccesses'].forEach(memberAccess=>{
-                                let rights = memberAccess['AccessRights'];
-                                let associationQName = memberAccess['Association'];
+                            let memberAccesses = Entity.findKey(accessRule, 'MemberAccesses');
+                            memberAccesses.forEach(memberAccess=>{
+                                let rights = Entity.findKey(memberAccess, 'AccessRights');
+                                let associationQName = Entity.findKey(memberAccess,'Association');
                                 if (associationQName){
                                     let parts = associationQName.split('.');
                                     let attrName = parts[1]; //Allways 2 long: Module.Association Name
@@ -75,7 +83,7 @@ class Entity {
                                         })
                                     }
                                 }
-                                let attributeQName = memberAccess['Attribute'];
+                                let attributeQName = Entity.findKey(memberAccess, 'Attribute');
                                 if (attributeQName){
                                     let parts = attributeQName.split('.');
                                     let attrName = parts[2]; //Allways 3 long: Module.Entity.Attr
