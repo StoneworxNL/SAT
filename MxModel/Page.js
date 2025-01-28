@@ -1,5 +1,8 @@
-class Page {
+
+const MxModelObject = require('./MxModelObject');
+class Page  extends MxModelObject {
     constructor(containerID, pageName, documentation, allowedRoles, buttons) {
+        super();
         this.containerID = containerID,
         this.documentation = documentation;
         this.name = pageName;
@@ -17,16 +20,16 @@ class Page {
         let allowedRoles;
         let args;
         if (doc['$ID']) {
-            page = new Page(containerID, doc['Name'], doc['Documentation']);
-            allowedRoles = doc['AllowedModuleRoles'];
+            page = new Page(containerID, Page.findKey(doc, 'Name'), Page.findKey(doc,'Documentation'));
+            allowedRoles = Page.findKey(doc,'AllowedModuleRoles');
             if (allowedRoles && allowedRoles.length > 1) {
-
                 page.allowedRoles = allowedRoles.slice(1);
             }
-            args = doc['FormCall']['Arguments'];
+            args = Page.findKey(doc, 'FormCall','Arguments');
+            if (!args) {args = Page.findKey(doc, 'LayoutCall','Arguments')};
             args.forEach(arg => {
                 if (typeof arg != 'number') {
-                    let widgets = arg['Widgets'];
+                    let widgets = Page.findKey(arg,'Widgets');
                     page.parseWidgets(widgets);
                 }
             });
@@ -64,8 +67,9 @@ class Page {
                     widgetType = 'Forms$ActionButton';
                     let button;
                     let actionType;
-                    if (widget['Action']) {
-                        actionType = widget['Action']['$Type']
+                    let action = Page.findKey(widget, 'Action');
+                    if (action) {
+                        actionType = Page.findKey(action, '$Type');
                     } else {
                         actionType = widget['action']['structureTypeName']
                     }

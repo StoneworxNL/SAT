@@ -13,6 +13,7 @@ class MxModelObject {
     
         const keyName = keyNames[0];
         const obj = Object.keys(doc).find(key => key.toLowerCase() === keyName.toLowerCase());
+        if (!obj) { return null};
         const result = doc[obj];
         if (keyNames.length === 1) {
             return result;
