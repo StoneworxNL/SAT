@@ -21,7 +21,7 @@ module.exports = class PageCommit extends CheckModule {
                 this.addErrors("PC2", ignoreRuleAnnotations);   
             }          
         });    
-        if (page.containsCSS){
+            if (page.containsCSS){
             this.addErrors("CS1", ignoreRuleAnnotations);
         }
         return this.errors;

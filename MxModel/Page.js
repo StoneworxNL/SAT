@@ -1,18 +1,18 @@
 
 const MxModelObject = require('./MxModelObject');
 class Page  extends MxModelObject {
-    constructor(containerID, pageName, documentation, allowedRoles, buttons) {
+    constructor(containerID, pageName, documentation, allowedRoles, buttons, containsCSS) {
         super();
         this.containerID = containerID,
         this.documentation = documentation;
         this.name = pageName;
         this.allowedRoles = allowedRoles || [];
         this.buttons = buttons || [];
-        this.containsCSS = false;
+        this.containsCSS = containsCSS;
     }
 
     static builder(pages) {
-        return pages.map(p => new Page(p.containerID, p.name, p.documentation, p.allowedRoles, p.buttons));
+        return pages.map(p => new Page(p.containerID, p.name, p.documentation, p.allowedRoles, p.buttons, p.containsCSS));
     }
 
     static parse(doc, container) {
