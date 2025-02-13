@@ -17,7 +17,8 @@ module.exports = class SplitMergeCheck extends CheckModule {
         let mfActions = microflow.actions;
         mfActions.forEach((mfAction) => {
             if (mfAction.type.startsWith('Microflows$ExclusiveSplit')) {
-                let caption = mfAction.caption.trim();
+                let caption = mfAction.caption;
+                if (caption) { caption = caption.trim(); }
                 if (!caption || caption.length == 0) {
                     this.addErrors("SM1", ignoreRuleAnnotations);
                 }

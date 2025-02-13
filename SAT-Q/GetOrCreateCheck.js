@@ -38,7 +38,10 @@ module.exports = class IllegalCommit extends CheckModule {
                 let mfReturnType = microflow.returnType;
                 let mfReturnEntity = microflow.returnEntity;
                 if (mfReturnType === 'DataTypes$ObjectType' || mfReturnType === 'DataTypes$ListType') { //Check if the microflow returntype is an object or list of objects
-                    let [moduleName, entityName] =mfReturnEntity.split('.');
+                    let moduleName, entityName;
+                    if (mfReturnEntity) {
+                        [moduleName, entityName]= mfReturnEntity.split('.');                        
+                    }
                     if (this.microflowName.includes(entityName)) {
                         //Oke
                     } else if (!GC1Found) {

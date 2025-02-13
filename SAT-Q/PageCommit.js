@@ -5,7 +5,8 @@ module.exports = class PageCommit extends CheckModule {
         super(options);
         this.errorCodes = {
             "PC1": "Commit button on page in stead of micro/nanoflow",
-            "PC2": "Delete button on page in stead of micro/nanoflow"
+            "PC2": "Delete button on page in stead of micro/nanoflow",
+            "CS1": "Page contains CSS"
         };
         this.level = 'page';
     }
@@ -20,6 +21,9 @@ module.exports = class PageCommit extends CheckModule {
                 this.addErrors("PC2", ignoreRuleAnnotations);   
             }          
         });    
+        if (page.containsCSS){
+            this.addErrors("CS1", ignoreRuleAnnotations);
+        }
         return this.errors;
     }
 }

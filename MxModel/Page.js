@@ -8,6 +8,7 @@ class Page  extends MxModelObject {
         this.name = pageName;
         this.allowedRoles = allowedRoles || [];
         this.buttons = buttons || [];
+        this.containsCSS = false;
     }
 
     static builder(pages) {
@@ -21,7 +22,7 @@ class Page  extends MxModelObject {
         let args;
         if (doc['$ID']) {
             page = new Page(containerID, Page.findKey(doc, 'Name'), Page.findKey(doc,'Documentation'));
-            allowedRoles = Page.findKey(doc,'AllowedModuleRoles');
+           allowedRoles = Page.findKey(doc,'AllowedModuleRoles');
             if (allowedRoles && allowedRoles.length > 1) {
                 page.allowedRoles = allowedRoles.slice(1);
             }
@@ -61,6 +62,10 @@ class Page  extends MxModelObject {
     parseWidget(widget) {
         if (typeof widget != 'number') {
             let widgetType = widget['$Type'] || widget['structureTypeName'];
+            let css = Page.findKey(widget, 'appearance', 'style');
+            if (css){
+                this.containsCSS = true
+            };
             switch (widgetType) {
                 case 'Forms$ActionButton':
                 case 'Pages$ActionButton':
@@ -128,9 +133,12 @@ class Page  extends MxModelObject {
 
     getIgnoreRuleAnnotations() {
         let ignoreRuleAnnotations = [];
-        ignoreRuleAnnotations = this.documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
-        if (ignoreRuleAnnotations) {
-            return ignoreRuleAnnotations[1];
+        let documentation = this.documentation;
+        if (documentation){
+            ignoreRuleAnnotations = this.documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
+            if (ignoreRuleAnnotations) {
+                return ignoreRuleAnnotations[1];
+            }
         }
         return [];
     }

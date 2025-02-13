@@ -6,7 +6,7 @@ class Microflow extends MxModelObject {
     constructor(containerID, microflowName, returnType, returnEntity) {
         super();
         this.containerID = containerID,
-        this.name = microflowName;
+            this.name = microflowName;
         this.returnType = returnType;
         this.returnEntity = returnEntity;
         this.flows = [];
@@ -16,9 +16,9 @@ class Microflow extends MxModelObject {
         this.roles = [];
     }
 
-    static builder(microflows){
+    static builder(microflows) {
         return microflows.map(obj => {
-            let mf = new Microflow(obj.containerID,obj.name,obj.returnType, obj.returnEntity)
+            let mf = new Microflow(obj.containerID, obj.name, obj.returnType, obj.returnEntity)
             mf.flows = obj.flows;
             mf.actions = obj.actions;
             mf.annotations = obj.annotations;
@@ -31,7 +31,7 @@ class Microflow extends MxModelObject {
     static parse(doc, container) {
         let containerID = container;
         let microflowName = Microflow.findKey(doc, 'Name');
-        let returnType = Microflow.findKey(doc, 'MicroflowReturnType'); 
+        let returnType = Microflow.findKey(doc, 'MicroflowReturnType');
         let returnEntity = '';
         if (returnType) {
             returnType = returnType['$Type'];
@@ -55,15 +55,15 @@ class Microflow extends MxModelObject {
                     flowValue = Microflow.findKey(newCase, 'Value') == 'true';
                 }
                 let isError = Microflow.findKey(flow, 'IsErrorHandler');
-                let flowData = new Flow(origin, destination, isError, flowValue)                
-                
+                let flowData = new Flow(origin, destination, isError, flowValue)
+
                 microflow.addFlow(flowData);
             }
         })
 
         let allowedRoles = Microflow.findKey(doc, 'AllowedModuleRoles');
         if (allowedRoles && allowedRoles.length > 1) {
-            microflow.roles  = allowedRoles.slice(1);
+            microflow.roles = allowedRoles.slice(1);
         }
         Microflow.parseMFActions(doc, microflow, container, microflowName);
         return microflow;
@@ -92,7 +92,7 @@ class Microflow extends MxModelObject {
                     case 'Microflows$ActionActivity':
                         let actionActivity = Microflow.findKey(action, 'Action');
                         let activityType = actionActivity['$Type'];
-                        switch (activityType) {                        
+                        switch (activityType) {
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
                                 microflow.addAction(actionData);
@@ -108,7 +108,7 @@ class Microflow extends MxModelObject {
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$ChangeVariableAction':
-                                complexity = microflow.checkExpressionComplexity(Microflow.findKey(actionActivity, 'Value'));                                
+                                complexity = microflow.checkExpressionComplexity(Microflow.findKey(actionActivity, 'Value'));
                                 caption = Microflow.findKey(action, 'Caption');
                                 actionData = new ExpressionAction(activityType, actionID, false, complexity, caption);
                                 microflow.addAction(actionData);
@@ -130,7 +130,7 @@ class Microflow extends MxModelObject {
                                 actionData.variableName = action['Action']['VariableName'] ? action['Action']['VariableName'] : action['Action']['ChangeVariableName'];
                                 microflow.addAction(actionData);
                                 break
-                            case 'Microflows$CommitAction':                                
+                            case 'Microflows$CommitAction':
                                 let commitVariable = Microflow.findKey(actionActivity, 'CommitVariableName');
                                 actionData = new Action(activityType, actionID, commitVariable);
                                 microflow.addAction(actionData);
@@ -166,15 +166,16 @@ class Microflow extends MxModelObject {
                         microflow.addAction(actionData);
                         break;
                     case 'Microflows$StartEvent':
-                            actionData = new Action(actionType, actionID);
-                            microflow.addAction(actionData);
-                            break;
+                        actionData = new Action(actionType, actionID);
+                        microflow.addAction(actionData);
+                        break;
                     case 'Microflows$EndEvent':
-                        let returnValue = Microflow.findKey(action,'ReturnValue');
-                            let returnVariable = returnValue.replace(/^\$/, "");
-                            actionData = new Action(actionType, actionID, returnVariable);
-                            microflow.addAction(actionData);
-                            break;
+                        let returnVariable;
+                        let returnValue = Microflow.findKey(action, 'ReturnValue');
+                        if (returnValue) {returnVariable = returnValue.replace(/^\$/, "");}
+                        actionData = new Action(actionType, actionID, returnVariable);
+                        microflow.addAction(actionData);
+                        break;
                     default:
                         actionData = new Action(actionType, actionID);
                         microflow.addAction(actionData);
@@ -184,11 +185,11 @@ class Microflow extends MxModelObject {
         })
     }
 
-    static parseQualifiedName(microflowName){
-        let [moduleName, mfName] =  microflowName.split('.');
+    static parseQualifiedName(microflowName) {
+        let [moduleName, mfName] = microflowName.split('.');
         let prefix; let entity; let action;
         if (mfName) {
-            [prefix, entity, action] = mfName.split('_',3);
+            [prefix, entity, action] = mfName.split('_', 3);
         }
         return [moduleName, prefix, entity, action];
     }
@@ -232,12 +233,12 @@ class Microflow extends MxModelObject {
         return ignoreRuleAnnotations;
     }
 
-    getQualifiedName(model){
+    getQualifiedName(model) {
         let module = model.getModule(this.containerID);
         return `${module.name}.${this.name}`;
     }
 
-    sortActions(){
+    sortActions() {
         let sortedActions = [];
         let startEvnt = this.findActionByType("Microflows$StartEvent");
         sortedActions.push(startEvnt);
@@ -245,12 +246,12 @@ class Microflow extends MxModelObject {
         return sortedActions;
     }
 
-    parseFlows(id, sortedActions){
-        let flows = this.findFlows(id);       
-        if (flows.length > 1){
+    parseFlows(id, sortedActions) {
+        let flows = this.findFlows(id);
+        if (flows.length > 1) {
             flows = flows.sort((flowA, flowB) => (flowB.flowValue === 'true') - (flowA.flowValue === 'true'));
         }
-        flows.forEach(flow =>{
+        flows.forEach(flow => {
             let action = this.findActionById(flow.destination);
             sortedActions.push(action);
             let id = flow.destination;
@@ -258,19 +259,19 @@ class Microflow extends MxModelObject {
         })
     }
 
-    findActionByType(actionType){
+    findActionByType(actionType) {
         return this.actions.find(action => action.type === actionType);
     }
 
-    findActionById(id){
+    findActionById(id) {
         return this.actions.find(action => action.id === id);
     }
 
-    findFlows(id){
+    findFlows(id) {
         return this.flows.filter(flow => flow.origin === id);
     }
 
-    
+
 }
 
 module.exports = Microflow;

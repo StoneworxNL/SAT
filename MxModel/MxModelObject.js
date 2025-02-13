@@ -12,9 +12,12 @@ class MxModelObject {
         }
     
         const keyName = keyNames[0];
-        const obj = Object.keys(doc).find(key => key.toLowerCase() === keyName.toLowerCase());
-        if (!obj) { return null};
+        let obj = Object.keys(doc).find(key => key.toLowerCase() === keyName.toLowerCase());
+        if (!obj){
+            obj = keyName;
+        }
         const result = doc[obj];
+        if (!result) { return null};
         if (keyNames.length === 1) {
             return result;
         } else {
