@@ -7,6 +7,7 @@ const { program: commander } = require('commander');
 const MxModel = require("./MxModel/MxModel.js");
 const MXCollector = require("./MXCollector.js")
 const { log } = require("console");
+const { execSync } = require('child_process');
 
 let model = new MxModel();
 
@@ -21,10 +22,20 @@ const options = commander.opts();
 main();
 
 function main() {
-    let mx = options.mx;
-    let outFile = options.out;
+    let mxOutput;
+    let mpr = options.mx
     let folder = config.get("outputFolder");
-    let mxCollector = new MXCollector(mx);
+    try {
+        let mxFolder = config.get("mxFolder");
+        mxOutput = execSync(`"${mxFolder}/mx.exe" dump-mpr ${mpr} > ${folder}/out.json`);
+        console.log("mx.exe output:", mxOutput);
+    } catch (error) {
+        console.error("Error executing mx.exe:", error);
+        process.exit(1);
+    }
+    ;    
+    let outFile = options.out;
+    let mxCollector = new MXCollector('out.json');
     mxCollector.collect().then((model) => {
         model.sortAll();
         fs.writeFileSync(folder+'/'+outFile+'.json',JSON.stringify(model, null, 2));

@@ -1,10 +1,10 @@
 
 const MxModelObject = require('./MxModelObject');
-class Page  extends MxModelObject {
+class Page extends MxModelObject {
     constructor(containerID, pageName, documentation, allowedRoles, buttons, containsCSS) {
         super();
         this.containerID = containerID,
-        this.documentation = documentation;
+            this.documentation = documentation;
         this.name = pageName;
         this.allowedRoles = allowedRoles || [];
         this.buttons = buttons || [];
@@ -21,19 +21,24 @@ class Page  extends MxModelObject {
         let allowedRoles;
         let args;
         if (doc['$ID']) {
-            page = new Page(containerID, Page.findKey(doc, 'Name'), Page.findKey(doc,'Documentation'));
-           allowedRoles = Page.findKey(doc,'AllowedModuleRoles');
+            page = new Page(containerID, Page.findKey(doc, 'Name'), Page.findKey(doc, 'Documentation'));
+            allowedRoles = Page.findKey(doc, 'AllowedModuleRoles');
             if (allowedRoles && allowedRoles.length > 1) {
                 page.allowedRoles = allowedRoles.slice(1);
             }
-            args = Page.findKey(doc, 'FormCall','Arguments');
-            if (!args) {args = Page.findKey(doc, 'LayoutCall','Arguments')};
-            args.forEach(arg => {
-                if (typeof arg != 'number') {
-                    let widgets = Page.findKey(arg,'Widgets');
-                    page.parseWidgets(widgets);
-                }
-            });
+            args = Page.findKey(doc, 'FormCall', 'Arguments');
+            if (!args) { args = Page.findKey(doc, 'LayoutCall', 'Arguments') };
+            if (doc['$Type'] === 'Forms$Snippet') {
+                let widgets = Page.findKey(doc, 'Widgets');
+                page.parseWidgets(widgets);
+            } else {
+                args.forEach(arg => {
+                    if (typeof arg != 'number') {
+                        let widgets = Page.findKey(arg, 'Widgets');
+                        page.parseWidgets(widgets);
+                    }
+                });
+            }
         } else {
             page = new Page(containerID, doc['name'], doc['documentation']);
             allowedRoles = doc['allowedRoles'];
@@ -63,7 +68,9 @@ class Page  extends MxModelObject {
         if (typeof widget != 'number') {
             let widgetType = widget['$Type'] || widget['structureTypeName'];
             let css = Page.findKey(widget, 'appearance', 'style');
-            if (css){
+            css = css.trim().replace(/\s+/g, ' ');
+            if (css) {
+                //console.log(`page: ${this.name}; widget: ${widget.Name} - ${widgetType} contains css`);
                 this.containsCSS = true
             };
             switch (widgetType) {
@@ -134,7 +141,7 @@ class Page  extends MxModelObject {
     getIgnoreRuleAnnotations() {
         let ignoreRuleAnnotations = [];
         let documentation = this.documentation;
-        if (documentation){
+        if (documentation) {
             ignoreRuleAnnotations = this.documentation.match(/^@SAT-([A-Z]{2}\d): .*/);
             if (ignoreRuleAnnotations) {
                 return ignoreRuleAnnotations[1];

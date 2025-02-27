@@ -54,6 +54,7 @@ class MPRCollector {
                             model.parseFolder(doc, containerID);
                             break;
                         case 'Forms$Page':
+                        case 'Forms$Snippet':
                             model.parsePage(doc, containerID);
                             break;
                         default:
