@@ -14,5 +14,6 @@ app.use(bodyParser.json({ extended: true }));
 setRoutes(app);
 
 app.listen(PORT, () => {
+    process.chdir('..'); 
     console.log(`Server is running on http://localhost:${PORT}`);
 });

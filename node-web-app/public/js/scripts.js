@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedSat = formData.get('satType');
         const inputFile = formData.get('inputFile');
         const outputFile = formData.get('outputFile');
+        resultContainer.innerHTML = '<p>Executing SAT program...</p>';
         fetch(`/execute`, {
             method: 'POST',
             body: JSON.stringify({
@@ -22,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
+                
                 if (data.success) {
                     resultContainer.innerHTML = `<p>Execution successful! Output file: ${data.outputFile}</p>`;
                 } else {

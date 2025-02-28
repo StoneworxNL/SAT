@@ -1,8 +1,19 @@
 body {
     font-family: Arial, sans-serif;
+    color: #5a5c61;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    background-image: url('/images/SX_logobeeld.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+    background-size: contain;
+}
+.container {
+    width: 80%;
+    margin: 20px auto;
+    overflow: hidden;
 }
 
 header {
@@ -14,31 +25,43 @@ header {
 
 h1 {
     margin: 0;
+    background-color: rgba(190, 185, 185, 0.8);
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
-.container {
-    width: 80%;
-    margin: auto;
-    overflow: hidden;
-}
+
 
 form {
-    background: #ffffff;
+    background-color: rgba(220, 220, 220, 0.95);
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+label.field {
+    display: block;
+    margin-top: 10px;
+}
+
 input[type="text"],
-input[type="file"],
 select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    min-width: 50vw;
+    margin: 3px 0px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    height: 30px;
+}
+
+input[type="file"]{
+    min-width: 50vw;
+    margin: 3px 0px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-
 input[type="submit"] {
     background: #35424a;
     color: #ffffff;
@@ -50,6 +73,16 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
     background: #45a049;
+}
+
+input::file-selector-button,
+button {
+    margin: 10px;
+    padding: 5px;
+    min-width: 100px;
+    border-radius: 5px;
+    background-color: rgb(69, 185, 228);
+    color: white
 }
 
 footer {
