@@ -12,7 +12,7 @@ module.exports = class NestingTooDeep extends CheckModule {
     }
 
     check = function (model, microflow) {      
-        console.log("NESTING TOO DEEP:" +microflow.name);
+        // console.log("NESTING TOO DEEP:" +microflow.name);
         this.setup(model, microflow);
         this.originalMF = microflow.name;
         this.mfList = [];
@@ -59,7 +59,7 @@ module.exports = class NestingTooDeep extends CheckModule {
                 this.isRecursionFound = true;
                 this.recursiveMicroflow = microflow;
             } else {
-//                console.log("Pushing one: "+ microflow.name);
+                // console.log("Pushing one: "+ microflow.name);
                 this.mfList.push(microflow);
             }
             let subs = microflow.subMicroflows;
@@ -71,33 +71,32 @@ module.exports = class NestingTooDeep extends CheckModule {
             if (level <= maxNesting + 1) {
                 if (!uniqueSubs || uniqueSubs.length == 0) {
                     level--;
-//                    console.log("Popping one of: " + microflow.name);                    
+                    // console.log("Popping one of: " + microflow.name);                    
                     this.mfList.pop();
                 } else {
                     uniqueSubs.forEach((subMF) => {
-//                        console.log(`NESTING: ${microflow} ==> ${subMF}:  ${level} < ${maxNesting} `);
+                        // console.log(`NESTING: ${microflow} ==> ${subMF}:  ${level} < ${maxNesting} `);
                         let [moduleName, microflowName] = subMF.split('.');
                         let subMicroflow = model.findMicroflow(moduleName, microflowName);                        
                         if (subMicroflow){
                             this.digDeep(model, subMicroflow, level, maxNesting);
                         } else {
                             level--;
-//                            console.log("Popping one of: " + microflow.name);
+                            // console.log("Popping one of: " + microflow.name);
                             this.mfList.pop();        
                         }
                     });
                     level--;
-//                    console.log("Popping one of: " + microflow.name);
+                    // console.log("Popping one of: " + microflow.name);
                     this.mfList.pop();
                 }
             }
 
         } else {
             level--;
-//            console.log("Popping one of" );
+            // console.log("Popping one of" );
             this.mfList.pop();
         }
     }
 
 }
-
