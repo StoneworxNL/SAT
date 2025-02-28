@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>SAT Executor</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Execute SAT Programs</h1>
+        <form id="satForm" action="/execute" method="POST">
+            <label for="satType">Select SAT Program:</label>
+            <select id="satType" name="satType" required>
+                <option value="sat-l">SAT-L</option>
+                <option value="sat-c">SAT-C</option>
+            </select>
+
+            <div id="inputFields">
+                <label for="inputFile">Input File:</label>
+                <input type="file" id="inputFile" name="inputFile" required onchange="document.getElementById('inputFileName').value = this.value.split('\\').pop();">
+                <input type="hidden" id="inputFileName" name="inputFileName">
+
+                <label for="outputFile">Output File Name:</label>
+                <input type="text" id="outputFile" name="outputFile" required>
+            </div>
+
+            <button type="submit">Execute</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+    <script src="/js/scripts.js"></script>
+</body>
+</html>
