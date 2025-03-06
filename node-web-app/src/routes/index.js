@@ -1,7 +1,9 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
 const SatController = require('../controllers/satController');
 
+const upload = multer({ dest: 'uploads/' });
 const satController = new SatController();
 
 function setRoutes(app) {
@@ -9,17 +11,22 @@ function setRoutes(app) {
         res.render('index');
     });
 
-    router.post('/execute', (req, res) => {
-        const { inputFile, outputFile, satType } = req.body;
-        console.log(`Executing ${satType} with inputs:`, inputFile);     
-        satController.executeSatProgram(satType, inputFile, outputFile)
-            .then(result => {
+    router.post('/execute', upload.single('inputFile'), (req, res) => {
+        const { satType, outputFileSATL, outputFileSATC, appID, brancheName } = req.body;
+        const inputFile = req.file;
+
+        console.log(`Executing ${satType} with inputs:`, inputFile.path);
+        const outputFile = satType.toUpperCase() === 'SAT-L' ? outputFileSATL : outputFileSATC;
+
+        satController.executeSatProgram(satType, inputFile.path, outputFile)
+            .then(result =>  {
                 res.json(result);
-            })
-            .catch(err => {
+            })           
+            .catch(err => { 
                 res.status(500).json({ error: err.message });
             });
     });
+
 
     app.use('/', router);
 }

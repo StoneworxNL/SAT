@@ -1,3 +1,8 @@
+
+const path = require('path');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
 class SatController {
     constructor() {
         this.satPrograms = ['SAT-L', 'SAT-C'];
@@ -7,24 +12,10 @@ class SatController {
         res.render('index', { satPrograms: this.satPrograms });
     }
 
-    async executeSat(req, res) {
-        const { program, inputFile, outputFile } = req.body;
-
-        if (!this.satPrograms.includes(program)) {
-            return res.status(400).send('Invalid SAT program selected.');
-        }
-
-        try {
-            const result = await this.executeSatProgram(program, inputFile, outputFile);
-            res.json({ message: 'Execution successful', result });
-        } catch (error) {
-            res.status(500).send('Error executing SAT program: ' + error.message);
-        }
-    }
 
     async executeSatProgram(program, inputFile, outputFile) {
         const { executeSat } = require('../utils/satExecutor');
-        console.log(`Executing ${program} with input file ${inputFile} and output file ${outputFile}`);                
+        console.log(`Executing ${program} with input file ${inputFile} and output file ${outputFile}`);
         return await executeSat(program, inputFile, outputFile);
     }
 

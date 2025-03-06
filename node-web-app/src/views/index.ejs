@@ -15,98 +15,94 @@
             <p>Use this tool to execute the SAT program on your Mendix project.</p>
         </div>
         <div class="container-block">
-            <form  id="satForm" class= "form-container" action="/execute" method="POST">
+            <form id="satForm" class="form-container" action="/execute" method="POST" enctype="multipart/form-data">
                 <div class="form-row">
-                <div class="form-block">
-                    <label class="field" for="satType">Select SAT Program:</label>
-                    <div>
-                        <input type="radio" id="satL" name="satType" value="sat-l" required >
-                        <label for="satL">Use local mpr</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="satC" name="satType" value="sat-c" required >
-                        <label for="satC">Use working copy</label>
-                    </div>
-                </div>
-
-                <div class="form-hidden" id="sat-l">
-                    <div id="inputFields">
-                        <label class="field" for="inputFile">Input File</label>
-                        <input type="file" id="inputFile" name="inputFile" 
-                            onchange="document.getElementById('inputFileName').value = this.value">
-                        <input type="hidden" id="inputFileName" name="inputFileName">
-                    </div>
-    
-                    <div id="inputFields">
-                        <label class="field" for="outputFileSATL">Output File Name</label>
-                        <input type="text" id="outputFileSATL" name="outputFile" >
-                    </div>
-                </div>
-                <div class="form-hidden" id="sat-c">
-                    <div id="inputFields">
-                        <label class="field" for="appID">App ID</label>
-                        <input type="text" id="appID" name="appID" >
-                    </div>
-                    <div id="inputFields">
-                        <label class="field" for="branchName">Branch Name</label>
-                        <input type="text" id="appID" name="branchName" >
-                    </div>
-    
-                    <div id="inputFields">
-                        <label class="field" for="outputFileSATC">Output File Name</label>
-                        <input type="text" id="outputFileSATC" name="outputFile" >
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="form-row">
-                <div class="form-block">
-                    <div id="qualityAssessment">
-                        <input type="checkbox" id="qualityAssessmentCheck" name="qualityAssessmentCheck">
-                        <label for="qualityAssessmentCheck">Quality Assessment</label>
+                    <div class="form-block">
+                        <label class="field" for="satType">Select SAT Program:</label>
                         <div>
-                            <label class="field" for="qualityModules">Exclude Modules:</label>
-                            <input type="text" id="qualityModules" name="qualityModules">
+                            <input type="radio" id="satL" name="satType" value="sat-l" required>
+                            <label for="satL">Use local mpr</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="satC" name="satType" value="sat-c" required>
+                            <label for="satC">Use working copy</label>
+                        </div>
+                    </div>
+
+                    <div class="form-hidden" id="sat-l">
+                        <div id="inputFields">
+                            <label class="field" for="inputFile">Input File</label>
+                            <input type="file" id="inputFile" name="inputFile">
+                        </div>
+
+                        <div id="inputFields">
+                            <label class="field" for="outputFileSATL">Output File Name</label>
+                            <input type="text" id="outputFileSATL" name="outputFileSATL">
+                        </div>
+                    </div>
+                    <div class="form-hidden" id="sat-c">
+                        <div id="inputFields">
+                            <label class="field" for="appID">App ID</label>
+                            <input type="text" id="appID" name="appID">
+                        </div>
+                        <div id="inputFields">
+                            <label class="field" for="branchName">Branch Name</label>
+                            <input type="text" id="branchName" name="branchName">
+                        </div>
+
+                        <div id="inputFields">
+                            <label class="field" for="outputFileSATC">Output File Name</label>
+                            <input type="text" id="outputFileSATC" name="outputFileSATC">
                         </div>
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-block">
+                        <div id="qualityAssessment">
+                            <input type="checkbox" id="qualityAssessmentCheck" name="qualityAssessmentCheck">
+                            <label for="qualityAssessmentCheck">Quality Assessment</label>
+                            <div>
+                                <label class="field" for="qualityModules">Exclude Modules:</label>
+                                <input type="text" id="qualityModules" name="qualityModules">
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="form-block">
-                    <div id="Authorisation Matrix">
-                        <input type="checkbox" id="authorisationMatrix" name="authorisationMatrix">
-                        <label for="authorisationMatrix">Authorisation Matrix</label>
-                        <div>
-                            <label class="field" for="authorisationModules">Exclude Modules:</label>
-                            <input type="text" id="authorisationModules" name="authorisationModules">
+                    <div class="form-block">
+                        <div id="Authorisation Matrix">
+                            <input type="checkbox" id="authorisationMatrix" name="authorisationMatrix">
+                            <label for="authorisationMatrix">Authorisation Matrix</label>
+                            <div>
+                                <label class="field" for="authorisationModules">Exclude Modules:</label>
+                                <input type="text" id="authorisationModules" name="authorisationModules">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <div id="Sequence Diagram">
+                            <input type="checkbox" id="sequenceDiagram" name="sequenceDiagram">
+                            <label for="sequenceDiagram">Sequence Diagram</label>
+                            <div>
+                                <label class="field" for="sdMicroflow">Microflow Name:</label>
+                                <input type="text" id="sdMicroflow" name="sdMicroflow">
+                            </div>
+                            <div>
+                                <label class="field" for="sdModules">Exclude Modules:</label>
+                                <input type="text" id="sdModules" name="sdModules">
+                            </div>
+                            <div>
+                                <label class="field" for="sdPrefixes">Aggregate Prefixes:</label>
+                                <input type="text" id="sdPrefixes" name="sdPrefixes">
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="form-block">
-                    <div id="Sequence Diagram">
-                        <input type="checkbox" id="sequenceDiagram" name="sequenceDiagram">
-                        <label for="sequenceDiagram">Sequence Diagram</label>
-                        <div>
-                            <label class="field" for="sdMicroflow">Microflow Name:</label>
-                            <input type="text" id="sdMicroflow" name="sdMicroflow">
-                        </div>
-                        <div>
-                            <label class="field" for="sdModules">Exclude Modules:</label>
-                            <input type="text" id="sdModules" name="sdModules">
-                        </div>
-                        <div>
-                            <label class="field" for="sdPrefixes">Aggregate Prefixes:</label>
-                            <input type="text" id="sdPrefixes" name="sdPrefixes">
-                        </div>
-                    </div>
-                </div>
-                </div>  
                 <button type="submit">Execute</button>
             </form>
         </div>
 
-        <div id="resultContainer"></div>
+        <div class="container-block" id="resultContainer"></div>
     </div>
     <script src="/js/scripts.js"></script>
 </body>
