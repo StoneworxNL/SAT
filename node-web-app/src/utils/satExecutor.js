@@ -1,13 +1,15 @@
 const { execSync } = require('child_process');
+const config = require('config');
+const workingDir = config.get('workingDir');
 
 function executeSat(program, inputFile, outputFile) {
     let extractCommand;
     let satQOutput = outputFile+'-SATQ';
-    let analyseCommand = `node SAT-Q.js -i ${outputFile}_SATL.json -o ${satQOutput}`;
+    let analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}`;
     if (program.toUpperCase() === 'SAT-L') {
-        console.log(`Executing SAT-L with input file ${inputFile} and output file ${outputFile}`);   
+        console.log(`Executing ${workingDir}/SAT-L with input file ${inputFile} and output file ${outputFile}`);   
         
-        extractCommand = `node SAT-L.js -m ${inputFile} -o ${outputFile}`;
+        extractCommand = `node "${workingDir}/SAT-L.js" -m ${inputFile} -o ${outputFile}`;
     } else if (program.toUpperCase() === 'SAT-C') {
         extractCommand = `sat-c-executable ${inputFile} > ${outputFile}`;
     } else {

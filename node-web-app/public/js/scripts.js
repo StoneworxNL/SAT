@@ -1,14 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('satForm');
     const resultContainer = document.getElementById('resultContainer');
+    const satTypeRadios = document.querySelectorAll('input[name="satType"]');
+    const conditionalDiv = document.querySelectorAll('.form-hidden');
+
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
 
         const formData = new FormData(form);
         const selectedSat = formData.get('satType');
-        const inputFile = formData.get('inputFile');
+        
+        const inputFile = formData.get('inputFileName');
         const outputFile = formData.get('outputFile');
+        console.log(selectedSat);
         resultContainer.innerHTML = '<p>Executing SAT program...</p>';
         fetch(`/execute`, {
             method: 'POST',
@@ -34,5 +39,18 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => {
                 resultContainer.innerHTML = `<p>Error: ${error.message}</p>`;
             });
+    });
+
+    satTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            conditionalDiv.forEach(div =>{
+                if (this.value === div.id) {
+                    div.className =  "form-block";
+                } else {
+                    div.className = 'form-hidden';
+                }
+
+            })
+        });
     });
 });
