@@ -12,13 +12,12 @@ function setRoutes(app) {
     });
 
     router.post('/execute', upload.single('inputFile'), (req, res) => {
-        const { satType, outputFileSATL, outputFileSATC, appID, brancheName } = req.body;
-        const inputFile = req.file;
+        const { satType, outputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes } = req.body;
+        const inputFile = req.file.path;
 
-        console.log(`Executing ${satType} with inputs:`, inputFile.path);
-        const outputFile = satType.toUpperCase() === 'SAT-L' ? outputFileSATL : outputFileSATC;
+        console.log(`Executing ${satType}`);
 
-        satController.executeSatProgram(satType, inputFile.path, outputFile)
+        satController.executeSatProgram(satType, inputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile)
             .then(result =>  {
                 res.json(result);
             })           

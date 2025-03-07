@@ -5,7 +5,7 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const SatController = require('./controllers/satController');
 const setRoutes = require('./routes/index');
-const config = require('config');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;

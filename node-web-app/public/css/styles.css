@@ -73,6 +73,7 @@ h1 {
     justify-content: flex-start;    
     width: 450px;
     padding: 5px;
+    padding-bottom: 10px;
     margin-top: 10px;
     margin-right: 20px;
     background-color: rgba(220, 220, 220, 0.95);
@@ -81,6 +82,11 @@ h1 {
 
 label.field {
     display: block;
+    margin-top: 10px;
+    min-width: 300px;
+}
+
+label.checkbox {
     margin-top: 10px;
     min-width: 300px;
 }

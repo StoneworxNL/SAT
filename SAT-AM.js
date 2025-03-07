@@ -35,7 +35,7 @@ function main() {
     let modelJSON = JSON.parse(fs.readFileSync(folder+'/'+inFile, 'utf8'));
     let model = MxModel.builder(modelJSON);
     let dateTimeString = getDateTimeString();
-    let reportFileName = `${folder}/${outFile}_${dateTimeString}`;
+    let reportFileName = `${folder}/${outFile}_${dateTimeString}.csv`;
     
     let report='module;fromAppstore;entity;persistent;attribute;type;app role;module role;rights;defaults;create;delete;xpath\n';
     model.entities.forEach(entity=>{

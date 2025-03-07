@@ -68,11 +68,13 @@ class Page extends MxModelObject {
         if (typeof widget != 'number') {
             let widgetType = widget['$Type'] || widget['structureTypeName'];
             let css = Page.findKey(widget, 'appearance', 'style');
-            css = css.trim().replace(/\s+/g, ' ');
             if (css) {
-                //console.log(`page: ${this.name}; widget: ${widget.Name} - ${widgetType} contains css`);
-                this.containsCSS = true
-            };
+                css = css.trim().replace(/\s+/g, ' ');
+                if (css) {
+                    //console.log(`page: ${this.name}; widget: ${widget.Name} - ${widgetType} contains css`);
+                    this.containsCSS = true
+                };
+            }
             switch (widgetType) {
                 case 'Forms$ActionButton':
                 case 'Pages$ActionButton':

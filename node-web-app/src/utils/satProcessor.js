@@ -3,6 +3,7 @@ const { execSync } = require('child_process');
 
 function processResult(outputFile) {
     const resultFilePath = `./public/results/${outputFile}`;
+    console.log(`SAT PROCESSOR IS TRIGGERED, Processing result file: ${resultFilePath}`);
     
     try {
         const resultData = fs.readFileSync(resultFilePath, 'utf8');

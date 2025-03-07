@@ -34,11 +34,6 @@
                             <label class="field" for="inputFile">Input File</label>
                             <input type="file" id="inputFile" name="inputFile">
                         </div>
-
-                        <div id="inputFields">
-                            <label class="field" for="outputFileSATL">Output File Name</label>
-                            <input type="text" id="outputFileSATL" name="outputFileSATL">
-                        </div>
                     </div>
                     <div class="form-hidden" id="sat-c">
                         <div id="inputFields">
@@ -48,48 +43,45 @@
                         <div id="inputFields">
                             <label class="field" for="branchName">Branch Name</label>
                             <input type="text" id="branchName" name="branchName">
-                        </div>
-
+                        </div>                    
                         <div id="inputFields">
-                            <label class="field" for="outputFileSATC">Output File Name</label>
-                            <input type="text" id="outputFileSATC" name="outputFileSATC">
+                            <input type="checkbox" id="cleanWorkingCopy" name="cleanWorkingCopy" value="true">
+                            <label class="checkbox" for="cleanWorkingCopy">Clean working copy</label>
+                        </div>
+                    </div>
+                    <div class="form-block">
+                        <div id="inputFields">
+                            <label class="field" for="outputFile">Output File Name</label>
+                            <input type="text" id="outputFile" name="outputFile">
+                        </div>
+                        <div>
+                            <label class="field" for="excludeModules">Exclude Modules:</label>
+                            <input type="text" id="excludeModules" name="excludeModules">
                         </div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-block">
                         <div id="qualityAssessment">
-                            <input type="checkbox" id="qualityAssessmentCheck" name="qualityAssessmentCheck">
-                            <label for="qualityAssessmentCheck">Quality Assessment</label>
-                            <div>
-                                <label class="field" for="qualityModules">Exclude Modules:</label>
-                                <input type="text" id="qualityModules" name="qualityModules">
-                            </div>
+                            <input type="checkbox" id="qualityAssessment" name="qualityAssessment" value="true">
+                            <label for="qualityAssessment">Quality Assessment</label>                            
                         </div>
                     </div>
 
                     <div class="form-block">
                         <div id="Authorisation Matrix">
-                            <input type="checkbox" id="authorisationMatrix" name="authorisationMatrix">
+                            <input type="checkbox" id="authorisationMatrix" name="authorisationMatrix" value="true">
                             <label for="authorisationMatrix">Authorisation Matrix</label>
-                            <div>
-                                <label class="field" for="authorisationModules">Exclude Modules:</label>
-                                <input type="text" id="authorisationModules" name="authorisationModules">
-                            </div>
                         </div>
                     </div>
 
                     <div class="form-block">
                         <div id="Sequence Diagram">
-                            <input type="checkbox" id="sequenceDiagram" name="sequenceDiagram">
+                            <input type="checkbox" id="sequenceDiagram" name="sequenceDiagram" value="true">                            
                             <label for="sequenceDiagram">Sequence Diagram</label>
                             <div>
                                 <label class="field" for="sdMicroflow">Microflow Name:</label>
                                 <input type="text" id="sdMicroflow" name="sdMicroflow">
-                            </div>
-                            <div>
-                                <label class="field" for="sdModules">Exclude Modules:</label>
-                                <input type="text" id="sdModules" name="sdModules">
                             </div>
                             <div>
                                 <label class="field" for="sdPrefixes">Aggregate Prefixes:</label>
