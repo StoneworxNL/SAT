@@ -48,7 +48,7 @@ Brought to you by Stoneworx
 
   
 **Installation**
-* requirements: Node & npm
+* requirements: Node & npm node version: v20.19.0 (higher gives issues with sqlite module)
 * clone repo into working directory
 * npm install to install all modules
 * update default.json to liking
