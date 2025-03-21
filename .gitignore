@@ -13,6 +13,6 @@ bin/
 *.svg
 *.csv
 *.log
-*.json
 *_analysis.csv
+package-lock.json
 RESTO_analysis.old

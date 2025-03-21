@@ -1,0 +1,22 @@
+{
+  "name": "node-web-app",
+  "version": "1.0.0",
+  "description": "A web application to execute SAT-L or SAT-C programs and process results with SAT-Q.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "config": "^3.3.12",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
