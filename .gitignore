@@ -14,5 +14,7 @@ bin/
 *.csv
 *.log
 *_analysis.csv
-package-lock.json
+*.json
+!package.json
+!SX_logobeeld.png
 RESTO_analysis.old

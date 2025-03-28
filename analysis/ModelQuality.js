@@ -30,7 +30,7 @@ class Menu {
 class Page {
     constructor(moduleName, pageName, documentation) {
         this.module = moduleName,
-            this.documentation = documentation;
+        this.documentation = documentation;
         this.name = pageName;
         this.allowedRoles = [];
         this.buttons = [];
@@ -214,6 +214,11 @@ module.exports = class ModelQuality extends AnalysisModule {
                     let actionData = new ExpressionAction(action_type, actionId, false, complexity, caption);
                     microflowData.addAction(actionData);
                 } else if (action_type === 'Microflows$CreateObjectAction' || action_type === 'Microflows$ChangeObjectAction') {
+                    let assignments = json['action']['items'].flatMap((item) => { 
+                        let attributes = item['attribute'] && item['attribute'] !== '' ? [item['attribute']] : [];
+                        let associations = item['association'] && item['association'] !== '' ? item['association'] : [];
+                        return [...attributes, ...associations];
+                    });
                     json['action']['items'].forEach((item) => {
                         let count = this.checkExpressionComplexity(item['value']);
                         if (count > complexity) { complexity = count };
@@ -225,8 +230,8 @@ module.exports = class ModelQuality extends AnalysisModule {
                         action_type = 'Microflows$CreateChangeAction';
                     } else {
                         action_type = 'Microflows$ChangeAction';
-                    }
-                    let actionData = new ExpressionAction(action_type, actionId, commit, complexity);
+                    }                    
+                    let actionData = new ExpressionAction(action_type, actionId, commit, complexity, '', '', assignments);
                     actionData.variableName = json['action']['outputVariableName'] ? json['action']['outputVariableName'] : json['action']['changeVariableName'];
                     microflowData.addAction(actionData);
                 } else if (action_type=== 'Microflows$CommitAction'){

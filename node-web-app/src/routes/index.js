@@ -13,7 +13,7 @@ function setRoutes(app) {
 
     router.post('/execute', upload.single('inputFile'), (req, res) => {
         const { satType, outputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes } = req.body;
-        const inputFile = req.file.path;
+        const inputFile = req.file?.path;
 
         console.log(`Executing ${satType}`);
 
