@@ -177,6 +177,10 @@ Diff tool to compare 2 ouput files of SAT-Q
 ***Example***
 ```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
 
+***Run as Docker container***
+docker build -t sat:latest .
+
+
 
 ***Accept notifications***
   To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
