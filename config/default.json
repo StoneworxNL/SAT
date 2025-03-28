@@ -2,7 +2,7 @@
     "checksFolder": "../qualityChecks/",
     "outputFolder": "./output",
     "mxFolder": "C:/Program Files/Mendix/10.12.11.55218/modeler", 
-    "workingDir": "C:/Users/Mark Nauta/Documents/projects/SAT",
+    "workingDir": "/usr/src/app",
     "SquatChecksFolder": "../SAT-Q/",
     "includeAppstore": false,
     "checks": [
