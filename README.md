@@ -2,6 +2,7 @@ Tool for analysis and documentation of Mendix apps.
 Brought to you by Stoneworx
 
 **Implemented features**
+
 * Parse a local .mpr file or a working copy in the cloud
 * Generate Sequence Diagram from a (top) Microflow
 * Generate Authorisation Matrix from a project
@@ -48,6 +49,7 @@ Brought to you by Stoneworx
 
   
 **Installation**
+
 * requirements: Node & npm node version: v20.19.0 (higher gives issues with sqlite module)
 * clone repo into working directory
 * npm install to install all modules
@@ -56,8 +58,11 @@ Brought to you by Stoneworx
 ** outputFolder: should point to folder where reports are written. Make sure that it exists
 
 **SAT-C**
+
 Extract model information from a workingcopy in the mendix cloud.
+
 ***Usage***
+
 ```node SAT-C.js  [OPTIONS]...```
 
  ptions:
@@ -75,11 +80,15 @@ Extract model information from a workingcopy in the mendix cloud.
 
 
 ***Example***
+
 ```node SAT-C.js -a [APPID] -b [BRANCH] -o [RESULTFILE]```
 
 **SAT-L**
+
 Extract model information from a local .mpr file.
+
 ***Usage***
+
 ```node SAT-L.js  [OPTIONS]...```
 
 Options:
@@ -92,12 +101,15 @@ Options:
   -h, --help                     display help for command
 
 ***Example***
+
 ```node SAT-L.js -m [MPR FILE] -o [RESULTFILE]```
 
 **SAT-AM**
+
 Create Authorisation Matrix based on model information
 
 ***Usage***
+
 ```node SAT-AM.js  [OPTIONS]...```
 
  Options:
@@ -110,12 +122,15 @@ Create Authorisation Matrix based on model information
   -h, --help                     display help for command
 
 ***Example***
+
 ```node SAT-AM.js -i [INPUT] -o [OUTPUT]```
 
 **SAT-SD**
+
 Generate Sequence Diagram (PlantUML format) for a microflow
 
 ***Usage***
+
 ```node SAT-SD.js  [OPTIONS]...```
 
  Options:
@@ -134,13 +149,16 @@ Generate Sequence Diagram (PlantUML format) for a microflow
   -h, --help                     display help for command
 
 ***Example***
+
 ```node SAT-SD.js -i [INPUT] -o [OUTPUT] -m [module.microflow] -e SSO -p VAL```
 
 
 **SAT-Q**
+
 Applies coding quality rules to model information
 
 ***Usage***
+
 ```node SAT-Q.js  [OPTIONS]...```
 
  Options:
@@ -155,12 +173,15 @@ Applies coding quality rules to model information
   -h, --help                     display help for command
 
 ***Example***
+
 ```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
 
 **SAT-D**
+
 Diff tool to compare 2 ouput files of SAT-Q
 
 ***Usage***
+
 ```node SAT-D.js  [OPTIONS]...```
 
  Options:
@@ -175,14 +196,23 @@ Diff tool to compare 2 ouput files of SAT-Q
   -h, --help                     display help for command
 
 ***Example***
+
 ```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
 
 ***Run as Docker container***
+
 docker build -t sat:latest .
+
+docker run --volume=[local config path]:/usr/src/app/config --volume=[local output path]:/usr/src/app/output --workdir=/usr/src/app/ -p 3000:3000 
+
+Goto config/default.json and set:
+"workingDir": "/usr/src/app"
+Restart container and goto: http://localhost:3000
 
 
 
 ***Accept notifications***
+
   To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
   @SAT-[CODE]: explanation. Where [CODE] is the finding code (like NC1)
 
@@ -190,9 +220,9 @@ docker build -t sat:latest .
 
 
 
-  **Diff tool**
-  To compare two results with each other, use node diff.js -1 [FIRST FILE] -2 [SECOND FILE] -o [OUTPUT FILE]
+**Diff tool**
 
+To compare two results with each other, use node diff.js -1 [FIRST FILE] -2 [SECOND FILE] -o [OUTPUT FILE]
   
 
   
