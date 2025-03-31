@@ -54,7 +54,7 @@ Brought to you by Stoneworx
 
 Easiest installation is via Docker.
 * Prerequisite is a working Docker install ofc. 
-* just download the install_docker.cmd in a folder of choice is enough (no need to clone the project)
+* just download the [install_docker.cmd](./install_docker.cmd) in a folder of choice is enough (no need to clone the project)
 * Run the command file install_docker.cmd will do the work (only first time)
 * After installing the command: docker start SAT will do, or just start it from Docker Desktop
 * Open: http://localhost:3000 in your browser
@@ -216,8 +216,6 @@ Diff tool to compare 2 ouput files of SAT-Q
 
   To accept findings just add an annotation to the document (Page/documentation, Domain/documentation or Microflow/Annotation). It should follow this structure:
   @SAT-[CODE]: explanation. Where [CODE] is the finding code (like NC1)
-
-
 
 
 

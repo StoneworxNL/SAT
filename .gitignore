@@ -16,5 +16,6 @@ bin/
 *_analysis.csv
 *.json
 !package.json
+!install_docker.cmd
 !SX_logobeeld.png
 RESTO_analysis.old
