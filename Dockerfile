@@ -10,6 +10,7 @@ RUN git clone https://github.com/StoneworxNL/SAT.git .
 #don't know why but this is needed to get the latest version of the repo
 RUN git pull
 
+RUN mv ./config/docker.json ./default.json
 # Install dependencies for the main project
 RUN npm install
 

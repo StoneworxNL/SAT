@@ -1,6 +1,9 @@
 if not exist "output" (
     mkdir output
 )
+if not exist "config" (
+    mkdir config
+)
 docker login
 
 docker build -t sat:latest .
