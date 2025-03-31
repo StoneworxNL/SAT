@@ -50,6 +50,18 @@ Brought to you by Stoneworx
   
 **Installation**
 
+***Run as Docker container***
+
+Easiest installation is via Docker.
+* Prerequisite is a working Docker install ofc. 
+* just download the install_docker.cmd in a folder of choice is enough (no need to clone the project)
+* Run the command file install_docker.cmd will do the work (only first time)
+* After installing the command: docker start SAT will do, or just start it from Docker Desktop
+* Open: http://localhost:3000 in your browser
+
+
+***Run as nodejs project***
+
 * requirements: Node & npm node version: v20.19.0 (higher gives issues with sqlite module)
 * clone repo into working directory
 * npm install to install all modules
@@ -198,19 +210,6 @@ Diff tool to compare 2 ouput files of SAT-Q
 ***Example***
 
 ```node SAT-Q.js -i [INPUT] -o [OUTPUT]```
-
-***Run as Docker container***
-
-Prerequisite is a working Docker install ofc. 
-
-Run the command file install_docker.cmd will do the work (only first time)
-
-After installing the command: docker start SAT will do, or just start it from Docker Desktop
-
-Goto config/default.json and set:
-"workingDir": "/usr/src/app"
-Restart container and goto: http://localhost:3000
-
 
 
 ***Accept notifications***
