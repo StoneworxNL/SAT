@@ -10,7 +10,6 @@ RUN git clone https://github.com/StoneworxNL/SAT.git .
 #don't know why but this is needed to get the latest version of the repo
 RUN git pull
 
-RUN mv ./config/docker.json ./default.json
 # Install dependencies for the main project
 RUN npm install
 
@@ -19,6 +18,7 @@ WORKDIR /usr/src/app/node-web-app
 RUN npm install
 
 WORKDIR /usr/src/app/
+COPY  ./config/docker.json ./config/default.json
 
 # Expose the port the app runs on (adjust if necessary)
 EXPOSE 3000

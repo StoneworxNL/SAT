@@ -1,0 +1,196 @@
+{
+    "checksFolder": "../qualityChecks/",
+    "outputFolder": "./output",
+    "mxFolder": "[mendixfolder]/Mendix/10.12.11.55218/modeler", 
+    "workingDir": "/usr/src/app",
+    "SquatChecksFolder": "../SAT-Q/",
+    "includeAppstore": false,
+    "checks": [
+        {
+            "fnc": "NamingConvention",
+            "options": {
+                "allowedPrefixes": [
+                    "ACO",
+                    "ACT",
+                    "ADE",
+                    "ASU",
+                    "BCO",
+                    "BSD",
+                    "CAL",
+                    "CRS",
+                    "CTL",
+                    "CWS",
+                    "CWS",
+                    "DS",
+                    "FNC",
+                    "HCH",
+                    "OCH",
+                    "OEN",
+                    "OLE",
+                    "OPR",
+                    "PRS",
+                    "PWS",
+                    "QUE",
+                    "QUEUE",
+                    "RET",
+                    "RULE",
+                    "SCE",
+                    "SCH",
+                    "SUB",
+                    "TRN",
+                    "VAL",
+                    "WFA",
+                    "WFC",
+                    "WFS"
+                ],
+                "exceptionPrefixes": [
+                    "ASU",
+                    "BSD",
+                    "CRS",
+                    "CWS",
+                    "HCH",
+                    "VAL",
+                    "WFA"
+                ]
+            }
+        },
+        {
+            "fnc": "ErrorHandling",
+            "options": {
+                "allowedJava": [
+                    "CommunityCommons.EndTransaction",
+                    "CommunityCommons.getGUID",
+                    "OIDC.DecodeJWTPlainText"
+                ]
+            }
+        },
+        {
+            "fnc": "TooComplexMicroflow",
+            "options": {
+                "maxActions": 25,
+                "maxComplexity": 30,
+                "prefixExceptions": [
+                    "VAL"
+                ],
+                "exceptionsMaxActions": 50,
+                "exceptionsMaxComplexity": 100,
+                "cxLoopCount": 4,
+                "cxExclusiveSplit": 5,
+                "cxObjectAction": 2,
+                "cxVariableAction": 1,
+                "cxMaxObjectExpression": 3,
+                "cxMaxVariableExpression": 5
+            }
+        },
+        {
+            "fnc": "IllegalCommit",
+            "options": {
+                "allowedTopLevelPrefixes": [
+                    "ACT",
+                    "QUE",
+                    "QUEUE",
+                    "ACO",
+                    "SCH"
+                ],
+                "allowedSubLevelPrefixes": [
+                    "SUB"
+                ]
+            }
+        },
+        {
+            "fnc": "IllegalShowPage",
+            "options": {
+                "allowedPrefixes": [
+                    "ACT"
+                ]
+            }
+        },
+        {
+            "fnc": "SplitMergeCheck",        
+        },
+        {
+            "fnc": "MissingPermissions",
+            "options": {
+                "permissionPrefixes": [
+                    "ACT",
+                    "OCH",
+                    "OEN",
+                    "OLE",
+                    "DS"
+                ]
+            }
+        },
+        {
+            "fnc": "DemoUsers"            
+        },
+        {
+            "fnc": "NestingTooDeep",
+            "options": {
+                "mxNesting": 5
+            }
+        },
+        {
+            "fnc": "DomainModel"
+        },
+        {
+            "fnc": "MenuStructure"
+        },
+        {
+            "fnc": "TopLevelFlows",
+            "options": {
+                "TopLevelPrefixes": [
+                    "ACO",
+                    "BCO",
+                    "BCR",
+                    "ACR",
+                    "BDE",
+                    "ADE",
+                    "BRO",
+                    "ARO",
+                    "ACT",
+                    "DS",
+                    "OEN",
+                    "OLE",
+                    "OCH"
+                ]
+            }
+        },
+        {
+            "fnc": "PageCommit"
+        },
+        {
+            "fnc": "IllegalObjectActions",
+            "options": {
+                "PrefixesNotAllowed": [
+                    "DS",
+                    "VAL"
+                ]
+            }
+        },
+        {
+            "fnc": "GetOrCreateCheck",
+            "options": {
+                "allowedPrefixes": [
+                    "SUB"
+                ]
+            }
+        },
+        {
+            "fnc": "RestCall",
+            "options": {
+                "allowedPrefixes": [
+                    "CRS"
+                ]
+            }
+        },
+        {
+            "fnc": "TodoCheckDomainModel"
+        },
+        {
+            "fnc": "TodoCheckMicroflow"
+        },
+        {
+            "fnc": "DryMicroflow"
+        }
+    ]
+}
