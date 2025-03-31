@@ -54,7 +54,7 @@ Brought to you by Stoneworx
 
 Easiest installation is via Docker.
 * Prerequisite is a working Docker install ofc. 
-* just download the [install_docker.cmd](./install_docker.cmd) in a folder of choice is enough (no need to clone the project)
+* just download the [install_docker.cmd](./install_docker.cmd) and [Dockerfile](./Dockerfile) in a folder of choice is enough (no need to clone the project)
 * Run the command file install_docker.cmd will do the work (only first time)
 * After installing the command: docker start SAT will do, or just start it from Docker Desktop
 * Open: http://localhost:3000 in your browser
