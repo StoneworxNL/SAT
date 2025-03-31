@@ -201,9 +201,11 @@ Diff tool to compare 2 ouput files of SAT-Q
 
 ***Run as Docker container***
 
-docker build -t sat:latest .
+Prerequisite is a working Docker install ofc. 
 
-docker run --volume=[local config path]:/usr/src/app/config --volume=[local output path]:/usr/src/app/output --workdir=/usr/src/app/ -p 3000:3000 
+Run the command file install_docker.cmd will do the work (only first time)
+
+After installing the command: docker start SAT will do, or just start it from Docker Desktop
 
 Goto config/default.json and set:
 "workingDir": "/usr/src/app"
