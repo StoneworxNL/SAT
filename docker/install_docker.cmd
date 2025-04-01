@@ -6,6 +6,7 @@ if not exist "config" (
 )
 docker login
 
-docker build --build-arg CACHE_BUST=%CACHE_BUST% -t sat:latest .
+docker build --no-cache -t sat:latest .
 
-docker run --name SAT --volume=config:/usr/src/app/config --volume=output:/usr/src/app/output --workdir=/usr/src/app/ -p 3000:3000 sat:latest
+docker run --rm --name SAT -d -v "%cd%\config:/usr/src/app/config" -v "%cd%\output:/usr/src/app/output" -p 3000:3000 sat:latest
+copy default.json config\default.json
