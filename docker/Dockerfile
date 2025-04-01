@@ -18,7 +18,9 @@ WORKDIR /usr/src/app/node-web-app
 RUN npm install
 
 WORKDIR /usr/src/app/
-COPY  ./config/docker.json ./config/default.json
+# Ensure the source file exists or adjust the path
+RUN ls ./config/docker.json
+# COPY ./config/docker.json ./config/default.json
 
 # Expose the port the app runs on (adjust if necessary)
 EXPOSE 3000
