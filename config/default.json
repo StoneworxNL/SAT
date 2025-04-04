@@ -2,7 +2,7 @@
     "checksFolder": "../qualityChecks/",
     "outputFolder": "./output",
     "mxFolder": "[Path to Mendix/10.12.11.55218/modeler]", 
-    "workingDir": "[working dir]",
+    "workingDir": "C:/Users/Mark Nauta/Documents/projects/SAT",
     "SquatChecksFolder": "../SAT-Q/",
     "includeAppstore": false,
     "checks": [
@@ -106,7 +106,7 @@
             }
         },
         {
-            "fnc": "SplitMergeCheck",        
+            "fnc": "SplitMergeCheck"
         },
         {
             "fnc": "MissingPermissions",

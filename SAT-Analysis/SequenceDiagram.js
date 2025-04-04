@@ -39,10 +39,13 @@ module.exports = class AnalysisSequenceDiagram {
         })
         let sortedActions = microflow.sortActions();
         sortedActions.forEach(action => {
-            if (action.type === 'Microflows$CommitAction') {
-                this.participants['Çommit'] = isExcluded;
+            if (action.type === 'Microflows$CommitAction' ||
+                (action.type === 'Microflows$CreateChangeAction' && action.isCommit) ||
+                (action.type === 'Microflows$ChangeAction' && action.isCommit)
+            ) {
+                this.participants['Commit'] = isExcluded;
                 this.calls.push({ caller: microflowNm, callee: "Commit", parameter: action.variableName })
-            }
+            } 
         })
     }
 

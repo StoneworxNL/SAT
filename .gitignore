@@ -1,7 +1,5 @@
 node_modules/
 .vscode/
-DIJK*
-Upskill/
 output/
 uploads/
 bin/
@@ -17,6 +15,6 @@ bin/
 *.json
 !package.json
 !docker.json
+!local.json
 !install_docker.cmd
 !SX_logobeeld.png
-RESTO_analysis.old

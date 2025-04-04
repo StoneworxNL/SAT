@@ -1,8 +1,8 @@
 {
     "checksFolder": "../qualityChecks/",
     "outputFolder": "./output",
-    "mxFolder": "[mendixfolder]/Mendix/10.12.11.55218/modeler", 
-    "workingDir": "/usr/src/app",
+    "mxFolder": "[Path to Mendix/10.12.11.55218/modeler]", 
+    "workingDir": "[working dir]",
     "SquatChecksFolder": "../SAT-Q/",
     "includeAppstore": false,
     "checks": [
