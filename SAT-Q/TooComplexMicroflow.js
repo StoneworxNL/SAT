@@ -17,7 +17,8 @@ module.exports = class TooComplexMicroflow extends CheckModule {
         let allowedJava = this.options.allowedJava;
         let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
         this.setup(model, microflow);  
-        let mfActions = microflow.actions;
+        let mfActions = microflow.actions.filter(action => action.type !== 'Microflows$LogMessageAction'); // Logs are not counted in the complexity
+
         let exceptions = this.options.prefixExceptions;
         let isException = false;
         if (exceptions) {
@@ -51,6 +52,8 @@ module.exports = class TooComplexMicroflow extends CheckModule {
                 if (expressionCX > this.options.cxMaxVariableExpression) {
                     this.addErrors("CX4", ignoreRuleAnnotations, `Complexity score: ${expressionCX}`);
                 }
+            } else if (mfAction.type.startsWith('Microflows$LogMessageAction')) {
+                // do nothing, this adds no complexity
             } else {
                 complexity++
             }
