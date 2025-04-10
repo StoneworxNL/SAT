@@ -4,7 +4,7 @@ module.exports = class DryMicroflow extends CheckModule {
     constructor(options) {
         super(options);
         this.errorCodes = {
-            "DR1": "Create and Change actions with (a lot) same assignments"
+            "DR1": "Create and Change actions with (a lot) same assignments in this or submicroflows.",
         };
         this.originalMF = '';
     }
@@ -31,7 +31,6 @@ module.exports = class DryMicroflow extends CheckModule {
             if (!isSubMF) { // only check for top level microflows downwards
                 this.mfList.push(microflow);
                 this.digDeep(model, microflow);
-                //                    this.addErrors("ND1", ignoreRuleAnnotations, this.maxLevel);
             }
         }
         let createChangeActions = [];
@@ -39,12 +38,12 @@ module.exports = class DryMicroflow extends CheckModule {
         this.mfList.forEach((mf) => {
             mf.actions.forEach((action) => {
                 if (action.type === "Microflows$CreateChangeAction" || action.type === "Microflows$ChangeAction") {
-                    createChangeActions.push(action.variableName);
+                    createChangeActions = createChangeActions.concat(action.assignments);
                 }
             });
         });
         let duplicates = createChangeActions.filter((item, index) => createChangeActions.indexOf(item) !== index);
-        duplicates = [...new Set(duplicates)]; // Remove duplicate entries from the duplicates array
+        if (duplicates.length > 0) {this.addErrors("DR1", ignoreRuleAnnotations);}
         return this.errors;
     }
 
@@ -52,7 +51,7 @@ module.exports = class DryMicroflow extends CheckModule {
         if (microflow && microflow.subMicroflows) {
             let subs = microflow.subMicroflows;
             subs.forEach((subMF) => {
-                console.log(`NESTING: ${microflow} ==> ${subMF} `);
+                //console.log(`NESTING: ${microflow} ==> ${subMF} `);
                 let [moduleName, microflowName] = subMF.split('.');
                 let subMicroflow = model.findMicroflow(moduleName, microflowName);
                 if (this.mfList.some(mf => mf.containerID === subMicroflow.containerID && mf.name === subMicroflow.name)) {

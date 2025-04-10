@@ -117,6 +117,11 @@ class Microflow extends MxModelObject {
                             case 'Microflows$CreateAction':
                             case 'Microflows$ChangeAction':
                                 let commit = false;
+                                let assignments = action['Action']['Items'].flatMap((item) => { 
+                                    let attributes = item['Attribute'] && item['Attribute'] !== '' ? [item['Attribute']] : [];
+                                    let associations = item['Association'] && item['Association'] !== '' ? item['Association'] : [];
+                                    return [...attributes, ...associations];
+                                });
                                 action['Action']['Items'].forEach((item) => {
                                     if (item['$ID']) {
                                         let count = microflow.checkExpressionComplexity(item['Value']);
@@ -126,7 +131,7 @@ class Microflow extends MxModelObject {
                                 if (action['Action']['Commit'].includes('Yes')) {
                                     commit = true;
                                 }
-                                actionData = new ExpressionAction(activityType, actionID, commit, complexity);
+                                actionData = new ExpressionAction(activityType, actionID, commit, complexity, null, null, assignments);
                                 actionData.variableName = action['Action']['VariableName'] ? action['Action']['VariableName'] : action['Action']['ChangeVariableName'];
                                 microflow.addAction(actionData);
                                 break
