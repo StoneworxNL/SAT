@@ -43,7 +43,7 @@ module.exports = class DryMicroflow extends CheckModule {
             });
         });
         let duplicates = createChangeActions.filter((item, index) => createChangeActions.indexOf(item) !== index);
-        if (duplicates.length > 0) {this.addErrors("DR1", ignoreRuleAnnotations);}
+        if (duplicates.length > 0) { this.addErrors("DR1", ignoreRuleAnnotations); }
         return this.errors;
     }
 
@@ -54,14 +54,17 @@ module.exports = class DryMicroflow extends CheckModule {
                 //console.log(`NESTING: ${microflow} ==> ${subMF} `);
                 let [moduleName, microflowName] = subMF.split('.');
                 let subMicroflow = model.findMicroflow(moduleName, microflowName);
-                if (this.mfList.some(mf => mf.containerID === subMicroflow.containerID && mf.name === subMicroflow.name)) {
-                } else {
-                    this.mfList.push(subMicroflow);
-                    if (subMicroflow) {
+                if (subMicroflow) {
+                    if (this.mfList.some(
+                        mf => mf && subMicroflow && mf.containerID === subMicroflow.containerID && mf.name === subMicroflow.name)
+                    ) { // already in list
+                    } else {
+                        this.mfList.push(subMicroflow);
                         this.digDeep(model, subMicroflow);
                     }
+                }  else { return }
                 }
-            });
+            );
         }
     }
 

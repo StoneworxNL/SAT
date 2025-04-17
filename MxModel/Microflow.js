@@ -117,7 +117,7 @@ class Microflow extends MxModelObject {
                             case 'Microflows$CreateAction':
                             case 'Microflows$ChangeAction':
                                 let commit = false;
-                                let assignments = action['Action']['Items'].flatMap((item) => { 
+                                let assignments = action['Action']['Items'].flatMap((item) => {
                                     let attributes = item['Attribute'] && item['Attribute'] !== '' ? [item['Attribute']] : [];
                                     let associations = item['Association'] && item['Association'] !== '' ? item['Association'] : [];
                                     return [...attributes, ...associations];
@@ -131,7 +131,14 @@ class Microflow extends MxModelObject {
                                 if (action['Action']['Commit'].includes('Yes')) {
                                     commit = true;
                                 }
-                                actionData = new ExpressionAction(activityType, actionID, commit, complexity, null, null, assignments);
+                                let entity;
+                                if (activityType === 'Microflows$CreateChangeAction') {
+                                    entity = Microflow.findKey(action, 'Action', 'Entity');
+                                } else {
+                                    let a = Microflow.findKey(action, 'Action');
+                                    entity = microflow.extractEntityFromChangeAction(a);
+                                }
+                                actionData = new ExpressionAction(activityType, actionID, commit, complexity, null, null, assignments, entity);
                                 actionData.variableName = action['Action']['VariableName'] ? action['Action']['VariableName'] : action['Action']['ChangeVariableName'];
                                 microflow.addAction(actionData);
                                 break
@@ -177,7 +184,7 @@ class Microflow extends MxModelObject {
                     case 'Microflows$EndEvent':
                         let returnVariable;
                         let returnValue = Microflow.findKey(action, 'ReturnValue');
-                        if (returnValue) {returnVariable = returnValue.replace(/^\$/, "");}
+                        if (returnValue) { returnVariable = returnValue.replace(/^\$/, ""); }
                         actionData = new Action(actionType, actionID, returnVariable);
                         microflow.addAction(actionData);
                         break;
@@ -274,6 +281,26 @@ class Microflow extends MxModelObject {
 
     findFlows(id) {
         return this.flows.filter(flow => flow.origin === id);
+    }
+
+    extractEntityFromChangeAction(changeAction) {
+        if (changeAction) {
+            const items = Microflow.findKey(changeAction, 'Items');
+            for (const item of items) {
+                let attribute = Microflow.findKey(item, 'Attribute');
+                if (attribute) {
+                    const entity = attribute.split('.')[0] + '.' + attribute.split('.')[1];
+                    return entity;
+                } else {
+                    let association = Microflow.findKey(item, 'Association');
+                    if (association) {
+                        const entity = association.split('.')[0] + '.' + association.split('.')[1];
+                        return entity;
+                    } 
+                }
+            }
+        }
+        return null;
     }
 
 

@@ -226,12 +226,15 @@ module.exports = class ModelQuality extends AnalysisModule {
                     if (json['action']['commit'].includes('Yes')) {
                         commit = true;
                     }
+                    let entity;
                     if (action_type === 'Microflows$CreateObjectAction') {
                         action_type = 'Microflows$CreateChangeAction';
+                         entity = json['action']['entity'];                   
                     } else {
                         action_type = 'Microflows$ChangeAction';
-                    }                    
-                    let actionData = new ExpressionAction(action_type, actionId, commit, complexity, '', '', assignments);
+                        entity = microflowData.extractEntityFromChangeAction(json['action']);
+                    } 
+                    let actionData = new ExpressionAction(action_type, actionId, commit, complexity, '', '', assignments, entity);
                     actionData.variableName = json['action']['outputVariableName'] ? json['action']['outputVariableName'] : json['action']['changeVariableName'];
                     microflowData.addAction(actionData);
                 } else if (action_type=== 'Microflows$CommitAction'){
