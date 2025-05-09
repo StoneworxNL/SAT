@@ -12,8 +12,7 @@ class QualityReport {
         let reports = analysis.reportedErrors;
         let errorCodes = analysis.errorCodes;
         let folder = config.get("outputFolder");
-        this.reportFileName = `${folder}/${this.reportName}_${dateTimeString}.csv`;
-        console.log("Writing to " + this.reportFileName);
+        this.reportFileName = `${folder}/${this.reportName}_${dateTimeString}.csv`;        
         fs.writeFileSync(this.reportFileName, 'Module;Microflow;Code;Description;Info\n');
         reports.forEach(item => {
             let theDocument = item.document;
@@ -45,6 +44,7 @@ class QualityReport {
                 }
             })
         })
+        console.log(`[outputfile:${this.reportFileName}]`);
     }
 
 

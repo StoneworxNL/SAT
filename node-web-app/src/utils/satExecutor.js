@@ -28,7 +28,10 @@ function executeSat(program, inputFile, appID, branchName, cleanWorkingCopy, qua
         execSync(extractCommand);
         if (qualityAssessment === 'true') {
             analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}-Q ${excludeModulesFlag}`;
-            execSync(analyseCommand);
+            let resultLog = execSync(analyseCommand);
+            const resultString = resultLog.toString();
+            const match = resultString.match(/\[outputfile:(.*?)\]/);
+            outputFile = match ? `<a href="${match[1]}" download>${match[1]}</a>` : outputFile;
         }
         if (authorisationMatrix === 'true') {
             analyseCommand = `node "${workingDir}/SAT-AM.js" -i ${outputFile}.json -o ${satQOutput}-AM ${excludeModulesFlag}`;

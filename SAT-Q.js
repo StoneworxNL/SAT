@@ -34,6 +34,5 @@ function main() {
     console.log("====================== ANALYSING =======================");
     analysis.analyse(model);
     console.log("====================== REPORTING =======================");
-    reporter.report(analysis);
-
+    reporter.report(analysis);    
 }

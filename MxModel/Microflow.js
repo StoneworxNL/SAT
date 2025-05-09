@@ -70,6 +70,7 @@ class Microflow extends MxModelObject {
     }
 
     static parseMFActions(doc, microflow, module, microflowName) {
+        console.log(microflow.name);        
         let objectCollection = Microflow.findKey(doc, 'ObjectCollection');
         let actions = Microflow.findKey(objectCollection, 'Objects');
         actions.forEach(action => {
@@ -98,6 +99,7 @@ class Microflow extends MxModelObject {
                                 microflow.addAction(actionData);
                                 let microflowCall = Microflow.findKey(actionActivity, 'MicroflowCall');
                                 let subMF = Microflow.findKey(microflowCall, 'Microflow');
+                                console.log(action['$ID'].toString('base64')+':  '+subMF);
                                 microflow.addSubMicroflow(subMF);
                                 break;
                             case 'Microflows$CreateVariableAction':
