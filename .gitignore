@@ -15,6 +15,6 @@ bin/
 *.json
 !package.json
 !docker.json
+!docker/*
 !local.json
-!install_docker.cmd
 !SX_logobeeld.png
