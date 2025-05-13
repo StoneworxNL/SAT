@@ -53,7 +53,7 @@ class Menu {
             if (typeof menuItem != 'number') {
                 let caption = Menus.findKey(menuItem, 'Caption');
                 let captionText;
-                if (caption['Items']){
+                if (caption['Items'] && caption['Items'].length > 1) {
                     captionText = caption['Items'][1]['Text'];
                 } else {
                     captionText = caption['translations'][0]['text'];
