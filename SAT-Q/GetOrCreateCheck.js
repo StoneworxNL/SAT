@@ -22,7 +22,7 @@ module.exports = class IllegalCommit extends CheckModule {
             let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
             let mfPrefix = this.mfPrefix;
             if (mfNameParts.length < 3) {
-                this.addErrors(errors, "GC1", ignoreRuleAnnotations);   // not according to naming conventions SUB_[Entity]_GetorCreate... 3 parts or more
+                this.addErrors("GC1", ignoreRuleAnnotations);   // not according to naming conventions SUB_[Entity]_GetorCreate... 3 parts or more
             } else {
                 let pfFound = allowedPrefixes.find((prefix) => prefix == mfPrefix);
                 let GC1Found = false;
