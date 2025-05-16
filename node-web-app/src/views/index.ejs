@@ -29,13 +29,13 @@
                         </div>
                     </div>
 
-                    <div class="form-hidden" id="sat-l">
+                    <div class="form-hidden" group="satType" id="sat-l">
                         <div id="inputFields">
                             <label class="field" for="inputFile">Input File</label>
                             <input type="file" id="inputFile" name="inputFile">
                         </div>
                     </div>
-                    <div class="form-hidden" id="sat-c">
+                    <div class="form-hidden" group="satType" id="sat-c">
                         <div id="inputFields">
                             <label class="field" for="appID">App ID</label>
                             <input type="text" id="appID" name="appID">
@@ -43,7 +43,7 @@
                         <div id="inputFields">
                             <label class="field" for="branchName">Branch Name</label>
                             <input type="text" id="branchName" name="branchName">
-                        </div>                    
+                        </div>
                         <div id="inputFields">
                             <input type="checkbox" id="cleanWorkingCopy" name="cleanWorkingCopy" value="true">
                             <label class="checkbox" for="cleanWorkingCopy">Clean working copy</label>
@@ -64,7 +64,15 @@
                     <div class="form-block">
                         <div id="qualityAssessment">
                             <input type="checkbox" id="qualityAssessment" name="qualityAssessment" value="true">
-                            <label for="qualityAssessment">Quality Assessment</label>                            
+                            <label for="qualityAssessment">Quality Assessment</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="doDiff" value="doDiff">
+                            <label for="doDiff">Execute diff with previous version</label>
+                        </div>
+                        <div id="doDiff" group="doDiff" class="form-hidden">
+                            <label class="field" for="diffFile">Input File for Diff</label>
+                            <input type="file" id="diffFile" name="diffFile">
                         </div>
                     </div>
 
@@ -77,7 +85,7 @@
 
                     <div class="form-block">
                         <div id="Sequence Diagram">
-                            <input type="checkbox" id="sequenceDiagram" name="sequenceDiagram" value="true">                            
+                            <input type="checkbox" id="sequenceDiagram" name="sequenceDiagram" value="true">
                             <label for="sequenceDiagram">Sequence Diagram</label>
                             <div>
                                 <label class="field" for="sdMicroflow">Microflow Name:</label>

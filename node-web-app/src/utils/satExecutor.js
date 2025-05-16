@@ -1,9 +1,10 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const config = require('config');
+const { log } = require('console');
 const workingDir = config.get('workingDir');
 
-function executeSat(program, inputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
+function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
     let extractCommand;
     let satQOutput = outputFile;
     let analyseCommand;
@@ -29,9 +30,18 @@ function executeSat(program, inputFile, appID, branchName, cleanWorkingCopy, qua
         if (qualityAssessment === 'true') {
             analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}-Q ${excludeModulesFlag}`;
             let resultLog = execSync(analyseCommand);
-            const resultString = resultLog.toString();
-            const match = resultString.match(/\[outputfile:(.*?)\]/);
-            outputFile = match ? `<a href="${match[1]}" download>${match[1]}</a>` : outputFile;
+            let resultString = resultLog.toString();
+            let match = resultString.match(/\[outputfile:(.*?)\]/);
+            outputFile = match ? match[1] : outputFile;
+            outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
+            if (doDiff) {
+                const diffCommand = `node "${workingDir}/SAT-D.js" -1 ${outputFile} -2 ${diffFile} -o ${satQOutput}-D.txt `;
+                resultLog = execSync(diffCommand);  
+                resultString = resultLog.toString();
+                let match = resultString.match(/\[outputfile:(.*?)\]/);
+                diffResultFile = match ? match[1] : outputFile;
+                outputLink = match ? `${outputLink}<br/><a href="${diffResultFile}" download="${diffResultFile}">${diffResultFile}</a>` : diffResultFile;
+            }
         }
         if (authorisationMatrix === 'true') {
             analyseCommand = `node "${workingDir}/SAT-AM.js" -i ${outputFile}.json -o ${satQOutput}-AM ${excludeModulesFlag}`;
@@ -43,7 +53,7 @@ function executeSat(program, inputFile, appID, branchName, cleanWorkingCopy, qua
         }
         console.log(`${program} executed successfully. Output saved to ${outputFile}`);
         if (inputFile) {fs.unlinkSync(inputFile)}
-        return {"success": true, "outputFile": outputFile};
+        return {"success": true, "outputFile": outputLink};
     } catch (error) {
         console.error(`Error executing ${program}:`, error.message);
         throw error;

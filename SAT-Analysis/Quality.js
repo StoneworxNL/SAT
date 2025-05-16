@@ -3,7 +3,7 @@ class Quality {
 
     constructor(model, excludes) {
         const checks = config.get("checks");
-        let checksFolder = config.get("SquatChecksFolder");
+        let checksFolder = config.get("SATQFolder");
         this.model = model;
         this.excludes = excludes;
         this.checkModules = [];

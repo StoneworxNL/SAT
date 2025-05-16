@@ -65,4 +65,5 @@ function diff(listASorted, listBSorted){
         }
     }
     console.log("done");
+    console.log(`[outputfile:${fileOut}]`);
 }

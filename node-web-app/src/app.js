@@ -18,9 +18,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 setRoutes(app);
-
-app.get('/', (req, res) => satController.renderHomePage(req, res));
-app.post('/execute', upload.single('inputFile'), (req, res) => satController.executeSat(req, res));
 app.get('/output/:file', (req, res) => {
     // Assuming files are stored in the &quot;files&quot; folder
     const filePath = path.join(__dirname, '../../output', req.params.file);

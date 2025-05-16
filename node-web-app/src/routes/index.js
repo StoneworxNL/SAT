@@ -11,17 +11,23 @@ function setRoutes(app) {
         res.render('index');
     });
 
-    router.post('/execute', upload.single('inputFile'), (req, res) => {
-        const { satType, outputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes } = req.body;
-        const inputFile = req.file?.path;
+    router.post('/execute', upload.fields([
+        { name: 'inputFile', maxCount: 1 }
+        , { name: 'diffFile', maxCount: 1 }
+    ]), (req, res) => {
+        const { satType, outputFile, appID, branchName, doDiff, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes } = req.body;
+
+        const inputFile = req.files.inputFile[0].path;
+        const diffFile = req.files.diffFile ? req.files.diffFile[0].path : null;
+
 
         console.log(`Executing ${satType}`);
 
-        satController.executeSatProgram(satType, inputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile)
-            .then(result =>  {
+        satController.executeSatProgram(satType, inputFile, appID, branchName, diffFile, doDiff, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile)
+            .then(result => {
                 res.json(result);
-            })           
-            .catch(err => { 
+            })
+            .catch(err => {
                 res.status(500).json({ error: err.message });
             });
     });

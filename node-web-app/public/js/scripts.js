@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const resultContainer = document.getElementById('resultContainer');
     const satTypeRadios = document.querySelectorAll('input[name="satType"]');
     const conditionalDiv = document.querySelectorAll('.form-hidden');
+    const doDiffCheckboxes = document.querySelectorAll('input[name="doDiff"]');
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log(data);
 
                 if (data.success) {
-                    resultContainer.innerHTML = `<p>Execution successful! Output file: ${data.outputFile}</p>`;
+                    resultContainer.innerHTML = `<p>Execution successful! Output file(s):<br/> ${data.outputFile}</p>`;
                 } else {
                     resultContainer.innerHTML = `<p>Error: ${data.error}</p>`;
                 }
@@ -32,10 +33,26 @@ document.addEventListener('DOMContentLoaded', function () {
     satTypeRadios.forEach(radio => {
         radio.addEventListener('change', function () {
             conditionalDiv.forEach(div => {
-                if (this.value === div.id) {
-                    div.className = "form-block";
-                } else {
-                    div.className = 'form-hidden';
+                if (this.name == div.getAttribute('group')) {
+                    if (this.value === div.id) {
+                        div.className = "form-block";
+                    } else {
+                        div.className = 'form-hidden';
+                    }
+                }
+            });
+        });
+    });
+
+    doDiffCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            conditionalDiv.forEach(div => {
+                if (this.name == div.getAttribute('group')) {
+                    if (this.value === div.id && this.checked) {
+                        div.className = "";
+                    } else {
+                        div.className = 'form-hidden';
+                    }
                 }
             });
         });

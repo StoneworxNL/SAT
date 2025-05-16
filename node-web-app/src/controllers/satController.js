@@ -13,10 +13,10 @@ class SatController {
     }
 
 
-    async executeSatProgram(program, inputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {
+    async executeSatProgram(program, inputFile, appID, branchName, diffFile, doDiff, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {
         const { executeSat } = require('../utils/satExecutor');
         console.log(`Executing ${program} with input file ${inputFile} and output file ${outputFile}`);
-        return await executeSat(program, inputFile, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile);
+        return await executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile);
     }
 
     async processResult(req, res) {
