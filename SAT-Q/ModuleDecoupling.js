@@ -14,8 +14,7 @@ module.exports = class ModuleDecoupling extends CheckModule {
         this.originalMF = microflow.name;
         let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations();
 
-        if (!this.module.fromAppStore) {
-            console.log(microflow.name);            
+        if (!this.module.fromAppStore) {              
             microflow.actions.forEach((action) => {
                 if (action.type === "Microflows$CreateChangeAction" || action.type === "Microflows$ChangeAction") {
                     let targetObject = action.entity;

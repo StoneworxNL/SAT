@@ -60,7 +60,7 @@ module.exports = class IllegalCommit extends CheckModule {
 
     checkPattern = function (microflow, ignoreRuleAnnotations) {
         const regex = /([\w]+)\s*!= empty\b/;
-
+        console.log(microflow.name);          
         let actions = microflow.actions;
         let illegalCommits = actions.find(action => {
             if (action.type === 'Microflows$CommitAction' || action.isCommit) {
