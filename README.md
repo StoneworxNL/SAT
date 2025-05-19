@@ -53,7 +53,8 @@ Brought to you by Stoneworx
 ***Run as Docker container***
 
 Easiest installation is via Docker.
-* Prerequisite is a working Docker install ofc. 
+* Prerequisite is a working Docker install ofc.
+* Launch Docker Desktop (this should log you on to Docker environment)
 * just download the files in the docker folder somewhere to your laptop
 * Run the command file install_docker.cmd will do the work (only first time)
 * After installing the command: docker start SAT will do, or just start it from Docker Desktop
