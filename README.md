@@ -56,6 +56,7 @@ Easiest installation is via Docker.
 * Prerequisite is a working Docker install ofc.
 * Launch Docker Desktop (this should log you on to Docker environment)
 * just download the files in the docker folder somewhere to your laptop
+** Rename Dockerfile.txt to Dockerfile after dwnl. It is named wrong for some silly reason
 * Run the command file install_docker.cmd will do the work (only first time)
 * After installing the command: docker start SAT will do, or just start it from Docker Desktop
 * Open: http://localhost:3000 in your browser
