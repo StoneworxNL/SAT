@@ -3,6 +3,7 @@ const fs = require('fs');
 const config = require('config');
 const { log } = require('console');
 const workingDir = config.get('workingDir');
+const outputFolder = config.get('outputFolder');
 
 function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
     let extractCommand;
@@ -26,14 +27,16 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
     }
 
     try {
+        let outputLink;
         execSync(extractCommand);
         if (qualityAssessment === 'true') {
             analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}-Q ${excludeModulesFlag}`;
             let resultLog = execSync(analyseCommand);
-            let resultString = resultLog.toString();
-            let match = resultString.match(/\[outputfile:(.*?)\]/);
-            outputFile = match ? match[1] : outputFile;
-            outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
+            // let resultString = resultLog.toString();
+            // let match = resultString.match(/\[outputfile:(.*?)\]/);
+            // outputFile = match ? match[1] : outputFile;
+            // outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
+            outputLink = parseCommandOutput(resultLog);
             if (doDiff) {
                 const diffCommand = `node "${workingDir}/SAT-D.js" -1 ${outputFile} -2 ${diffFile} -o ${satQOutput}-D.txt `;
                 resultLog = execSync(diffCommand);  
@@ -48,8 +51,10 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
             execSync(analyseCommand);
         }
         if (sequenceDiagram === 'true') {
+            let SDFile = `${satQOutput}-${sdMicroflow}.txt`;
             analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow} -p ${sdPrefixes}  ${excludeModulesFlag}`;
             execSync(analyseCommand);
+            outputLink =`<a href="${outputFolder}/${SDFile}" download="${SDFile}">${SDFile}</a>`
         }
         console.log(`${program} executed successfully. Output saved to ${outputFile}`);
         if (inputFile) {fs.unlinkSync(inputFile)}
@@ -57,6 +62,14 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
     } catch (error) {
         console.error(`Error executing ${program}:`, error.message);
         throw error;
+    }
+
+    function parseCommandOutput (resultLog){
+        let resultString = resultLog.toString();
+        let match = resultString.match(/\[outputfile:(.*?)\]/);
+        outputFile = match ? match[1] : outputFile;
+        outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
+        return outputLink;
     }
 }
 
