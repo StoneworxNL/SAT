@@ -56,7 +56,7 @@ Easiest installation is via Docker.
 * Prerequisite is a working Docker install ofc.
 * Launch Docker Desktop (this should log you on to Docker environment)
 * just download the files in the docker folder somewhere to your laptop
-** Rename Dockerfile.txt to Dockerfile after dwnl. It is named wrong for some silly reason
+  * Rename Dockerfile.txt to Dockerfile after dwnl. It is named wrong for some silly reason
 * Run the command file install_docker.cmd will do the work (only first time)
 * After installing the command: docker start SAT will do, or just start it from Docker Desktop
 * Open: http://localhost:3000 in your browser
@@ -68,8 +68,8 @@ Easiest installation is via Docker.
 * clone repo into working directory
 * npm install to install all modules
 * update default.json to liking
-** checksFolder: should point to folder that contains all checks that are specified in the 'checks' array 
-** outputFolder: should point to folder where reports are written. Make sure that it exists
+  * checksFolder: should point to folder that contains all checks that are specified in the 'checks' array 
+  * outputFolder: should point to folder where reports are written. Make sure that it exists
 
 **SAT-C**
 
