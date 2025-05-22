@@ -93,7 +93,7 @@ label.checkbox {
 
 input[type="text"],
 select {
-    min-width: 400px;
+    min-width: -webkit-fill-available;
     max-width: 25%;
     margin: 3px 0px;
     border: 1px solid #ccc;
