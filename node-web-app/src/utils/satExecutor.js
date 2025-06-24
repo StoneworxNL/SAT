@@ -32,10 +32,6 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
         if (assessmentType === 'Q') {
             analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}-Q ${excludeModulesFlag}`;
             let resultLog = execSync(analyseCommand);
-            // let resultString = resultLog.toString();
-            // let match = resultString.match(/\[outputfile:(.*?)\]/);
-            // outputFile = match ? match[1] : outputFile;
-            // outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
             outputLink = parseCommandOutput(resultLog);
             if (doDiff) {
                 const diffCommand = `node "${workingDir}/SAT-D.js" -1 ${outputFile} -2 ${diffFile} -o ${satQOutput}-D.txt `;
@@ -50,21 +46,10 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
             analyseCommand = `node "${workingDir}/SAT-AM.js" -i ${outputFile}.json -o ${satQOutput}-AM ${excludeModulesFlag}`;
             execSync(analyseCommand);
         }
-<<<<<<< HEAD
         if (assessmentType === 'SD') {
             analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow} -p ${sdPrefixes}  ${excludeModulesFlag}`;
             let resultLog = execSync(analyseCommand);
-            let resultString = resultLog.toString();
-            let match = resultString.match(/\[outputfile:(.*?)\]/);
-            outputFile = match ? match[1] : outputFile;
-            outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
-=======
-        if (sequenceDiagram === 'true') {
-            let SDFile = `${satQOutput}-${sdMicroflow}.txt`;
-            analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow} -p ${sdPrefixes}  ${excludeModulesFlag}`;
-            execSync(analyseCommand);
-            outputLink =`<a href="${outputFolder}/${SDFile}" download="${SDFile}">${SDFile}</a>`
->>>>>>> 6469a0c23ebbb75051001f0df252de32ff636fad
+            outputLink = parseCommandOutput(resultLog);
         }
         console.log(`${program} executed successfully. Output saved to ${outputFile}`);
         if (inputFile) {fs.unlinkSync(inputFile)}
