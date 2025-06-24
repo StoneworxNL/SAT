@@ -1,6 +1,6 @@
 const MxModelObject = require('./MxModelObject');
 const Flow = require('./Flow');
-const { Action, JavaAction, ExpressionAction } = require('./Action');
+const { Action, JavaAction, ExpressionAction, RetrieveAction } = require('./Action');
 
 class Microflow extends MxModelObject {
     constructor(containerID, microflowName, returnType, returnEntity) {
@@ -31,12 +31,12 @@ class Microflow extends MxModelObject {
     static parse(doc, container) {
         let containerID = container;
         let microflowName = Microflow.findKey(doc, 'Name');
-        let returnType = Microflow.findKey(doc, 'MicroflowReturnType');
-        let returnEntity = '';
-        if (returnType) {
-            returnType = returnType['$Type'];
+        let mfReturnType = Microflow.findKey(doc, 'MicroflowReturnType');
+        let returnType; let returnEntity = '';
+        if (mfReturnType) {
+            returnType = mfReturnType['$Type'];
             if (returnType === 'DataTypes$ObjectType' || returnType === 'DataTypes$ListType') {
-                returnEntity = Microflow.findKey(returnType, 'Entity');
+                returnEntity = Microflow.findKey(mfReturnType, 'Entity');
             }
         }
 
@@ -69,8 +69,7 @@ class Microflow extends MxModelObject {
         return microflow;
     }
 
-    static parseMFActions(doc, microflow, module, microflowName) {
-        console.log(microflow.name);        
+    static parseMFActions(doc, microflow, module, microflowName) {         
         let objectCollection = Microflow.findKey(doc, 'ObjectCollection');
         let actions = Microflow.findKey(objectCollection, 'Objects');
         actions.forEach(action => {
@@ -93,6 +92,7 @@ class Microflow extends MxModelObject {
                     case 'Microflows$ActionActivity':
                         let actionActivity = Microflow.findKey(action, 'Action');
                         let activityType = actionActivity['$Type'];
+                        let entity ;
                         switch (activityType) {
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
@@ -132,8 +132,7 @@ class Microflow extends MxModelObject {
                                 })
                                 if (action['Action']['Commit'].includes('Yes')) {
                                     commit = true;
-                                }
-                                let entity;
+                                }                                
                                 if (activityType === 'Microflows$CreateChangeAction') {
                                     entity = Microflow.findKey(action, 'Action', 'Entity');
                                 } else {
@@ -157,7 +156,8 @@ class Microflow extends MxModelObject {
                                 break;
                             case 'Microflows$RetrieveAction':
                                 let resultVariableName = Microflow.findKey(actionActivity, 'ResultVariableName');
-                                actionData = new Action(activityType, action['$ID'], resultVariableName);
+                                entity = Microflow.findKey(action, 'Action', 'RetrieveSource', 'Entity');
+                                actionData = new RetrieveAction(activityType, action['$ID'], resultVariableName, entity);
                                 microflow.addAction(actionData);
                                 break;
                             default:
@@ -256,12 +256,15 @@ class Microflow extends MxModelObject {
         let sortedActions = [];
         let startEvnt = this.findActionByType("Microflows$StartEvent");
         sortedActions.push(startEvnt);
-        this.parseFlows(startEvnt.id, sortedActions);
+        let flowIds = {};
+        this.parseFlows(startEvnt.id, sortedActions, flowIds);
         return sortedActions;
     }
 
-    parseFlows(id, sortedActions) {
+    parseFlows(id, sortedActions, flowIds ) {
+        
         let flows = this.findFlows(id);
+        flowIds[id] = true;
         if (flows.length > 1) {
             flows = flows.sort((flowA, flowB) => (flowB.flowValue === 'true') - (flowA.flowValue === 'true'));
         }
@@ -269,7 +272,9 @@ class Microflow extends MxModelObject {
             let action = this.findActionById(flow.destination);
             sortedActions.push(action);
             let id = flow.destination;
-            this.parseFlows(id, sortedActions);
+            if (!flowIds[id]) {
+                this.parseFlows(id, sortedActions, flowIds);
+            }
         })
     }
 

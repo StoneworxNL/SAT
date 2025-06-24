@@ -4,7 +4,7 @@ const config = require('config');
 const { log } = require('console');
 const workingDir = config.get('workingDir');
 
-function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
+function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
     let extractCommand;
     let satQOutput = outputFile;
     let analyseCommand;
@@ -27,7 +27,7 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
 
     try {
         execSync(extractCommand);
-        if (qualityAssessment === 'true') {
+        if (assessmentType === 'Q') {
             analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}-Q ${excludeModulesFlag}`;
             let resultLog = execSync(analyseCommand);
             let resultString = resultLog.toString();
@@ -43,13 +43,17 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
                 outputLink = match ? `${outputLink}<br/><a href="${diffResultFile}" download="${diffResultFile}">${diffResultFile}</a>` : diffResultFile;
             }
         }
-        if (authorisationMatrix === 'true') {
+        if (assessmentType === 'AM') {
             analyseCommand = `node "${workingDir}/SAT-AM.js" -i ${outputFile}.json -o ${satQOutput}-AM ${excludeModulesFlag}`;
             execSync(analyseCommand);
         }
-        if (sequenceDiagram === 'true') {
+        if (assessmentType === 'SD') {
             analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow} -p ${sdPrefixes}  ${excludeModulesFlag}`;
-            execSync(analyseCommand);
+            let resultLog = execSync(analyseCommand);
+            let resultString = resultLog.toString();
+            let match = resultString.match(/\[outputfile:(.*?)\]/);
+            outputFile = match ? match[1] : outputFile;
+            outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
         }
         console.log(`${program} executed successfully. Output saved to ${outputFile}`);
         if (inputFile) {fs.unlinkSync(inputFile)}

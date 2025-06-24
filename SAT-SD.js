@@ -38,5 +38,6 @@ function main() {
     
     console.log("====================== REPORTING =======================");
     analysis.report(outFile);
+    console.log(`[outputfile:${outFile}]`);
 
 }

@@ -15,7 +15,7 @@ function setRoutes(app) {
         { name: 'inputFile', maxCount: 1 }
         , { name: 'diffFile', maxCount: 1 }
     ]), (req, res) => {
-        const { satType, outputFile, appID, branchName, doDiff, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes } = req.body;
+        const { satType, outputFile, appID, branchName, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes } = req.body;
 
         const inputFile = req.files.inputFile[0].path;
         const diffFile = req.files.diffFile ? req.files.diffFile[0].path : null;
@@ -23,7 +23,7 @@ function setRoutes(app) {
 
         console.log(`Executing ${satType}`);
 
-        satController.executeSatProgram(satType, inputFile, appID, branchName, diffFile, doDiff, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile)
+        satController.executeSatProgram(satType, inputFile, appID, branchName, diffFile, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile)
             .then(result => {
                 res.json(result);
             })

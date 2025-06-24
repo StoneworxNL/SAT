@@ -19,7 +19,10 @@ module.exports = class AnalysisSequenceDiagram {
 
     parseMicroflow(microflowName) {
         let microflow = this.findMicroflowByName(microflowName);
-        if (!microflow) {console.log("Microflow not found: "+microflowName);}
+        if (!microflow) {
+            console.log("Microflow not found: "+microflowName);
+            throw new Error("Microflow not found: " + microflowName);
+        }
         
         let module = this.model.getModule(microflow.containerID);
         let qName = module.name + '.' + microflow.name;
