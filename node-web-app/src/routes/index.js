@@ -17,8 +17,8 @@ function setRoutes(app) {
     ]), (req, res) => {
         const { satType, outputFile, appID, branchName, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes } = req.body;
 
-        const inputFile = req.files.inputFile[0].path;
-        const diffFile = req.files.diffFile ? req.files.diffFile[0].path : null;
+        const inputFile = req.files?.inputFile ? req.files.inputFile[0].path: null;
+        const diffFile = req.files?.diffFile ? req.files.diffFile[0].path : null;
 
 
         console.log(`Executing ${satType}`);
