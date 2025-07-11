@@ -1,7 +1,6 @@
-const c = require("config");
-const { log } = require("console");
+const config = require("config");
 const fs = require("fs");
-
+const {generateSequenceDiagram} = require("./plantuml.js");
 
 module.exports = class AnalysisSequenceDiagram {
     constructor(model, excludes, prefixes, outFileName) {
@@ -20,16 +19,16 @@ module.exports = class AnalysisSequenceDiagram {
     parseMicroflow(microflowName) {
         let microflow = this.findMicroflowByName(microflowName);
         if (!microflow) {
-            console.log("Microflow not found: "+microflowName);
+            console.log("Microflow not found: " + microflowName);
             throw new Error("Microflow not found: " + microflowName);
         }
-        
+
         let module = this.model.getModule(microflow.containerID);
         let qName = module.name + '.' + microflow.name;
         let [moduleName, microflowNm, prefix] = this.getNameParts(qName);
         let [participantCaller, isExcluded] = this.getParticipant(moduleName, microflow.name, prefix);
         this.participants[participantCaller] = isExcluded;
-        microflow.subMicroflows.forEach(subMF => { 
+        microflow.subMicroflows.forEach(subMF => {
             let [moduleNameSUB, microflowSUB, prefixSUB] = this.getNameParts(subMF);
             let [participantCallee, isExcluded] = this.getParticipant(moduleNameSUB, microflowSUB, prefixSUB);
             this.participants[participantCallee] = isExcluded;
@@ -48,7 +47,7 @@ module.exports = class AnalysisSequenceDiagram {
             ) {
                 this.participants['Commit'] = isExcluded;
                 this.calls.push({ caller: microflowNm, callee: "Commit", parameter: action.variableName })
-            } 
+            }
         })
     }
 
@@ -94,32 +93,40 @@ module.exports = class AnalysisSequenceDiagram {
             if (err) throw err;
         });
         Object.keys(this.participants).forEach(participant => {
-            if (!this.participants[participant]){
+            if (!this.participants[participant]) {
                 fs.appendFileSync(outFileName, `participant "${participant}" as ${participant}\n`, function (err) {
                     if (err) throw err;
                 });
             }
-        })        
+        })
         Object.keys(this.participants).forEach(participant => {
-            if (this.participants[participant]){
+            if (this.participants[participant]) {
                 fs.appendFileSync(outFileName, `participant "${participant}" as ${participant}\n`, function (err) {
                     if (err) throw err;
                 });
             }
-        })        
+        })
         this.calls.forEach(call => {
-                let parm = '';
-                if (call.parameter) {
-                    parm = ": " + call.parameter;
-                }
-                fs.appendFileSync(outFileName, `${call.caller} --> "${call.callee}" ${parm}\n`, function (err) {
-                    if (err) throw err;
-                });
-            })
+            let parm = '';
+            if (call.parameter) {
+                parm = ": " + call.parameter;
+            }
+            fs.appendFileSync(outFileName, `${call.caller} --> "${call.callee}" ${parm}\n`, function (err) {
+                if (err) throw err;
+            });
+        })
         fs.appendFileSync(outFileName, `@enduml\n`, function (err) {
             if (err) throw err;
         });
+        let outputPath = config.get("outputFolder");
+        generateSequenceDiagram(outputPath, outFileName, "./plantuml-1.2025.4.jar")
+        .then((outputPath) => {
+            console.log(`Sequence Diagram generated: ${outputPath}`);
+        })
+        .catch((err) => {
+            console.error(`Error generating Sequence Diagram: ${err}`);
+        });        
     }
-
 }
+
 

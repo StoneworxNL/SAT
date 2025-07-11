@@ -38,6 +38,7 @@ function main() {
     
     console.log("====================== REPORTING =======================");
     analysis.report(outFile);
-    console.log(`[outputfile:${outFile}]`);
+    let pngFile = outFile.replace('.txt', '.png');
+    console.log(`[outputfile:${pngFile}]`);
 
 }

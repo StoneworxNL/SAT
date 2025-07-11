@@ -4,6 +4,14 @@ FROM node:20
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
+# Install Graphviz and Java JRE
+RUN apt-get update && \
+    apt-get install -y graphviz openjdk-24-jre && \
+    rm -rf /var/lib/apt/lists/*
+
+# Add Java to PATH
+ENV PATH="/usr/lib/jvm/java-24-openjdk-amd64/bin:${PATH}"    
+
 # Clone the repository
 RUN git clone https://github.com/StoneworxNL/SAT.git .
 
