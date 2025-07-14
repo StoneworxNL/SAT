@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 
+
 /**
  * Generates a sequence diagram PNG using PlantUML.
  * @param {string} plantUmlText - The PlantUML source text.
