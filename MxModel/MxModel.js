@@ -6,6 +6,7 @@ const Folder = require("./Folder");
 const { Menus, Menu } = require("./Menu");
 const Page = require("./Page");
 const Security = require("./Security");
+const Layout = require("./Layout");
 
 class MxModel {
     constructor() {
@@ -16,6 +17,7 @@ class MxModel {
         this.folders = {};
         this.menus = [];
         this.pages = [];
+        this.layouts = [];
     }
 
     static builder(obj) {
@@ -27,6 +29,7 @@ class MxModel {
         mxModel.folders = Folder.builder(obj.folders);
         mxModel.menus = Menus.builder(obj.menus);
         mxModel.pages = Page.builder(obj.pages);
+        mxModel.layouts = Layout.builder(obj.layouts);
         return mxModel
     }
 
@@ -39,11 +42,11 @@ class MxModel {
     };
 
     parseDomain(doc, container) {
-        this.entities.push(...Entity.parse(doc, container))
+        this.entities.push(...Entity.parse(doc, container));
     }
 
     parseMicroflow(doc, container) {
-        this.microflows.push(Microflow.parse(doc, container))
+        this.microflows.push(Microflow.parse(doc, container));
     }
 
     parseFolder(doc, container) {
@@ -52,7 +55,18 @@ class MxModel {
     }
 
     parsePage(doc, container) {
-        let page = Page.parse(doc, container);
+        let module = this.getModule(container);
+
+        let moduleName = module? module.name : '';
+
+        const pageName = doc['Name'];                   
+
+        if (pageName === 'AICHistory_Versions' || pageName === 'AICHistory_ViewDetails') {
+            
+            console.log('container for page ' + pageName + ' is: ' + container);
+
+        }
+        let page = Page.parse(doc, container, moduleName);
         this.pages.push(page);
     }
 
@@ -63,6 +77,11 @@ class MxModel {
     parseMenu(doc, container) {
         let menuItems = Menu.parse(doc, container);
         this.menus.push(...menuItems);
+    }
+
+    parseLayout(doc, container) {
+        let module = this.getModule(container);
+        this.layouts.push(Layout.parse(doc, container, module));
     }
 
     getModule(containerID) {
@@ -127,12 +146,17 @@ class MxModel {
             return a.name.localeCompare(b.name);
         });
 
+        let layoutsSorted = this.layouts.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        });
+
         this.modules = modulesSorted;
         this.entities =  entitiesSorted;
         this.microflows = microflowsSorted;
         this.folders = foldersSorted;
         this.menus = menusSorted;
         this.pages = pagesSorted;
+        this.layouts = layoutsSorted;
     }
 }
 
