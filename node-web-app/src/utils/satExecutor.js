@@ -5,7 +5,7 @@ const { log } = require('console');
 const workingDir = config.get('workingDir');
 const outputFolder = config.get('outputFolder');
 
-function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, qualityAssessment, authorisationMatrix, sequenceDiagram, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
+function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
     let extractCommand;
     let satQOutput = outputFile;
     let analyseCommand;
@@ -29,13 +29,9 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
     try {
         let outputLink;
         execSync(extractCommand);
-        if (qualityAssessment === 'true') {
+        if (assessmentType === 'Q') {
             analyseCommand = `node "${workingDir}/SAT-Q.js" -i ${outputFile}.json -o ${satQOutput}-Q ${excludeModulesFlag}`;
             let resultLog = execSync(analyseCommand);
-            // let resultString = resultLog.toString();
-            // let match = resultString.match(/\[outputfile:(.*?)\]/);
-            // outputFile = match ? match[1] : outputFile;
-            // outputLink = match ? `<a href="${outputFile}" download="${outputFile}">${outputFile}</a>` : outputFile;
             outputLink = parseCommandOutput(resultLog);
             if (doDiff) {
                 const diffCommand = `node "${workingDir}/SAT-D.js" -1 ${outputFile} -2 ${diffFile} -o ${satQOutput}-D.txt `;
@@ -46,15 +42,14 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
                 outputLink = match ? `${outputLink}<br/><a href="${diffResultFile}" download="${diffResultFile}">${diffResultFile}</a>` : diffResultFile;
             }
         }
-        if (authorisationMatrix === 'true') {
+        if (assessmentType === 'AM') {
             analyseCommand = `node "${workingDir}/SAT-AM.js" -i ${outputFile}.json -o ${satQOutput}-AM ${excludeModulesFlag}`;
             execSync(analyseCommand);
         }
-        if (sequenceDiagram === 'true') {
-            let SDFile = `${satQOutput}-${sdMicroflow}.txt`;
+        if (assessmentType === 'SD') {
             analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow} -p ${sdPrefixes}  ${excludeModulesFlag}`;
-            execSync(analyseCommand);
-            outputLink =`<a href="${outputFolder}/${SDFile}" download="${SDFile}">${SDFile}</a>`
+            let resultLog = execSync(analyseCommand);
+            outputLink = parseCommandOutput(resultLog);
         }
         console.log(`${program} executed successfully. Output saved to ${outputFile}`);
         if (inputFile) {fs.unlinkSync(inputFile)}

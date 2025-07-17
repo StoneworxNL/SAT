@@ -26,4 +26,10 @@ class ExpressionAction extends Action{
     }
 }
 
-module.exports = {Action, JavaAction, ExpressionAction};
+class RetrieveAction extends Action{
+    constructor(Type, ID, VariableName, Entity) {
+        super(Type, ID, VariableName);
+        this.entity =Entity;
+    }
+}
+module.exports = {Action, JavaAction, ExpressionAction, RetrieveAction};
