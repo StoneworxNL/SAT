@@ -6,7 +6,8 @@ module.exports = class SplitMergeCheck extends CheckModule {
 
         this.errorCodes = {
             "SM1": "Missing caption for Exclusive split",
-            "SM2": "Useless merge action"
+            "SM2": "Useless merge action",
+            "SM3": "Exclusive split that checks on enums should not",
         };
     }
 
