@@ -62,7 +62,6 @@ module.exports = class SplitMergeCheck extends CheckModule {
                     }
                 }
                 // entityValue now contains the entity string, or null if not found
-                console.log(`Enum part: ${variableName}: ${entity}`);
                 if (entity) {
                     let entityInModel;
                     const entityName = entity.split('.').pop();
