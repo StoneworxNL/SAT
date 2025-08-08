@@ -17,7 +17,8 @@ module.exports = class PlaywrightBuilder {
         this.importstatements = '';
         this.widgetTypes = [];
         this.widgetDeclarations = '';
-        this.classConstructor = '';          
+        this.classConstructor = '';
+        this.folderMap = new Map(model.folders);          
     }
 
     report() {
@@ -26,11 +27,12 @@ module.exports = class PlaywrightBuilder {
             console.log('writing page: ' + page.name);
             this.writePage(page);
         });
+
     }
 
     writePage(page) {
         const pageName = page.name;
-        const module = page.moduleName;   
+        const module = this.getModuleName(page.containerID);   
         this.widgetDeclarations = '';
         this.classConstructor = '';  
         this.widgetDefinitions = '';
@@ -334,5 +336,24 @@ import  ${snippetClass} from './${targetPage}';`
         else {
             return undefined;
         }        
+    }
+
+    getModuleName(containerID) {
+        if(containerID) {
+            let module = this.model.modules.find(module => module.id === containerID);
+            if (module) {
+                return module.name;
+            } else {
+                let folder = this.folderMap.get(containerID);
+                if (folder) {
+                    return this.getModuleName(folder.container)
+                } else {
+                    return;
+                }
+            }
+        }
+        else {
+            return undefined;
+        }
     }
 }
