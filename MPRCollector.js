@@ -54,11 +54,16 @@ class MPRCollector {
                             model.parseFolder(doc, containerID);
                             break;
                         case 'Forms$Page':
+                            model.parsePage(doc, containerID);
+                            break;
                         case 'Forms$Snippet':
                             model.parsePage(doc, containerID);
                             break;
+                        case 'Forms$Layout':
+                            model.parseLayout(doc,containerID);
+                            break;
                         default:
-                            //console.log('Not Implemented: ' + docType);
+                            // console.log('Not Implemented: ' + docType);
                             break;
                     }
                 }, () => {

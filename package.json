@@ -14,6 +14,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "bson": "^6.8.0",
     "commander": "^12.0.0",
     "config": "^3.3.11",

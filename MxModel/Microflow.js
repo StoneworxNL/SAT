@@ -108,7 +108,7 @@ class Microflow extends MxModelObject {
                                 microflow.addAction(actionData);
                                 let microflowCall = Microflow.findKey(actionActivity, 'MicroflowCall');
                                 let subMF = Microflow.findKey(microflowCall, 'Microflow');
-                                console.log(action['$ID'].toString('base64')+':  '+subMF);
+                                // console.log(action['$ID'].toString('base64')+':  '+subMF);
                                 microflow.addSubMicroflow(subMF);
                                 break;
                             case 'Microflows$CreateVariableAction':
