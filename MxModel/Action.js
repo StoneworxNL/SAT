@@ -26,10 +26,10 @@ class ExpressionAction extends Action{
     }
 }
 
-class RetrieveAction extends Action{
+class ReturnEntityAction extends Action{ // Action that returns a single object or a list of objects
     constructor(Type, ID, VariableName, Entity) {
         super(Type, ID, VariableName);
         this.entity =Entity;
     }
 }
-module.exports = {Action, JavaAction, ExpressionAction, RetrieveAction};
+module.exports = {Action, JavaAction, ExpressionAction, ReturnEntityAction: ReturnEntityAction};

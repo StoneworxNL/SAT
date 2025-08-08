@@ -41,7 +41,7 @@ const MxModel = require("../MxModel/MxModel");
 const SquatModule = require("../MxModel/Module");
 const SquatEntity = require("../MxModel/Entity");
 const SquatMicroflow = require("../MxModel/Microflow");
-const { Action, JavaAction, ExpressionAction } = require('../MxModel/Action');
+const { Action, JavaAction, ExpressionAction, ReturnEntityAction } = require('../MxModel/Action');
 const SquatFolder = require("../MxModel/Folder");
 const SquatMenu = require("../MxModel/Menu");
 const SquatPage = require("../MxModel/Page");
@@ -244,7 +244,8 @@ module.exports = class ModelQuality extends AnalysisModule {
 
                 } else if (action_type === 'Microflows$RetrieveAction') {
                     let returnValue = action.action.outputVariableName;
-                    let actionData = new Action(action_type, actionId, returnValue);
+                    let entity = action.action.retrieveSource.entity ? action.action.retrieveSource.entity.qualifiedName : '';
+                    let actionData = new ReturnEntityAction(action_type, actionId, returnValue, entity);
                     microflowData.addAction(actionData);
                 } else if (action_type === 'Microflows$JavaActionCallAction') {
                     let errorHandling = json['action']['errorHandlingType'];
@@ -286,11 +287,14 @@ module.exports = class ModelQuality extends AnalysisModule {
             } else if (json['$Type'] === 'Microflows$ExclusiveMerge') {
                 let actionData = new Action(actionType, actionId);
                 microflowData.addAction(actionData);
-            } else {
-                switch (actionType) {
-                    case 'Microflows$MicroflowParameterObject':
+            } else if  (json['$Type'] === 'Microflows$MicroflowParameterObject'){
+                        let variableName = json['name'] ? json['name'] : '';
+                        let entity = json['variableType']['entity'] ? json['variableType']['entity'] : json['variableType']['$Type'];
                         actionType = 'Microflows$MicroflowParameter';
-                        break;
+                        let actionData = new ReturnEntityAction(actionType, actionId, variableName, entity);       
+                        microflowData.addAction(actionData);                 
+            } else {
+                switch (actionType) {                   
                     case 'Microflows$ListOperationAction':
                         actionType = 'Microflows$ListOperationsAction';
                         break;

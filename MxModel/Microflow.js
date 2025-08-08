@@ -1,6 +1,6 @@
 const MxModelObject = require('./MxModelObject');
 const Flow = require('./Flow');
-const { Action, JavaAction, ExpressionAction, RetrieveAction } = require('./Action');
+const { Action, JavaAction, ExpressionAction, ReturnEntityAction } = require('./Action');
 
 class Microflow extends MxModelObject {
     constructor(containerID, microflowName, returnType, returnEntity) {
@@ -78,11 +78,20 @@ class Microflow extends MxModelObject {
                 let actionType = action['$Type'];
                 let actionData;
                 let complexity = 0;
-                let caption;
-                switch (actionType) {
+                let caption; 
+                let entity;               
+                switch (actionType) {                    
                     case 'Microflows$Annotation':
                         let annotation = Microflow.findKey(action, 'Caption');
                         microflow.addAnnotation(annotation);
+                        break;
+                    case 'Microflows$MicroflowParameter':
+                       // Microflow.findKey(action, 'Caption');
+                        let variableName = Microflow.findKey(action, 'Name');
+                        entity = Microflow.findKey(action, 'VariableType', 'Entity') ;
+                        actionType = 'Microflows$MicroflowParameter';
+                        actionData = new ReturnEntityAction(actionType, actionID, variableName, entity);   
+                        microflow.addAction(actionData);
                         break;
                     case 'Microflows$LoopedActivity':
                         actionData = new Action(actionType, actionID);
@@ -92,7 +101,7 @@ class Microflow extends MxModelObject {
                     case 'Microflows$ActionActivity':
                         let actionActivity = Microflow.findKey(action, 'Action');
                         let activityType = actionActivity['$Type'];
-                        let entity ;
+                        
                         switch (activityType) {
                             case 'Microflows$MicroflowCallAction':
                                 actionData = new Action(activityType, actionID);
@@ -157,7 +166,7 @@ class Microflow extends MxModelObject {
                             case 'Microflows$RetrieveAction':
                                 let resultVariableName = Microflow.findKey(actionActivity, 'ResultVariableName');
                                 entity = Microflow.findKey(action, 'Action', 'RetrieveSource', 'Entity');
-                                actionData = new RetrieveAction(activityType, action['$ID'], resultVariableName, entity);
+                                actionData = new ReturnEntityAction(activityType, action['$ID'], resultVariableName, entity);
                                 microflow.addAction(actionData);
                                 break;
                             default:

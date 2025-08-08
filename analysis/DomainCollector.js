@@ -56,7 +56,8 @@ module.exports = class DomainCollector {
             let isPersistable = entity.generalization.persistable;
             let mXEntity = new MxEntity(domain.container.id, entity.id, entity.name, entity.documentation || '', isPersistable);
             attributes.forEach((attribute) => {
-                let mXAttribute = new MxAttribute(attribute['name'], 'attr');
+                let attributeType = attribute.type.structureTypeName;
+                let mXAttribute = new MxAttribute(attribute['name'], attributeType);
                 mXEntity.attrs.push(mXAttribute);
             })
 
