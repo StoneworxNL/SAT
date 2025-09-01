@@ -31,7 +31,6 @@ class Microflow extends MxModelObject {
     static parse(doc, container) {
         let containerID = container;        
         let microflowName = Microflow.findKey(doc, 'Name');
-        console.log(containerID + ':  ' + microflowName);
         let mfReturnType = Microflow.findKey(doc, 'MicroflowReturnType');
         let returnType; let returnEntity = '';
         if (mfReturnType) {

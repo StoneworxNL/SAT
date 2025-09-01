@@ -41,7 +41,6 @@ class MPRCollector {
                     let docType = doc['$Type'];                  
                     
                     let containerID = MPRCollector.uint8ArrayToUUID(container);
-                    console.log(container + ' ==> ' + containerID + ':  ' + doc['Name']);
                     switch (docType) {
                         case 'Security$ProjectSecurity':
                             model.parseSecurity(doc);

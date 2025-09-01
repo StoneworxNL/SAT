@@ -44,8 +44,6 @@ class Entity extends MxModelObject {
                     attrs.forEach(attr => {
                         if (attr['$Type'] && attr['$Type'] === 'DomainModels$Attribute') {
                             let subType = Entity.findKey(attr, 'NewType', '$Type');
-                            console.log(`Attribute type: ${subType}`);
-                            
                             let attribute = new Attribute(Entity.findKey(attr, 'Name'), subType);
                             attributes.push(attribute);
                         }

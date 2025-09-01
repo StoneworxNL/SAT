@@ -47,7 +47,8 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
             execSync(analyseCommand);
         }
         if (assessmentType === 'SD') {
-            analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow} -p ${sdPrefixes}  ${excludeModulesFlag}`;
+            analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow}  ${excludeModulesFlag}`;
+            analyseCommand += (sdPrefixes ? ` -p ${sdPrefixes}`:'');
             let resultLog = execSync(analyseCommand);
             outputLink = parseCommandOutput(resultLog);
         }
