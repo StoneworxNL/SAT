@@ -14,7 +14,12 @@ class Module extends MxModelObject{
 
     static parse (doc) {
         let moduleName = Module.findKey(doc,'Name');
-        let moduleID = doc['$ID'].toString('base64');
+        // let uint8Array = new Uint8Array(doc['$ID'].buffer.length);
+        // doc['$ID'].buffer.map((value, index) => {
+        //     uint8Array[index] = value;
+        // });
+        // let moduleID = Module.uint8ArrayToUUID(uint8Array);
+        let moduleID = Module.binaryToUUID(doc['$ID']);
         let appStore = false;        
         if (doc['$Type']==='Projects$Project') {
             moduleName = 'Project';

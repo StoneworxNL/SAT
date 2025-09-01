@@ -7,6 +7,25 @@ class MPRCollector {
         this.mpr = mpr;
     }
 
+    static uint8ArrayToUUID(uint8Array) {
+        if (!(uint8Array instanceof Uint8Array) || uint8Array.length !== 16) {
+            throw new Error("Input must be a Uint8Array of length 16");
+        }
+
+        const hex = [...uint8Array].map(b => b.toString(16).padStart(2, '0'));
+
+        // Apply little-endian conversion to the first three fields
+        const timeLow = hex.slice(0, 4).reverse().join('');
+        const timeMid = hex.slice(4, 6).reverse().join('');
+        const timeHiAndVersion = hex.slice(6, 8).reverse().join('');
+
+        // Remaining fields are big-endian
+        const clockSeq = hex.slice(8, 10).join('');
+        const node = hex.slice(10, 16).join('');
+
+        return `${timeLow}-${timeMid}-${timeHiAndVersion}-${clockSeq}-${node}`;
+    }
+
     collect() {
         const db = new sqlite3.Database(this.mpr);
         let model = new MxModel();
@@ -17,11 +36,12 @@ class MPRCollector {
                         console.log(err.message)
                     };
                     const doc = BSON.deserialize(row.contents);
+
                     let container = row.container;
-                    let docType = doc['$Type'];
-
-
-                    let containerID = container.toString('base64');
+                    let docType = doc['$Type'];                  
+                    
+                    let containerID = MPRCollector.uint8ArrayToUUID(container);
+                    console.log(container + ' ==> ' + containerID + ':  ' + doc['Name']);
                     switch (docType) {
                         case 'Security$ProjectSecurity':
                             model.parseSecurity(doc);
@@ -60,7 +80,7 @@ class MPRCollector {
                             model.parsePage(doc, containerID);
                             break;
                         case 'Forms$Layout':
-                            model.parseLayout(doc,containerID);
+                            model.parseLayout(doc, containerID);
                             break;
                         default:
                             // console.log('Not Implemented: ' + docType);

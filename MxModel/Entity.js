@@ -21,7 +21,7 @@ class Entity extends MxModelObject {
     }
 
     static parse(doc, container) {
-        let containerID = container.toString('base64');
+        let containerID = container;
         let entities = [];
         let domainEntities = Entity.findKey(doc, 'Entities');
         Entity.findKey(doc, 'Associations');
@@ -33,7 +33,8 @@ class Entity extends MxModelObject {
         if (domainEntities.length > 1) {
             domainEntities.forEach(domainEntity => {
                 if (typeof domainEntity != 'number') {
-                    let id = domainEntity['$ID'].toString('base64');
+                    //let id = domainEntity['$ID'].toString('base64');
+                    let id = Entity.binaryToUUID(domainEntity['$ID']);
                     let entityName = Entity.findKey(domainEntity, 'Name');
                     let attributes = [];
                     let generalization = Entity.findKey(domainEntity, 'MaybeGeneralization') || Entity.findKey(domainEntity, 'generalization');

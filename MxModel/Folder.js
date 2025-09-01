@@ -20,8 +20,8 @@ class Folder extends MxModelObject {
 
     static parse (doc, container) {
         let name = Folder.findKey(doc, 'Name');
-        let id = doc['$ID'].toString('base64');
-        return new Folder(id, container.toString('base64'), name)
+        let id = Folder.binaryToUUID(doc['$ID']);
+        return new Folder(id, container, name)
     }
 }
 

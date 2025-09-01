@@ -20,7 +20,7 @@ commander
 const options = commander.opts();
 main();
 
-function main() {
+function main() {``
     let mpr = options.mpr;
     let outFile = options.out;
     let folder = config.get("outputFolder");

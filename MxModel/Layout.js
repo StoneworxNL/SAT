@@ -13,7 +13,7 @@ class Layout extends MxModelObject {
     }
 
     static parse(doc, container, module) {
-        let containerID = container.toString('base64');
+        let containerID = container;
         const layoutName = module.name+'.'+doc.Name;
         const layoutType = doc.Content.LayoutType;
                 
