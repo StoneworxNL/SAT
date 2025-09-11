@@ -150,6 +150,7 @@ class MxModel {
             return a.name.localeCompare(b.name);
         });
 
+        
         this.modules = modulesSorted;
         this.entities =  entitiesSorted;
         this.microflows = microflowsSorted;

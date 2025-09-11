@@ -22,6 +22,14 @@ main();
 
 function main() {``
     let mpr = options.mpr;
+    if (!mpr.includes('uploads\\')) {
+        mpr = findMprFile(mpr);
+        if (!mpr) {
+            console.error("No .mpr file found in the specified folder.");
+            process.exit(1);
+        }
+    }
+    
     let outFile = options.out;
     let folder = config.get("outputFolder");
     let mprCollector = new MPRCollector(mpr);
@@ -32,6 +40,18 @@ function main() {``
         console.log("====================== Ready =======================");
     });
 }
+
+    function findMprFile(folderPath) {
+        try {
+            const files = fs.readdirSync(folderPath);
+            const mprFile = files.find(file => file.endsWith('.mpr'));
+            return mprFile ? `${folderPath}/${mprFile}` : null;
+        } catch (err) {
+            console.error("Error reading folder:", err.message);
+            return null;
+        }
+    }
+
 
 
 function getDateTimeString(){

@@ -74,7 +74,7 @@ class Microflow extends MxModelObject {
         let actions = Microflow.findKey(objectCollection, 'Objects');
         actions.forEach(action => {
             if (action['$Type']) {
-                let actionID = action['$ID'].toString('base64');
+                let actionID = Microflow.binaryToUUID(action['$ID']);
                 let actionType = action['$Type'];
                 let actionData;
                 let complexity = 0;
@@ -160,13 +160,13 @@ class Microflow extends MxModelObject {
                             case 'Microflows$JavaActionCallAction':
                                 let errorHandling = Microflow.findKey(actionActivity, 'ErrorHandlingType');
                                 let JavaActionName = Microflow.findKey(actionActivity, 'JavaAction');
-                                actionData = new JavaAction(activityType, action['$ID'], errorHandling, JavaActionName);
+                                actionData = new JavaAction(activityType, actionID, errorHandling, JavaActionName);
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$RetrieveAction':
                                 let resultVariableName = Microflow.findKey(actionActivity, 'ResultVariableName');
                                 entity = Microflow.findKey(action, 'Action', 'RetrieveSource', 'Entity');
-                                actionData = new ReturnEntityAction(activityType, action['$ID'], resultVariableName, entity);
+                                actionData = new ReturnEntityAction(activityType, actionID, resultVariableName, entity);
                                 microflow.addAction(actionData);
                                 break;
                             default:

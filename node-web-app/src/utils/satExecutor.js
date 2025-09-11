@@ -5,15 +5,20 @@ const { log } = require('console');
 const workingDir = config.get('workingDir');
 const outputFolder = config.get('outputFolder');
 
-function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
+function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
     let extractCommand;
     let satQOutput = outputFile;
     let analyseCommand;
     let excludeModulesFlag = excludeModules ? '-e '+excludeModules : '';
+    let unlinkIt = true;
     if (program.toUpperCase() === 'SAT-L') {
-        if (!inputFile || !outputFile)  {
+        if ((!inputFile && !inputFolder) || !outputFile)  {
             throw new Error('inputFile and outputFile are mandatory for SAT-L program.');
         }
+        if (!inputFile) {
+            inputFile = inputFolder; //pass the folder as input file to SAT-L        
+            unlinkIt = false;
+        } 
         console.log(`Executing ${workingDir}/SAT-L with input file ${inputFile} and output file ${outputFile}`);
         extractCommand = `node "${workingDir}/SAT-L.js" -m ${inputFile} -o ${outputFile}`;
     } else if (program.toUpperCase() === 'SAT-C') {
@@ -53,7 +58,7 @@ function executeSat(program, inputFile, diffFile, doDiff, appID, branchName, cle
             outputLink = parseCommandOutput(resultLog);
         }
         console.log(`${program} executed successfully. Output saved to ${outputFile}`);
-        if (inputFile) {fs.unlinkSync(inputFile)}
+        if (inputFile && unlinkIt) {fs.unlinkSync(inputFile)}
         return {"success": true, "outputFile": outputLink};
     } catch (error) {
         console.error(`Error executing ${program}:`, error.message);

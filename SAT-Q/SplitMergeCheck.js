@@ -64,16 +64,17 @@ module.exports = class SplitMergeCheck extends CheckModule {
             // For each variable in the comparison, check if it's an enum
             variables.forEach(variable => {
                 let entity = null;
-                let variableClass = variable.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\/?/);
-
-                if(variableClass && variableClass.length == 2) variableClass = variableClass[1];
+                let variableClassName = variable.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\/?/);
+                
+                if(variableClassName && variableClassName.length == 2) variableClassName = variableClassName[1];
+                let variableClass = this.getVariableClass(variableClassName, microflow.actions);
                 let variableAttribute = variable.match(/^\$[a-zA-Z_][a-zA-Z0-9_]*\/([a-zA-Z_][a-zA-Z0-9_]*)$/);
                 if (variableAttribute &&variableAttribute.length == 2) {
                     variableAttribute = variableAttribute[1];
                 }
 
                 for (const action of microflow.actions) {
-                    if (action.variableName === variableClass && action.entity) {
+                    if (action.variableName === variableClassName && action.entity) {
                         entity = action.entity;
                         break;
                     }
@@ -136,6 +137,15 @@ module.exports = class SplitMergeCheck extends CheckModule {
                 }
             }
         }
+    }
+
+    getVariableClass(variableClassName, actions) {
+        for (const action of actions) {
+            if (action.variableName === variableClassName && action.entity) {
+                return action.entity;
+            }
+        }
+        return null;
     }
 
 }
