@@ -27,8 +27,9 @@ RUN apt-get update && \
 ARG CACHEBUST=1
 RUN git clone https://github.com/StoneworxNL/SAT.git .
 
-#don't know why but this is needed to get the latest version of the repo
-#RUN git pull
+# don't know why but this is needed to get the latest version of the repo
+ARG CACHEBUST=1
+RUN git pull
 
 # Install dependencies for the main project
 RUN npm install

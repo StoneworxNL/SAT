@@ -4,6 +4,8 @@ const config = require('config');
 const { log } = require('console');
 const workingDir = config.get('workingDir');
 const outputFolder = config.get('outputFolder');
+const mendixProjects = process.env.MendixProjects||'';
+// Now you can use mendixProjects as a local variable in your code
 
 function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
     let extractCommand;
@@ -16,7 +18,7 @@ function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, br
             throw new Error('inputFile and outputFile are mandatory for SAT-L program.');
         }
         if (!inputFile) {
-            inputFile = inputFolder; //pass the folder as input file to SAT-L        
+            inputFile = mendixProjects + inputFolder; //pass the folder as input file to SAT-L pre
             unlinkIt = false;
         } 
         console.log(`Executing ${workingDir}/SAT-L with input file ${inputFile} and output file ${outputFile}`);
