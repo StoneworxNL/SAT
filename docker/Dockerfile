@@ -24,11 +24,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Clone the repository
-ARG CACHEBUST=1
+ARG NOCACHE=2
 RUN git clone https://github.com/StoneworxNL/SAT.git .
 
 # don't know why but this is needed to get the latest version of the repo
-ARG CACHEBUST=1
 RUN git pull
 
 # Install dependencies for the main project

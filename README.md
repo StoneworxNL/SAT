@@ -65,6 +65,7 @@ Easiest installation is via Docker.
 ***Run as nodejs project***
 
 * requirements: Node & npm node version: v20.19.0 (higher gives issues with sqlite module)
+* add environment variable MendixProjects to point to the folder where Mendix projects are located
 * clone repo into working directory
 * npm install to install all modules
 * update default.json to liking
