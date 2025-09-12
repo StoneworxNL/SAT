@@ -1,10 +1,12 @@
+const fs = require("fs");
 const { BSON, EJSON, ObjectId, UUID } = require('bson');
 const sqlite3 = require('sqlite3').verbose();
 const MxModel = require("./MxModel/MxModel");
 
 class MPRCollector {
-    constructor(mpr) {
+    constructor(mpr, mprFolder) {
         this.mpr = mpr;
+        this.mprFolder = mprFolder;
     }
 
     static uint8ArrayToUUID(uint8Array) {
@@ -42,10 +44,19 @@ class MPRCollector {
                         if (err) {
                             console.log(err.message)
                         };
-                        const doc = {};
+                        let doc = {};
                         let unitID = MPRCollector.uint8ArrayToUUID(row.UnitID);
                         if (model.productVersion >= '10.24') {
-
+                            const unitIDStr = unitID.replace(/-/g, '');
+                            const xx = unitIDStr.substring(0, 2);
+                            const yy = unitIDStr.substring(2, 4);
+                            const path = `${this.mprFolder}/mprcontents/${xx}/${yy}/${unitID}.mxunit`;
+                            try {
+                                const fileContents = fs.readFileSync(path);
+                                doc = BSON.deserialize(fileContents);
+                            } catch (e) {
+                                console.log(`Failed to read file ${path}:`, e.message);
+                            }
                         } else {
                             doc = BSON.deserialize(row.contents);
                         }

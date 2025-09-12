@@ -37,8 +37,10 @@ class CheckModule {
     }
 
     addErrors = function(code, ignoreList, comment){
-        let isIgnore = ignoreList.find(ignore => code === ignore);
-        if (!isIgnore || isIgnore.length == 0 ){
+        let isIgnore = Array.isArray(ignoreList)
+            ? ignoreList.includes(code)
+            : code === ignoreList;
+        if (!isIgnore){
             this.errors.push({'code': code, 'comment': comment});
         }
     }

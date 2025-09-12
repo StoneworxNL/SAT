@@ -123,15 +123,17 @@ module.exports = class SplitMergeCheck extends CheckModule {
                     const entityModule = entity.split('.').slice(0, -1).join('.');
 
                     const matchedEntity = model.entities.find(e => e.name === entityName);
-                    console.log(`Matched entity:`, matchedEntity);
-                    let module = model.getModule(matchedEntity.containerID);
-                    if (module.name === entityModule) {
-                        console.log(`Matched module:`, module);
-                        entityInModel = matchedEntity;
-                        const matchedAttribute = matchedEntity.attrs.find(attr => attr.name === attributeName);
-                        console.log(`Matched attribute:`, matchedAttribute);
-                        if (matchedAttribute && matchedAttribute.type === 'DomainModels$EnumerationAttributeType') {
-                            this.addErrors("SM3", ignoreRuleAnnotations);
+                    //console.log(`Matched entity:`, matchedEntity);
+                    if (matchedEntity) {
+                        let module = model.getModule(matchedEntity.containerID);
+                        if (module.name === entityModule) {
+                            //console.log(`Matched module:`, module);
+                            entityInModel = matchedEntity;
+                            const matchedAttribute = matchedEntity.attrs.find(attr => attr.name === attributeName);
+                            //console.log(`Matched attribute:`, matchedAttribute);
+                            if (matchedAttribute && matchedAttribute.type === 'DomainModels$EnumerationAttributeType') {
+                                this.addErrors("SM3", ignoreRuleAnnotations);
+                            }
                         }
                     }
                 }

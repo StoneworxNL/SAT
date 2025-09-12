@@ -20,46 +20,46 @@ commander
 const options = commander.opts();
 main();
 
-function main() {``
-    let mpr = options.mpr;
-    if (!mpr.includes('uploads\\')) {
-        mpr = findMprFile(mpr);
-        if (!mpr) {
-            console.error("No .mpr file found in the specified folder.");
-            process.exit(1);
-        }
+function main() {
+    ``
+    let mprFolder = options.mpr;
+    let mpr = '';
+    mpr = findMprFile(mprFolder);
+    if (!mpr) {
+        console.error("No .mpr file found in the specified folder.");
+        process.exit(1);
     }
-    
+
     let outFile = options.out;
     let folder = config.get("outputFolder");
-    let mprCollector = new MPRCollector(mpr);
+    let mprCollector = new MPRCollector(mpr, mprFolder);
 
     mprCollector.collect().then((model) => {
         model.sortAll();
-        fs.writeFileSync(folder+'/'+outFile+'.json',JSON.stringify(model, null, 2));
+        fs.writeFileSync(folder + '/' + outFile + '.json', JSON.stringify(model, null, 2));
         console.log("====================== Ready =======================");
     });
 }
 
-    function findMprFile(folderPath) {
-        try {
-            const files = fs.readdirSync(folderPath);
-            const mprFile = files.find(file => file.endsWith('.mpr'));
-            return mprFile ? `${folderPath}/${mprFile}` : null;
-        } catch (err) {
-            console.error("Error reading folder:", err.message);
-            return null;
-        }
+function findMprFile(folderPath) {
+    try {
+        const files = fs.readdirSync(folderPath);
+        const mprFile = files.find(file => file.endsWith('.mpr'));
+        return mprFile ? `${folderPath}/${mprFile}` : null;
+    } catch (err) {
+        console.error("Error reading folder:", err.message);
+        return null;
     }
+}
 
 
 
-function getDateTimeString(){
-    let now = new  Date();
+function getDateTimeString() {
+    let now = new Date();
     let year = now.getFullYear();
-    let month = ('00'+(now.getMonth()+1).toString()).slice(-2);
-    let day = ('00'+now.getDate().toString()).slice(-2);
-    let hour = ('00'+ now.getHours().toString()).slice(-2);
-    let minute = ('00'+now.getMinutes().toString()).slice(-2);
+    let month = ('00' + (now.getMonth() + 1).toString()).slice(-2);
+    let day = ('00' + now.getDate().toString()).slice(-2);
+    let hour = ('00' + now.getHours().toString()).slice(-2);
+    let minute = ('00' + now.getMinutes().toString()).slice(-2);
     return `${year}${month}${day}_${hour}${minute}`;
 }
