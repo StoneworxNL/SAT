@@ -39,14 +39,20 @@ class MPRCollector {
                     } else if (row) {
                         model.productVersion = row._ProductVersion;
                     }
-                    let query = model.productVersion < '10.24' ? "SELECT UnitID, ContainerID as container, ContainmentName, Contents as contents from Unit" : "SELECT UnitID, ContainerID as container, ContainmentName from Unit";
+                    // Compare version numbers numerically instead of lexicographically
+                    let isLessThan1024 = this.isVersionLessThan(model.productVersion, '10.24');
+                    let query = isLessThan1024
+                        ? "SELECT UnitID, ContainerID as container, ContainmentName, Contents as contents from Unit"
+                        : "SELECT UnitID, ContainerID as container, ContainmentName from Unit";
                     db.each(query, (err, row) => {
                         if (err) {
                             console.log(err.message)
                         };
                         let doc = {};
                         let unitID = MPRCollector.uint8ArrayToUUID(row.UnitID);
-                        if (model.productVersion >= '10.24') {
+                        if (isLessThan1024) {
+                            doc = BSON.deserialize(row.contents);                
+                        } else {
                             const unitIDStr = unitID.replace(/-/g, '');
                             const xx = unitIDStr.substring(0, 2);
                             const yy = unitIDStr.substring(2, 4);
@@ -57,11 +63,9 @@ class MPRCollector {
                             } catch (e) {
                                 console.log(`Failed to read file ${path}:`, e.message);
                             }
-                        } else {
-                            doc = BSON.deserialize(row.contents);
                         }
                         let container = row.container;
-                        let docType = doc['$Type'];                  
+                        let docType = doc['$Type'];
                         let containerID = MPRCollector.uint8ArrayToUUID(container);
                         switch (docType) {
                             case 'Security$ProjectSecurity':
@@ -114,6 +118,18 @@ class MPRCollector {
             });
         })
         db.close();
+    }
+
+    isVersionLessThan(a, b) {
+        const pa = a.split('.').map(Number);
+        const pb = b.split('.').map(Number);
+        for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            const na = pa[i] || 0;
+            const nb = pb[i] || 0;
+            if (na < nb) return true;
+            if (na > nb) return false;
+        }
+        return false;
     }
 }
 

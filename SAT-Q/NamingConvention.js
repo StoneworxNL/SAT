@@ -1,3 +1,4 @@
+
 const CheckModule = require("./CheckModule");
 
 module.exports = class NamingConvention extends CheckModule {
