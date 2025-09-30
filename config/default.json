@@ -89,7 +89,8 @@
                     "QUE",
                     "QUEUE",
                     "ACO",
-                    "SCH"
+                    "SCH",
+                    "ASU"
                 ],
                 "allowedSubLevelPrefixes": [
                     "SUB"

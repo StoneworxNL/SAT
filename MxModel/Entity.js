@@ -36,6 +36,7 @@ class Entity extends MxModelObject {
                     //let id = domainEntity['$ID'].toString('base64');
                     let id = Entity.binaryToUUID(domainEntity['$ID']);
                     let entityName = Entity.findKey(domainEntity, 'Name');
+
                     let attributes = [];
                     let generalization = Entity.findKey(domainEntity, 'MaybeGeneralization') || Entity.findKey(domainEntity, 'generalization');
                     let isPersistent = Entity.findKey(generalization, 'Persistable');
@@ -50,12 +51,16 @@ class Entity extends MxModelObject {
                     });
                     associations.forEach(association => {
                         let parent = association['ParentPointer'] || association['parent'];
-                        let parentID = parent.toString('base64');
+                        let parentID = Entity.binaryToUUID(parent);
+
+                        let child = Entity.findKey(association, 'ChildPointer');
+                        let childName = Entity.findKey(association, 'Child');
+                        let childID = child ? Entity.binaryToUUID(child) : null;
                         if (parentID === id) {
-                            let attribute = new Attribute(Entity.findKey(association, 'Name'), 'assoc');
+                            let attribute = new Attribute(Entity.findKey(association, 'Name'), 'assoc', parentID, childID, childName);
                             attributes.push(attribute);
                         }
-                    })
+                    });
 
                     let accessRules = Entity.findKey(domainEntity, 'AccessRules');
                     accessRules.forEach(accessRule => {

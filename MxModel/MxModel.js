@@ -110,6 +110,10 @@ class MxModel {
         })
     }
 
+    findEntity(entityID){
+        return this.entities.find(entity => entity.id === entityID);
+    }
+
     findAppRolesByModuleRole(roleName) {
         return this.security.roles.filter(role =>
             role.moduleRoles.find(moduleRole => moduleRole === roleName)

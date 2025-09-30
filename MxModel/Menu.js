@@ -49,7 +49,7 @@ class Menu {
     static parseItems(items, container, menuName) {
         let menuItems = [];
         let containerID = container.toString('base64');
-        items.forEach(menuItem => {
+        items?.forEach(menuItem => {
             if (typeof menuItem != 'number') {
                 let caption = Menus.findKey(menuItem, 'Caption');
                 let captionText;

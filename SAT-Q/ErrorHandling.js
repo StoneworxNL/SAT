@@ -8,7 +8,7 @@ module.exports = class ErrorHandling extends CheckModule {
         };
     }
 
-    check = function (model, microflow) {
+    check = function (model, microflow) {        
         let allowedJava = this.options.allowedJava;
         let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations(microflow);
         this.setup(model, microflow);  

@@ -32,4 +32,18 @@ class ReturnEntityAction extends Action{ // Action that returns a single object 
         this.entity =Entity;
     }
 }
-module.exports = {Action, JavaAction, ExpressionAction, ReturnEntityAction: ReturnEntityAction};
+
+class ReturnEnumAction extends Action{ // Action that returns a single object or a list of objects
+    constructor(Type, ID, VariableName,  Enum) {
+        super(Type, ID, VariableName);
+        this.enum = Enum;
+    }
+}
+
+class ReturnPrimitiveAction extends Action{ // Action that returns a single object or a list of objects
+    constructor(Type, ID, VariableName,  VariableType) {
+        super(Type, ID, VariableName);
+        this.variableType = VariableType;
+    }
+}
+module.exports = {Action, JavaAction, ExpressionAction, ReturnEntityAction: ReturnEntityAction, ReturnEnumAction, ReturnPrimitiveAction};

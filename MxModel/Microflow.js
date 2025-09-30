@@ -1,6 +1,6 @@
 const MxModelObject = require('./MxModelObject');
 const Flow = require('./Flow');
-const { Action, JavaAction, ExpressionAction, ReturnEntityAction } = require('./Action');
+const { Action, JavaAction, ExpressionAction, ReturnEntityAction, ReturnEnumAction, ReturnPrimitiveAction } = require('./Action');
 
 class Microflow extends MxModelObject {
     constructor(containerID, microflowName, returnType, returnEntity) {
@@ -79,7 +79,7 @@ class Microflow extends MxModelObject {
                 let actionData;
                 let complexity = 0;
                 let caption; 
-                let entity;               
+                let entity; let primitiveType; let enumeration;
                 switch (actionType) {                    
                     case 'Microflows$Annotation':
                         let annotation = Microflow.findKey(action, 'Caption');
@@ -87,10 +87,19 @@ class Microflow extends MxModelObject {
                         break;
                     case 'Microflows$MicroflowParameter':
                        // Microflow.findKey(action, 'Caption');
+                       actionType = 'Microflows$MicroflowParameter';
                         let variableName = Microflow.findKey(action, 'Name');
-                        entity = Microflow.findKey(action, 'VariableType', 'Entity') ;
-                        actionType = 'Microflows$MicroflowParameter';
-                        actionData = new ReturnEntityAction(actionType, actionID, variableName, entity);   
+                        let type = Microflow.findKey(action, 'VariableType', '$Type');
+                        if (type === 'DataTypes$ObjectType' || type === 'DataTypes$ListType') {
+                            entity = Microflow.findKey(action, 'VariableType', 'Entity') ;
+                            actionData = new ReturnEntityAction(actionType, actionID, variableName,  entity);   
+                        } else if (type === 'DataTypes$EnumerationType') {
+                            enumeration = Microflow.findKey(action, 'VariableType', 'Enumeration') ;
+                            actionData = new ReturnEnumAction(actionType, actionID, variableName,  enumeration);
+                        } else {
+                            primitiveType = Microflow.findKey(action, 'VariableType', '$Type') ;
+                            actionData = new ReturnPrimitiveAction(actionType, actionID, variableName, primitiveType);  
+                        }
                         microflow.addAction(actionData);
                         break;
                     case 'Microflows$LoopedActivity':
@@ -164,7 +173,7 @@ class Microflow extends MxModelObject {
                                 microflow.addAction(actionData);
                                 break;
                             case 'Microflows$RetrieveAction':
-                                let resultVariableName = Microflow.findKey(actionActivity, 'ResultVariableName');
+                                let resultVariableName =  Microflow.findKey(actionActivity, 'ResultVariableName');
                                 entity = Microflow.findKey(action, 'Action', 'RetrieveSource', 'Entity');
                                 actionData = new ReturnEntityAction(activityType, actionID, resultVariableName, entity);
                                 microflow.addAction(actionData);

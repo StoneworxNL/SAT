@@ -65,41 +65,40 @@ module.exports = class SplitMergeCheck extends CheckModule {
             variables.forEach(variable => {
                 let entity = null;
                 let variableClassName = variable.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\/?/);
-                
-                if(variableClassName && variableClassName.length == 2) variableClassName = variableClassName[1];
+
+                if (variableClassName && variableClassName.length == 2) variableClassName = variableClassName[1];
                 let variableClass = this.getVariableClass(variableClassName, microflow.actions);
                 let variableAttribute = variable.match(/^\$[a-zA-Z_][a-zA-Z0-9_]*\/([a-zA-Z_][a-zA-Z0-9_]*)$/);
-                if (variableAttribute &&variableAttribute.length == 2) {
+                if (variableAttribute && variableAttribute.length == 2) {
                     variableAttribute = variableAttribute[1];
                 }
+                if (variableClass && variableAttribute) {
+                    for (const action of microflow.actions) {
+                        if (action.variableName === variableClassName && action.entity) {
+                            entity = action.entity;
+                            break;
+                        }
+                        if (entity) {
+                            let entityInModel;
+                            const entityName = entity.split('.').pop();
+                            const entityModule = entity.split('.').slice(0, -1).join('.');
 
-                for (const action of microflow.actions) {
-                    if (action.variableName === variableClassName && action.entity) {
-                        entity = action.entity;
-                        break;
-                    }
-                    if (entity) {
-                        let entityInModel;
-                        const entityName = entity.split('.').pop();
-                        const entityModule = entity.split('.').slice(0, -1).join('.');
-
-                        const matchedEntity = model.entities.find(e => e.name === entityName);
-                        console.log(`Matched entity:`, matchedEntity);
-                        let module = model.getModule(matchedEntity.containerID);
-                        if (module.name === entityModule) {
-                            console.log(`Matched module:`, module);
-                            entityInModel = matchedEntity;
-                            const matchedAttribute = matchedEntity.attrs.find(attr => attr.name === attributeName);
-                            console.log(`Matched attribute:`, matchedAttribute);
-                            if (matchedAttribute && matchedAttribute.type === 'DomainModels$EnumerationAttributeType') {
-                                this.addErrors("SM3", ignoreRuleAnnotations);
+                            const matchedEntity = model.entities.find(e => e.name === entityName);
+                            console.log(`Matched entity:`, matchedEntity);
+                            let module = model.getModule(matchedEntity.containerID);
+                            if (module.name === entityModule) {
+                                console.log(`Matched module:`, module);
+                                entityInModel = matchedEntity;
+                                const matchedAttribute = matchedEntity.attrs.find(attr => attr.name === attributeName);
+                                console.log(`Matched attribute:`, matchedAttribute);
+                                if (matchedAttribute && matchedAttribute.type === 'DomainModels$EnumerationAttributeType') {
+                                    this.addErrors("SM3", ignoreRuleAnnotations);
+                                }
                             }
                         }
                     }
-                }
+                };
             });
-
-
             const leftSide = expression.split(/[=!<>]=?|[<>]/)[0].trim();
             const leftSideMatchClass = leftSide.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\//);
             const leftSideMatchAttribute = leftSide.match(/^\$[a-zA-Z_][a-zA-Z0-9_]*\/([a-zA-Z_][a-zA-Z0-9_]*)$/);
