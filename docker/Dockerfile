@@ -24,11 +24,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Clone the repository
-ARG NOCACHE=2
-RUN git clone https://github.com/StoneworxNL/SAT.git .
-
-# don't know why but this is needed to get the latest version of the repo
-RUN git pull
+ARG CACHEBUST=1
+RUN git clone https://github.com/StoneworxNL/SAT.git . && \
+    git pull
 
 # Install dependencies for the main project
 RUN npm install
@@ -38,7 +36,7 @@ WORKDIR /usr/src/app/node-web-app
 RUN npm install
 
 WORKDIR /usr/src/app/
-VOLUME /usr/src/app/config
+#VOLUME /usr/src/app/config
 
 # Expose the port the app runs on (adjust if necessary)
 EXPOSE 3000

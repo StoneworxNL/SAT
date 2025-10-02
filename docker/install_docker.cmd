@@ -1,5 +1,5 @@
 REM Check for MendixProjects environment variable
-
+set CACHEBUST=%DATE%_%TIME%
 IF "%MendixProjects%"=="" (
     echo ERROR: Environment variable MendixProjects is not set.
     exit /b 1
@@ -13,16 +13,18 @@ if not exist "config" (
 )
 docker login
 
-docker build --build-arg NOCACHE=2 -t sat:latest .
-
 docker rm -f SAT 2>nul
+docker image prune -a -f  
+docker system prune -a -f
+docker build --build-arg CACHEBUST=%CACHEBUST% -t sat:latest .
+
 
 REM Ensure Docker Desktop has access to your local drive (C:)
 REM This is a manual step in Docker Desktop settings, but we can check if the folders exist
 docker run --restart unless-stopped --name SAT -d ^
     -e "MendixProjects=/mendix/" ^
-    -v "%cd%\config:/usr/src/app/config" ^
-    -v "%cd%\output:/usr/src/app/output" ^
+    -v "%cd%\config:/usr/src/config" ^
+    -v "%cd%\output:/usr/src/output" ^
     -v "%MendixProjects%:/mendix" ^
     -p 3000:3000 sat:latest 
 
