@@ -36,7 +36,7 @@ function main() {
 
     mprCollector.collect().then((model) => {
         model.sortAll();
-        console.log("Writing output to " + folder + '/' + outFile + '.json');
+        console.log("Writing SAT-L output to " + folder + '/' + outFile + '.json');
         fs.writeFileSync(folder + '/' + outFile + '.json', JSON.stringify(model, null, 2));
         console.log("====================== Ready =======================");
     });
