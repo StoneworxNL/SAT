@@ -36,7 +36,7 @@ function main() {
 
     mprCollector.collect().then((model) => {
         model.sortAll();
-        log("Writing output to " + folder + '/' + outFile + '.json');
+        consolelog("Writing output to " + folder + '/' + outFile + '.json');
         fs.writeFileSync(folder + '/' + outFile + '.json', JSON.stringify(model, null, 2));
         console.log("====================== Ready =======================");
     });
