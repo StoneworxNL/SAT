@@ -1,7 +1,7 @@
 {
-    "outputFolder": "./output",
+    "outputFolder": "output",
     "mxFolder": "[Path to Mendix/10.12.11.55218/modeler]", 
-    "workingDir": ".",
+    "workingDir": "./",
     "SATQFolder": "../SAT-Q/",
     "includeAppstore": false,
     "checks": [

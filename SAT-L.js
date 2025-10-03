@@ -21,7 +21,7 @@ const options = commander.opts();
 main();
 
 function main() {
-    ``
+    let workingDir = config.workingDir;
     let mprFolder = options.mpr;
     let mpr = '';
     mpr = findMprFile(mprFolder);
@@ -31,7 +31,7 @@ function main() {
     }
 
     let outFile = options.out;
-    let folder = config.get("outputFolder");
+    let folder = workingDir +  config.get("outputFolder");
     let mprCollector = new MPRCollector(mpr, mprFolder);
 
     mprCollector.collect().then((model) => {

@@ -14,8 +14,6 @@ if not exist "config" (
 docker login
 
 docker rm -f SAT 2>nul
-REM docker image prune -a -f  
-REM docker system prune -a -f
 docker build --build-arg CACHEBUST=%CACHEBUST% -t sat:latest .
 
 

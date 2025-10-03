@@ -23,6 +23,7 @@ function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, br
         } 
         console.log(`Executing ${workingDir}/SAT-L with input file ${inputFile} and output file ${outputFile}`);
         extractCommand = `node "${workingDir}/SAT-L.js" -m ${inputFile} -o ${outputFile}`;
+        console.log(extractCommand);
     } else if (program.toUpperCase() === 'SAT-C') {
         if (!appID || !branchName || !outputFile)  {
             throw new Error('appID, branchName and  and outputFile are mandatory for SAT-C program.');
