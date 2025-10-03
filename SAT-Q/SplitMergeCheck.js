@@ -7,7 +7,7 @@ module.exports = class SplitMergeCheck extends CheckModule {
 
         this.errorCodes = {
             "SM1": "Missing caption for Exclusive split",
-            "SM2": "Useless merge action",
+           // "SM2": "Useless merge action",
             "SM3": "Exclusive split that check on enums should have an enum split ",
         };
     }
@@ -29,9 +29,9 @@ module.exports = class SplitMergeCheck extends CheckModule {
                 //let mf = model.findMicroflowInContainer(microflow.containerID, microflow.name);
                 let flows = microflow.flows;
                 let actionsToMerge = flows.filter((flow) => flow.destination === mfAction.id);
-                if (actionsToMerge.length <= 1) {
-                    this.addErrors("SM2", ignoreRuleAnnotations);
-                }
+                // if (actionsToMerge.length <= 1) {
+                //     this.addErrors("SM2", ignoreRuleAnnotations);
+                // }
             }
         })
         return this.errors;

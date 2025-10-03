@@ -85,12 +85,14 @@
             "fnc": "IllegalCommit",
             "options": {
                 "allowedTopLevelPrefixes": [
+                    "ACO",
                     "ACT",
+                    "ASU",
+                    "OCH",
+                    "PRS",
                     "QUE",
                     "QUEUE",
-                    "ACO",
-                    "SCH",
-                    "ASU"
+                    "SCH"
                 ],
                 "allowedSubLevelPrefixes": [
                     "SUB"
