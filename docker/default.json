@@ -66,8 +66,8 @@
         {
             "fnc": "TooComplexMicroflow",
             "options": {
-                "maxActions": 25,
-                "maxComplexity": 30,
+                "maxActions": 35,
+                "maxComplexity": 45,
                 "prefixExceptions": [
                     "VAL"
                 ],
@@ -92,6 +92,7 @@
                     "PRS",
                     "QUE",
                     "QUEUE",
+                    "SCE",
                     "SCH"
                 ],
                 "allowedSubLevelPrefixes": [
