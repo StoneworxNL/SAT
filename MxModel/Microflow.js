@@ -139,7 +139,7 @@ class Microflow extends MxModelObject {
                                 let commit = false;
                                 let assignments = action['Action']['Items'].flatMap((item) => {
                                     let attributes = item['Attribute'] && item['Attribute'] !== '' ? [item['Attribute']] : [];
-                                    let associations = item['Association'] && item['Association'] !== '' ? item['Association'] : [];
+                                    let associations = item['Association'] && item['Association'] !== '' ? [item['Association']] : [];
                                     return [...attributes, ...associations];
                                 });
                                 action['Action']['Items'].forEach((item) => {

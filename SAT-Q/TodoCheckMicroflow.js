@@ -16,7 +16,7 @@ module.exports = class TodoCheckMicroflow extends CheckModule {
         this.setup(model, microflow);
         let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations();
         microflow.annotations.forEach(annotation =>{
-            if (annotation.match(/to\s?do/i)){
+            if (annotation.match(/^to\s?do/i)){
                 this.addErrors("TD2", ignoreRuleAnnotations, annotation);   
             };
         })

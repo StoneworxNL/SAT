@@ -43,7 +43,7 @@ module.exports = class DryMicroflow extends CheckModule {
             });
         });
         let duplicates = createChangeActions.filter((item, index) => createChangeActions.indexOf(item) !== index);
-        if (duplicates.length > 0) { this.addErrors("DR1", ignoreRuleAnnotations); }
+         if (duplicates.length > 0) { this.addErrors("DR1", ignoreRuleAnnotations); }
         return this.errors;
     }
 

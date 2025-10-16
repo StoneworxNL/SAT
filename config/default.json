@@ -59,7 +59,8 @@
                 "allowedJava": [
                     "CommunityCommons.EndTransaction",
                     "CommunityCommons.getGUID",
-                    "OIDC.DecodeJWTPlainText"
+                    "CommunityCommons.ThrowException",
+                    "OIDC.DecodeJWTPlainText"            
                 ]
             }
         },
@@ -74,7 +75,7 @@
                 "exceptionsMaxActions": 50,
                 "exceptionsMaxComplexity": 100,
                 "cxLoopCount": 4,
-                "cxExclusiveSplit": 5,
+                "cxExclusiveSplit": 2,
                 "cxObjectAction": 2,
                 "cxVariableAction": 1,
                 "cxMaxObjectExpression": 3,

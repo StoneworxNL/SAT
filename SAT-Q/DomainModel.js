@@ -5,7 +5,7 @@ module.exports = class DomainModel extends CheckModule {
     constructor(options) {
         super(options);
         this.errorCodes = {
-            "DM1": "Attribute name should not starts with the entity name",
+            "DM1": "Attribute name should not start with the entity name",
             "DM2": "Attribute name should not contain underscores '_'",
             "DM3": "Entity name should be singular"
         };
@@ -21,7 +21,7 @@ module.exports = class DomainModel extends CheckModule {
         }
         entity.attrs.forEach(attr => {
             let attrName = attr.name;
-            if (attrName.startsWith(entity.name)) {
+            if (attr.type != 'assoc' && attrName.startsWith(entity.name)) {
                 this.addErrors("DM1", ignoreRuleAnnotations, `${entity.name}.${attr.name}`);
             }
             if (attr.type != 'assoc' && attrName.includes('_') && !attrName.startsWith('_')) {

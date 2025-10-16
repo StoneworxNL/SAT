@@ -5,7 +5,8 @@ module.exports = class TopLevelFlows extends CheckModule {
     constructor(options) {
         super(options);
         this.errorCodes = {
-            "TL1": "Microflow may not call a Top level microflow"
+            "TL1": "Microflow may not call a Top level microflow",
+            "TL2": "Microflow is not allowed as a Top level microflow"
         };
     }
 
