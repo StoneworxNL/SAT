@@ -5,10 +5,12 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const SatController = require('./controllers/satController');
 const setRoutes = require('./routes/index');
+const config = require("config");
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const outputFolder = config.get("outputFolder");
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -20,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 setRoutes(app);
 app.get('/output/:file', (req, res) => {
     // Assuming files are stored in the &quot;files&quot; folder
-    const filePath = path.join('./output', req.params.file);
+    const filePath = path.join(outputFolder, req.params.file);
     console.log('Serving file:', filePath);
     // Use res.download() to initiate the file download
     res.download(filePath, (err) => {
