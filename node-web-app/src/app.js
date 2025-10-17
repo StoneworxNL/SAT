@@ -20,8 +20,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 setRoutes(app);
 app.get('/output/:file', (req, res) => {
     // Assuming files are stored in the &quot;files&quot; folder
-    const filePath = path.join(__dirname, '../../output', req.params.file);
-
+    const filePath = path.join('./output', req.params.file);
+    console.log('Serving file:', filePath);
     // Use res.download() to initiate the file download
     res.download(filePath, (err) => {
         if (err) {
