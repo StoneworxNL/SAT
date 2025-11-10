@@ -156,6 +156,9 @@
                     "OEN",
                     "OLE",
                     "OCH"
+                ],
+                "exceptionPrefixes": [
+                    "DS"   
                 ]
             }
         },

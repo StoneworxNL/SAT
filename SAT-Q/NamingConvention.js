@@ -1,4 +1,5 @@
 
+const pluralize = require('pluralize');
 const CheckModule = require("./CheckModule");
 
 module.exports = class NamingConvention extends CheckModule {
@@ -29,7 +30,7 @@ module.exports = class NamingConvention extends CheckModule {
                     if (!pfFound) {
                         this.addErrors("NC2", ignoreRuleAnnotations);
                     }
-                    let mfEntityName = mfNameParts[1];
+                    let mfEntityName = pluralize.singular(mfNameParts[1]);
                     let entitiesForMF = model.entities.filter((entity) => {
                         let entityName = entity.name;
                         return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName);

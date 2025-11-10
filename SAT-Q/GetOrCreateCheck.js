@@ -1,3 +1,4 @@
+const pluralize = require('pluralize');
 const CheckModule = require("./CheckModule");
 
 module.exports = class IllegalCommit extends CheckModule {
@@ -44,7 +45,7 @@ module.exports = class IllegalCommit extends CheckModule {
                     if (mfReturnEntity) {
                         [moduleName, entityName] = mfReturnEntity.split('.');
                     }
-                    if (this.microflowName.includes(entityName)) {
+                    if (this.microflowName.includes(entityName) || pluralize.singular(this.microflowName).includes(entityName)) {
                         //Oke
                     } else if (!GC1Found) {
                         this.addErrors("GC8", ignoreRuleAnnotations); //Microflow name does not contain name of returned Entity 
@@ -62,7 +63,6 @@ module.exports = class IllegalCommit extends CheckModule {
 
     checkPattern = function (microflow, ignoreRuleAnnotations) {
         const regex = /([\w]+)\s*!= empty\b/;
-        console.log(microflow.name);
         let actions = microflow.actions;
         let illegalCommits = actions.find(action => {
             if (action.type === 'Microflows$CommitAction' || action.isCommit) {

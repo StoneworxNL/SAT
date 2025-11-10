@@ -14,13 +14,17 @@ module.exports = class TopLevelFlows extends CheckModule {
     check = function (model, microflow) {
         this.setup(model, microflow);
         let topLevelPrefixes = this.options.TopLevelPrefixes;
+        let exceptionPrefixes = this.options.exceptionPrefixes;
         let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations();
         let subMFs = microflow.subMicroflows;
         if (subMFs) {
             subMFs.forEach(subMF => {                
                 let [moduleName, prefix, entity, action] = Microflow.parseQualifiedName(subMF);
                 if (topLevelPrefixes.includes(prefix)) {
-                    this.addErrors("TL1", ignoreRuleAnnotations, `ToplevelMF: ${subMF}`);
+                    let isExceptionPrefix = exceptionPrefixes.find((exPrefix) => exPrefix == prefix);
+                    if (!isExceptionPrefix) {
+                        this.addErrors("TL1", ignoreRuleAnnotations, `ToplevelMF: ${subMF}`);
+                    }
                 }
             });
         }
