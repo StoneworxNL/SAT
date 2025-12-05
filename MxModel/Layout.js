@@ -14,7 +14,7 @@ class Layout extends MxModelObject {
 
     static parse(doc, container, module) {
         let containerID = container;
-        const layoutName = module.name+'.'+doc.Name;
+        const layoutName = module ? module.name+'.'+doc.Name : doc.Name;
         const layoutType = doc.Content.LayoutType;
                 
         return new Layout(containerID,layoutName,layoutType);

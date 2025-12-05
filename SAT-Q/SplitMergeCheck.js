@@ -54,7 +54,7 @@ module.exports = class SplitMergeCheck extends CheckModule {
             variables.push(match[0]);
         }
         // variables now contains all Mendix variables in the expression
-        const isSingleVariable = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(expression.trim());
+        const isSingleVariable = /^\$?[a-zA-Z_][a-zA-Z0-9_\/]*$/.test(expression.trim());
         const isComparison = /[=!<>]=?|[<>]/.test(expression);
 
         if (isSingleVariable) {
@@ -126,10 +126,10 @@ module.exports = class SplitMergeCheck extends CheckModule {
                     if (matchedEntity) {
                         let module = model.getModule(matchedEntity.containerID);
                         if (module.name === entityModule) {
-                            //console.log(`Matched module:`, module);
+                      //      console.log(`Matched module:`, module);
                             entityInModel = matchedEntity;
                             const matchedAttribute = matchedEntity.attrs.find(attr => attr.name === attributeName);
-                            //console.log(`Matched attribute:`, matchedAttribute);
+                        //    console.log(`Matched attribute:`, matchedAttribute);
                             if (matchedAttribute && matchedAttribute.type === 'DomainModels$EnumerationAttributeType') {
                                 this.addErrors("SM3", ignoreRuleAnnotations);
                             }

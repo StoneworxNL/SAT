@@ -5,7 +5,7 @@ class Entity extends MxModelObject {
     constructor(containerID, id, entityName, documentation, isPersistent, attrs) {
         super();
         this.containerID = containerID,
-            this.id = id;
+        this.id = id;
         this.documentation = documentation;
         this.name = entityName;
         this.isPersistent = isPersistent;
