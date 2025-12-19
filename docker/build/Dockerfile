@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:20
+FROM node:22
 
 # Install dependencies and Eclipse Temurin JDK
 RUN apt-get update && \
@@ -29,9 +29,9 @@ RUN git clone https://github.com/StoneworxNL/SAT.git . && \
     git pull
 
 # Install dependencies for the main project
-RUN npm config set registry=https://nexus3.rabobank.nl/repository/npmjs/
-RUN npm config set ignore-scripts true
-RUN npm config set strict-ssl false
+#RUN npm config set registry=https://nexus3.rabobank.nl/repository/npmjs/
+#RUN npm config set ignore-scripts true
+#RUN npm config set strict-ssl false
 RUN npm install
 
 # Change to the node-web-app directory and install its dependencies
