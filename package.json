@@ -18,6 +18,7 @@
     "bson": "^6.8.0",
     "commander": "^12.0.0",
     "config": "^3.3.11",
+    "gauge": "^4.0.4",
     "jspath": "^0.4.0",
     "mendixmodelsdk": "^4.95.0",
     "mendixplatformsdk": "^5.1.3",

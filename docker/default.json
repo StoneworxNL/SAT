@@ -1,5 +1,5 @@
 {
-    "outputFolder": "output",
+    "outputFolder": "../output",
     "mxFolder": "[Path to Mendix/10.12.11.55218/modeler]", 
     "workingDir": "./",
     "SATQFolder": "../SAT-Q/",
@@ -156,6 +156,9 @@
                     "OEN",
                     "OLE",
                     "OCH"
+                ],
+                "exceptionPrefixes": [
+                    "DS"   
                 ]
             }
         },

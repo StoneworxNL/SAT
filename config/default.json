@@ -60,6 +60,7 @@
                     "CommunityCommons.EndTransaction",
                     "CommunityCommons.getGUID",
                     "CommunityCommons.ThrowException",
+                    "CommunityCommons.RandomHash",
                     "OIDC.DecodeJWTPlainText"            
                 ]
             }

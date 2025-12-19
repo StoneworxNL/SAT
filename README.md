@@ -50,6 +50,10 @@ Brought to you by Stoneworx
   
 **Installation**
 
+SAT can be installed as local nodejs project or as Docker container, both variants described below. For either variant an environment variable must be set:
+MendixProjects=[c:\Mendix]
+Change the path to the correct path on your PC of course. 
+
 ***Run as Docker container***
 
 Easiest installation is via Docker.
