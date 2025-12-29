@@ -1,6 +1,26 @@
 # Use the official Node.js image as the base image
 FROM node:22
 
+
+# Debug npm config early in the build
+RUN echo "Node/npm versions:" \
+ && node -v && npm -v \
+ && echo "\nEffective npm config list:" \
+ && npm config list \
+ && echo "\nEffective registry:" \
+ && npm config get registry \
+ && echo "\nProject .npmrc:" \
+ && (test -f .npmrc && cat .npmrc || echo "no project .npmrc") \
+ && echo "\nUser .npmrc (/root/.npmrc):" \
+ && (test -f /root/.npmrc && cat /root/.npmrc || echo "no user .npmrc") \
+ && echo "\nGlobal .npmrc (/etc/npmrc):" \
+ && (test -f /etc/npmrc && cat /etc/npmrc || echo "no global .npmrc") \
+ && echo "\nEnvironment variables:" \
+ && (env | grep -i '^npm\|^NPM\|HTTP_PROXY\|HTTPS_PROXY\|NO_PROXY' || true)
+
+
+
+
 # Install dependencies and Eclipse Temurin JDK
 RUN apt-get update && \
     apt-get install -y wget gnupg curl && \
