@@ -13,10 +13,10 @@ class SatController {
     }
 
 
-    async executeSatProgram(program, inputFile, inputFolder, appID, branchName, diffFile, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {
+    async executeSatProgram(inputFolder, diffFile, doDiff, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {
         const { executeSat } = require('../utils/satExecutor');
-        console.log(`Executing ${program} with input file ${inputFile} and output file ${outputFile}`);
-        return await executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile);
+        console.log(`Executing ${assessmentType} with input folder ${inputFolder} and output file ${outputFile}`);
+        return await executeSat(inputFolder, diffFile, doDiff, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile);
     }
 
     async processResult(req, res) {

@@ -4,35 +4,23 @@ const config = require('config');
 const { log } = require('console');
 const workingDir = config.get('workingDir');
 const outputFolder = config.get('outputFolder');
-const mendixProjects = process.env.MendixProjects||'';
+const mendixProjects = process.env.MendixProjects || '';
 // Now you can use mendixProjects as a local variable in your code
 
-function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, branchName, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {    
+function executeSat(inputFolder, diffFile, doDiff, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile) {
     let extractCommand;
     let satQOutput = outputFile;
     let analyseCommand;
-    let excludeModulesFlag = excludeModules ? '-e '+excludeModules : '';
+    let excludeModulesFlag = excludeModules ? '-e ' + excludeModules : '';
     let unlinkIt = true;
-    if (program.toUpperCase() === 'SAT-L') {
-        if ((!inputFile && !inputFolder) || !outputFile)  {
-            throw new Error('inputFile and outputFile are mandatory for SAT-L program.');
-        }
-        if (!inputFile) {
-            inputFile = mendixProjects + inputFolder; //pass the folder as input file to SAT-L pre
-            unlinkIt = false;
-        } 
-        console.log(`Executing ${workingDir}/SAT-L with input file ${inputFile} and output file ${outputFile}`);
-        extractCommand = `node "${workingDir}/SAT-L.js" -m ${inputFile} -o ${outputFile}`;
-        console.log(extractCommand);
-    } else if (program.toUpperCase() === 'SAT-C') {
-        if (!appID || !branchName || !outputFile)  {
-            throw new Error('appID, branchName and  and outputFile are mandatory for SAT-C program.');
-        }
-        let clean = cleanWorkingCopy === 'true' ? '-c' : '';
-        extractCommand = `node  "${workingDir}/SAT-C.js" -a ${appID} -b ${branchName} -o ${outputFile} ${clean}`;
-    } else {
-        throw new Error('Invalid program specified. Use "SAT-L" or "SAT-C".');
+    if ( !inputFolder || !outputFile) {
+        throw new Error('inputFolder and outputFile are mandatory for SAT-L program.');
     }
+        inputFile = mendixProjects + "\\" +inputFolder; //pass the folder as input file to SAT-L
+        unlinkIt = false;
+    console.log(`Executing ${workingDir}/SAT-L with input file ${inputFile} and output file ${outputFile}`);
+    extractCommand = `node "${workingDir}/SAT-L.js" -m ${inputFile} -o ${outputFile}`;
+    console.log(extractCommand);
 
     try {
         let outputLink;
@@ -43,7 +31,7 @@ function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, br
             outputLink = parseCommandOutput(resultLog);
             if (doDiff) {
                 const diffCommand = `node "${workingDir}/SAT-D.js" -1 ${outputFile} -2 ${diffFile} -o ${satQOutput}-D.txt `;
-                resultLog = execSync(diffCommand);  
+                resultLog = execSync(diffCommand);
                 resultString = resultLog.toString();
                 let match = resultString.match(/\[outputfile:(.*?)\]/);
                 diffResultFile = match ? match[1] : outputFile;
@@ -56,19 +44,18 @@ function executeSat(program, inputFile, inputFolder, diffFile, doDiff, appID, br
         }
         if (assessmentType === 'SD') {
             analyseCommand = `node "${workingDir}/SAT-SD.js" -i ${outputFile}.json -o ${satQOutput}-${sdMicroflow} -m ${sdMicroflow}  ${excludeModulesFlag}`;
-            analyseCommand += (sdPrefixes ? ` -p ${sdPrefixes}`:'');
+            analyseCommand += (sdPrefixes ? ` -p ${sdPrefixes}` : '');
             let resultLog = execSync(analyseCommand);
             outputLink = parseCommandOutput(resultLog);
         }
-        console.log(`${program} executed successfully. Output saved to ${outputFile}`);
-        if (inputFile && unlinkIt) {fs.unlinkSync(inputFile)}
-        return {"success": true, "outputFile": outputLink};
+        console.log(`SAT executed successfully. Output saved to ${outputFile}`);
+        return { "success": true, "outputFile": outputLink };
     } catch (error) {
         console.error(`Error executing ${program}:`, error.message);
         throw error;
     }
 
-    function parseCommandOutput (resultLog){
+    function parseCommandOutput(resultLog) {
         let resultString = resultLog.toString();
         let match = resultString.match(/\[outputfile:(.*?)\]/);
         outputFile = match ? match[1] : outputFile;

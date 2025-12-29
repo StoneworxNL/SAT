@@ -17,40 +17,10 @@
         <div class="container-block">
             <form id="satForm" class="form-container" action="/execute" method="POST" enctype="multipart/form-data">
                 <div class="form-row">
-                    <div class="form-block">
-                        <label class="field" for="satType">Select SAT Program:</label>
-                        <div>
-                            <input type="radio" id="satL" name="satType" value="sat-l" required>
-                            <label for="satL">Use local mpr</label>
-                        </div>
-                        <div>
-                            <input type="radio" id="satC" name="satType" value="sat-c" required>
-                            <label for="satC">Use working copy</label>
-                        </div>
-                    </div>
-
-                    <div class="form-hidden" group="satType" id="sat-l">
-                        <!--div id="inputFields">
-                            <label class="field" for="inputFile">Input File</label>
-                            <input type="file" id="inputFile" name="inputFile">
-                        </div-->
+                    <div class="form-block" group="satType" id="sat-l">
                         <div id="inputFields">
                             <label class="field" for="inputFolder">Input Folder</label>
                             <input type="text" id="inputFolder" name="inputFolder">
-                        </div>
-                    </div>
-                    <div class="form-hidden" group="satType" id="sat-c">
-                        <div id="inputFields">
-                            <label class="field" for="appID">App ID</label>
-                            <input type="text" id="appID" name="appID">
-                        </div>
-                        <div id="inputFields">
-                            <label class="field" for="branchName">Branch Name</label>
-                            <input type="text" id="branchName" name="branchName">
-                        </div>
-                        <div id="inputFields">
-                            <input type="checkbox" id="cleanWorkingCopy" name="cleanWorkingCopy" value="true">
-                            <label class="checkbox" for="cleanWorkingCopy">Clean working copy</label>
                         </div>
                     </div>
                     <div class="form-block">

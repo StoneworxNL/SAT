@@ -12,18 +12,12 @@ function setRoutes(app) {
     });
 
     router.post('/execute', upload.fields([
-        { name: 'inputFile', maxCount: 1 }
-        , { name: 'diffFile', maxCount: 1 }
+        { name: 'diffFile', maxCount: 1 }
     ]), (req, res) => {
-        const { satType, inputFolder, outputFile, appID, branchName, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes } = req.body;
-
-        const inputFile = req.files?.inputFile ? req.files.inputFile[0].path: null;
+        const { inputFolder, outputFile, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes } = req.body;        
         const diffFile = req.files?.diffFile ? req.files.diffFile[0].path : null;
-
-
-        console.log(`Executing ${satType}`);
-
-        satController.executeSatProgram(satType, inputFile, inputFolder, appID, branchName, diffFile, doDiff, cleanWorkingCopy, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile)
+        console.log(`Executing ${assessmentType}`);
+        satController.executeSatProgram(inputFolder, diffFile, doDiff, assessmentType, excludeModules, sdMicroflow, sdPrefixes, outputFile)
             .then(result => {
                 res.json(result);
             })
