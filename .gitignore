@@ -8,7 +8,6 @@ vendorlib/
 *.txt
 *.puml
 *.png
-*.cmd
 *.svg
 *.csv
 *.log

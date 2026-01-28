@@ -47,8 +47,8 @@ class Microflow extends MxModelObject {
             if (flow['$Type'] && flow['$Type'] === 'Microflows$SequenceFlow') {
                 // console.log('FLOW');
                 // console.log(JSON.stringify(flow, null, 2));
-                let origin = flow['OriginPointer'] ? flow['OriginPointer'].toString('base64') : flow['origin'];
-                let destination = flow['DestinationPointer'] ? flow['DestinationPointer'].toString('base64') : flow['destination'];
+                let origin = flow['OriginPointer'] ? Microflow.binaryToUUID(flow['OriginPointer']) : flow['origin'];
+                let destination = flow['DestinationPointer'] ? Microflow.binaryToUUID(flow['DestinationPointer']) : flow['destination'];
                 let flowValue = false;
                 let newCase = Microflow.findKey(flow, 'NewCaseValue');
                 if (newCase) {
