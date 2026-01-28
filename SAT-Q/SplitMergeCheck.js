@@ -7,8 +7,9 @@ module.exports = class SplitMergeCheck extends CheckModule {
 
         this.errorCodes = {
             "SM1": "Missing caption for Exclusive split",
-           // "SM2": "Useless merge action",
+            // "SM2": "Useless merge action",
             "SM3": "Exclusive split that check on enums should have an enum split ",
+            "SM4": "Exclusive split must have True on the right and False on the bottom direction"
         };
     }
 
@@ -24,7 +25,7 @@ module.exports = class SplitMergeCheck extends CheckModule {
                 this.checkExpression(mfAction.expression, ignoreRuleAnnotations, model, microflow);
                 if (!caption || caption.length == 0) {
                     this.addErrors("SM1", ignoreRuleAnnotations);
-                }
+                }                
             } else if (mfAction.type.startsWith('Microflows$ExclusiveMerge')) {
                 //let mf = model.findMicroflowInContainer(microflow.containerID, microflow.name);
                 let flows = microflow.flows;
@@ -34,6 +35,7 @@ module.exports = class SplitMergeCheck extends CheckModule {
                 // }
             }
         })
+        this.checkSplitDirections(microflow, ignoreRuleAnnotations);
         return this.errors;
     }
 
@@ -126,16 +128,39 @@ module.exports = class SplitMergeCheck extends CheckModule {
                     if (matchedEntity) {
                         let module = model.getModule(matchedEntity.containerID);
                         if (module.name === entityModule) {
-                      //      console.log(`Matched module:`, module);
+                            //      console.log(`Matched module:`, module);
                             entityInModel = matchedEntity;
                             const matchedAttribute = matchedEntity.attrs.find(attr => attr.name === attributeName);
-                        //    console.log(`Matched attribute:`, matchedAttribute);
+                            //    console.log(`Matched attribute:`, matchedAttribute);
                             if (matchedAttribute && matchedAttribute.type === 'DomainModels$EnumerationAttributeType') {
                                 this.addErrors("SM3", ignoreRuleAnnotations);
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    checkSplitDirections(microflow, ignoreRuleAnnotations) {
+        // Find all ExclusiveSplit actions
+        const splits = microflow.actions.filter(
+            a => a.type === "Microflows$ExclusiveSplit"
+        );
+        for (const split of splits) {
+            // Find flows originating from this split
+            const flowsFromSplit = microflow.flows.filter(f =>
+                f.origin.startsWith(split.id)
+            );
+            const hasTrueFlowError = flowsFromSplit.some(
+                f => f.flowValue === 'true' && f.OriginIndex != 1
+            );
+            const hasFalseFlowError = flowsFromSplit.some(
+                f => f.flowValue === 'false' && f.OriginIndex != 2 && f.OriginIndex != 0
+            );
+            if (hasTrueFlowError || hasFalseFlowError) {
+                this.addErrors("SM4", ignoreRuleAnnotations);
+                return;
             }
         }
     }

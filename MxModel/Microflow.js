@@ -49,13 +49,18 @@ class Microflow extends MxModelObject {
                 // console.log(JSON.stringify(flow, null, 2));
                 let origin = flow['OriginPointer'] ? Microflow.binaryToUUID(flow['OriginPointer']) : flow['origin'];
                 let destination = flow['DestinationPointer'] ? Microflow.binaryToUUID(flow['DestinationPointer']) : flow['destination'];
-                let flowValue = false;
-                let newCase = Microflow.findKey(flow, 'NewCaseValue');
-                if (newCase) {
-                    flowValue = Microflow.findKey(newCase, 'Value') == 'true';
+                let originIndex = flow['OriginConnectionIndex'] ? flow['OriginConnectionIndex'] : 0;
+                let destinationIndex = flow['DestinationConnectionIndex'] ? flow['DestinationConnectionIndex'] : 0;
+                origin = origin + '_' + originIndex;
+                destination = destination + '_' + destinationIndex;
+                let caseValues = Microflow.findKey(flow, 'NewCaseValue');
+                if (!caseValues) {
+                    caseValues = Microflow.findKey(flow, 'CaseValues');
                 }
+                let enumerationCase = caseValues.find(cv => cv['$Type'] === 'Microflows$EnumerationCase');
+                let flowValue = enumerationCase ? enumerationCase['Value'] : null;
                 let isError = Microflow.findKey(flow, 'IsErrorHandler');
-                let flowData = new Flow(origin, destination, isError, flowValue)
+                let flowData = new Flow(origin, destination, originIndex, destinationIndex, isError, flowValue)
 
                 microflow.addFlow(flowData);
             }
