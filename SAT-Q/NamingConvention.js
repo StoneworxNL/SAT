@@ -17,7 +17,7 @@ module.exports = class NamingConvention extends CheckModule {
     check = function (model, microflow) {
         this.setup(model, microflow);        
         if (!this.module.fromAppStore){
-            let mfNameParts = this.microflowName.split('_');
+            let mfNameParts = microflow.name.split('_');            
             let ignoreRuleAnnotations = microflow.getIgnoreRuleAnnotations();
             let mfPrefix = this.mfPrefix;
             let isExceptionPrefix = this.exceptionPrefixes.find((prefix) => prefix == mfPrefix);
@@ -30,10 +30,11 @@ module.exports = class NamingConvention extends CheckModule {
                     if (!pfFound) {
                         this.addErrors("NC2", ignoreRuleAnnotations);
                     }
-                    let mfEntityName = pluralize.singular(mfNameParts[1]);
+                    let mfEntityName = mfNameParts[1];
+                    let mfEntityNameSingle = pluralize.singular(mfEntityName);
                     let entitiesForMF = model.entities.filter((entity) => {
                         let entityName = entity.name;
-                        return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName);
+                        return (entityName == mfEntityName || entityName + 's' == mfEntityName || entityName + 'List' == mfEntityName || mfEntityNameSingle == mfEntityName || mfEntityNameSingle + 's' == mfEntityName || mfEntityNameSingle + 'List' == mfEntityName);
                     })
                     if (entitiesForMF && entitiesForMF.length > 0) { //one or more entities with same name found
                         let entityForMFInModule = entitiesForMF.find((entity) => {
