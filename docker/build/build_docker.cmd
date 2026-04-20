@@ -1,3 +1,4 @@
+echo OFF
 REM Check for MendixProjects environment variable
 set CACHEBUST=%DATE%_%TIME%
 set CACHEBUST=%CACHEBUST: =%

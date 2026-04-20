@@ -1,3 +1,4 @@
+ECHO OFF
 REM Check for MendixProjects environment variable
 IF "%MendixProjects%"=="" (
     echo ERROR: Environment variable MendixProjects is not set.
